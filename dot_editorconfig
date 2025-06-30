@@ -1,0 +1,86 @@
+# vim: ft=conf
+
+##########################################
+# Common Settings
+##########################################
+
+# This file is the top-most EditorConfig file
+root = true
+
+# All Files
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 2
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+# max_line_length = 120  # set 'textwidth' in vim
+
+[*.{c,cpp,h,hpp,cc,cxx}]
+indent_size = 4
+
+[*.rs]
+indent_size = 4
+
+[*.fnl]
+trim_trailing_whitespace = true
+
+[*.diff]
+trim_trailing_whitespace = false
+
+[zshrc]
+indent_size = 4
+
+[Makefile]
+indent_style = tab
+
+[portool]
+indent_size = 4
+
+[*.rst]
+trim_trailing_whitespace = false
+indent_size  = 2
+
+# Markdown Files
+[*.{md,mdx}]
+trim_trailing_whitespace = false
+
+[README.md]
+indent_size = 4
+
+[*.py]
+indent_size = 4
+
+[*.go]
+indent_style = tab
+indent_size = 4
+
+[**.min.js]
+indent_style = ignore
+insert_final_newline = ignore
+
+[*.{groovy,java,kt}]
+indent_size = 4
+
+[gnome-terminal/**.xml]
+indent_style = tab
+indent_size = 4
+
+[*.hs]
+indent_size = 4
+
+# Visual Studio Solution Files
+[*.sln]
+indent_style = tab
+
+# Batch Files
+[*.{cmd,bat}]
+end_of_line = crlf
+# indent_style = tab
+
+# Shell Files
+[*.sh]
+end_of_line = lf
+# like -i=4
+# indent_size = 4

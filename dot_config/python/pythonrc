@@ -1,0 +1,161 @@
+# vim: ft=python
+# https://raw.githubusercontent.com/alichtman/dotfiles/main/.config/python/pythonrc
+"""
+This file is executed when the Python interactive shell is started if
+$PYTHONSTARTUP is in your environment and points to this file. It's just
+regular Python commands, so do what you will. Your ~/.inputrc file can greatly
+complement this file.
+
+Modified from: https://gist.github.com/taavi223/1340876/7fcbec09a4f9dd4ee9bbafcfec5ce94c9decb8fb,
+which itself was modified from: https://github.com/sontek/dotfiles
+"""
+
+#######################
+# IMPORTS & CONSTANTS #
+#######################
+
+try:
+    import atexit
+    import os
+    import sys
+    from pathlib import Path
+    import rlcompleter, readline
+except ImportError as e:
+    print(f"Couldn't load module. {e}")
+    sys.exit(1)
+
+##################
+# TAB COMPLETION #
+##################
+
+try:
+    readline.parse_and_bind("tab: complete")
+except ImportError:
+    pass
+
+### XDG Compliant History File
+# Modified from https://gist.github.com/viliampucik/8713b09ff7e4d984b29bfcd7804dc1f4
+
+# Destroy default history file writing hook
+if hasattr(sys, "__interactivehook__"):
+    del sys.__interactivehook__
+
+# # https://unix.stackexchange.com/questions/630642/change-location-of-python-history
+# history = os.path.join(os.path.expanduser('~'), '.cache/python_history')
+histfile = Path(os.getenv("XDG_CACHE_HOME", Path.home() / ".cache")) / "python_history"
+try:
+    histfile.touch(exist_ok=True)
+except FileNotFoundError:  # Probably the parent directory doesn't exist
+    histfile.parent.mkdir(parents=True, exist_ok=True)
+
+try:
+    readline.read_history_file(str(histfile))
+except OSError:  # idk why this is happening, file definitely exists
+    pass
+
+# def write_history():
+#     try:
+#         readline.write_history_file(history)
+#     except OSError:
+#         pass
+
+# Don't store an obscene amount of history
+readline.set_history_length(5000)
+atexit.register(readline.write_history_file, histfile)
+# atexit.register(write_history)
+
+#################
+# COLOR SUPPORT #
+#################
+
+
+class TermColors(dict):
+    """Gives easy access to ANSI color codes. Attempts to fall back to no color
+    for certain TERM values. (Mostly stolen from IPython.)"""
+
+    COLOR_TEMPLATES = (
+            ("Black", "0;30"),
+            ("Red", "0;31"),
+            ("Green", "0;32"),
+            ("Brown", "0;33"),
+            ("Blue", "0;34"),
+            ("Purple", "0;35"),
+            ("Cyan", "0;36"),
+            ("LightGray", "0;37"),
+            ("DarkGray", "1;30"),
+            ("LightRed", "1;31"),
+            ("LightGreen", "1;32"),
+            ("Yellow", "1;33"),
+            ("LightBlue", "1;34"),
+            ("LightPurple", "1;35"),
+            ("LightCyan", "1;36"),
+            ("White", "1;37"),
+            ("Normal", "0"),
+            )
+
+    NoColor = ""
+    _base = "\001\033[%sm\002"
+
+    def __init__(self):
+        if os.environ.get("TERM") in (
+            "xterm-color",
+            "xterm-256color",
+            "linux",
+            "screen",
+            "screen-256color",
+            "screen-bce",
+            ):
+            self.update(dict([(k, self._base % v) for k, v in self.COLOR_TEMPLATES]))
+        else:
+            self.update(dict([(k, self.NoColor) for k, v in self.COLOR_TEMPLATES]))
+
+
+_c = TermColors()
+
+################################
+# PRETTY PRINT OUTPUT & ERRORS #
+################################
+
+# NOTE: there is a bug (at least on Mac OS X) that causes the following lines to
+# garble the command history whenever there are long lines. Try enabling them
+# and using the up/down arrows to cycle through your history.
+
+# Make the prompts colorful.
+sys.ps1 = "%s>>> %s" % (_c["LightGreen"], _c["Normal"])
+sys.ps2 = "%s... %s" % (_c["LightPurple"], _c["Normal"])
+
+# Enable pretty printing for STDOUT
+# def my_displayhook(value):
+#     if value is not None:
+#         # TODO: What's the point of this anyway?
+#         try:
+#             import __builtin__
+#
+#             __builtin__._ = value
+#         except ImportError:
+#             __builtins__._ = value
+#
+#         import pprint
+#
+#         pprint.pprint(value)
+#         del pprint
+
+
+# sys.displayhook = my_displayhook
+
+
+# Make errors and tracebacks stand out a bit more.
+# def my_excepthook(type, value, tb):
+#     sys.stderr.write(_c["Red"])
+#     import traceback
+#
+#     output = traceback.print_exception(type, value, tb)
+#     del traceback
+#     sys.stderr.write(_c["Normal"])
+#
+#     # NOTE: There is a bug (?) in Python 3, where a trailing color marker that's
+#     # written to STDERR or STDOUT by itself does not color the subsequent lines.
+#     # We work around this by manually calling ``flush`` afterwards.
+#     sys.stderr.flush()
+#
+# sys.excepthook = my_excepthook

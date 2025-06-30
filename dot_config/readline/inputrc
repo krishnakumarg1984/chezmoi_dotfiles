@@ -1,0 +1,265 @@
+# First, include any system-wide settings which are ignored
+# by default if one has their own .inputrc
+$include /etc/skel/.inputrc
+$include /etc/inputrc
+
+# do not bell on tab-completion
+#set bell-style none
+
+"\C-l":clear-screen
+
+# Allow Meta (Alt) key bindings.
+# set convert-meta on # Turns on 8th bit stripping
+set convert-meta off # https://www.baeldung.com/linux/inputrc-file https://github.com/nficano/dotfiles/blob/master/home/inputrc
+
+# The forward equivalent to this mode is called forward-search-history and is bound to Ctrl+s by default. Beware that most terminals override Ctrl+s to suspend execution until Ctrl+q is entered. (This is called XON/XOFF flow control). For activating forward-search-history, either disable flow control by issuing: $ `stty -ixon` or use a different key in inputrc. For example, to use Alt+s which is not bound by default:
+"\es": forward-search-history
+
+
+# Some defaults / modifications for the Emacs mode.
+$if mode=emacs
+
+# <C-up/down> for searching matching commands from the history.
+"\e[1;5A": history-search-backward
+"\e[1;5B": history-search-forward
+
+# <C-left/right> to move by whole words.
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
+Meta-p: history-search-backward
+Meta-n: history-search-forward
+
+$endif
+
+# Show completion options on first tab; begin cycling on second tab. # Color the common prefix in menu-complete
+set menu-complete-display-prefix on
+# Show all available completion options on second tab.
+set show-all-if-unmodified on
+# a single tab will perform two steps: a) partially complete the word and b) show all possible completions if it is still ambiguous:
+set show-all-if-ambiguous on
+# Color files by types
+set colored-stats on
+# Also highlight the search prefix. Color the common prefix
+set colored-completion-prefix on
+# Append char to indicate type # Show symbols to denote file type of each completion option.
+
+# Display "..." for already completed match in completions
+# This line sets 3 to be the maximum number of characters to be the common prefix to display for completions.
+# If the common prefix has more than 3 characters, they are replaced by ellipsis.
+# set completion-prefix-display-length 3
+set completion-prefix-display-length 10
+
+# show extra file information when completing, like `ls -F` does
+set visible-stats on
+
+# completion is case-insensitive
+set completion-ignore-case on
+# Treat underscores and hyphens the same way for completion purposes
+# set completion-map-case on
+# Avoid duplicating text when completing an option mid-word.
+# Be more intelligent when autocompleting by also looking at the text after the cursor.
+# For example, when the current line is "cd ~/src/mozil", and the cursor is on the "z", pressing Tab will not autocomplete it to "cd ~/src/mozillail", but to "cd ~/src/mozilla".
+# (This is supported by the Readline used by Bash 4.)
+set skip-completed-text on  # correct completion from the middle of a word # https://github.com/3ximus/dotfiles/blob/master/.inputrc
+# Append directories with a slash.
+# set mark-directories on
+# Do the same for symlinked directories (mark them) Append symlinks with an at.
+set mark-symlinked-directories on
+# If there are more than 200 possible completions for a word, ask to show them all
+# # Show me up to 5,000 completion items, don't be shy
+set completion-query-items 200
+# Expand tilde to full path on completion
+set expand-tilde on
+# Preserve caret position while browsing through history lines
+set history-preserve-point on
+# Don't paginate possible completions # turns off the use of internal pager when returning long completion lists
+set page-completions off
+
+# Do not autocomplete hidden files unless the pattern explicitly begins with a dot
+set match-hidden-files off
+
+# Hard-code some UTF-8 conversion defaults.
+set meta-flag on
+set input-meta on
+set output-meta on  # Keep the 8th bit for display
+
+# Use Alt/Meta + Delete to delete the preceding word
+"\e[3;3~": kill-word # https://github.com/nficano/dotfiles/blob/master/home/inputrc
+## enable Alt-arrows
+"\e[1;5D": backward-word ### Alt left
+"\e[1;5C": forward-word ### Alt right
+
+# for Xterm
+"\eOH": beginning-of-line
+"\eOF": end-of-line
+
+# for linux console
+"\e[1~": beginning-of-line
+"\e[4~": end-of-line
+
+
+# https://github.com/nficano/dotfiles/blob/master/home/inputrc
+set print-completions-horizontally off
+
+# Make sure we don't output everything on the 1 line https://github.com/ehusby/shell-utils/blob/main/linux_bash/config/.inputrc
+set horizontal-scroll-mode Off
+
+# https://github.com/astier/dotfiles/blob/master/inputrc, # don't echo character (eg. ^C) corresponding to the signal (eg. Ctrl-C)
+# set echo-control-characters off  # https://github.com/jindraj/dotfiles/blob/master/.inputrc
+# set enable-bracketed-paste off
+
+# https://github.com/mhf-air/mhf-linux-config/blob/master/dotfiles/.inputrc
+
+$if mode=vi
+    set keyseq-timeout 80
+    set show-mode-in-prompt on
+    set vi-ins-mode-string \1\e[3 q\2
+    set vi-cmd-mode-string \1\e[1 q\2
+
+    # normal mode
+    set keymap vi-command
+
+    # insert mode
+    set keymap vi-insert
+    "hl": vi-movement-mode
+    "\C-l": clear-screen
+    "\C-p": previous-history
+    # "\C-p": history-search-backward
+    "\C-n": next-history
+    # "\C-n": history-search-forward
+    # RETURN: "\e\n"
+
+    # Ctrl+left/right for word movement
+    "\e\e[C": forward-word
+    "\e\e[D": backward-word
+    "\e[1;5C": forward-word
+    "\e[1;5D": backward-word
+
+$endif
+
+
+# https://github.com/crramirez/dotfiles/blob/master/.inputrc
+$if Bash
+    # 'Magic Space'
+    # Insert a space character then performs
+    # a history expansion in the line
+    Space: magic-space
+$endif
+
+# https://github.com/acherunilam/dot-files/blob/master/.inputrc
+# undo changes to history lines when newline is received
+set revert-all-at-newline on
+
+
+# https://github.com/rafi/etc-skel/blob/master/.config/bash/inputrc
+# Preserve caret position while browsing through history lines
+set history-preserve-point on
+
+
+# https://github.com/jindraj/dotfiles/blob/master/.inputrc
+set blink-matching-paren on
+
+# https://github.com/LucHermitte/Bash-scripts/blob/master/.inputrc
+# # Insert "$()" around current line
+# "\e\C-m": '\C-a"$(\C-e)"'
+# # Insert " 2>&1"
+# "\e2": '2>&1'
+# # Append " | less"
+# "\el": '\C-e | less'
+# # Prepend "less"
+# "\eL": '\C-aless '
+# # Find
+# "\eF": '\C-afind . -name '
+# # append "| awk /pattern/ {print $42}"
+# "\ea": '\C-e | awk \'/pattern/ {print $42}\''
+# # make vi-insert behave like usual emacs
+# "\C-k": kill-line
+# "\C-a": beginning-of-line
+# "\C-e": end-of-line
+# "\C-l": clear-screen
+# "\eb": backward-word
+# "\ef": forward-word
+#
+# # delete until the previous path separator /
+# "\C-b": unix-filename-rubout
+#
+# # cicle through completions
+# "\e[Z": menu-complete
+#
+# # "\e[A": history-search-backward
+# # "\e[B": history-search-forward
+# "\C-p": history-search-backward
+# "\C-n": history-search-forward
+#
+# "\C-xr": re-read-init-file
+# "\C-xi": redraw-current-line
+#
+# "\C-x\C-l": shell-expand-line
+
+
+# Applications # https://github.com/jindraj/dotfiles/blob/master/.inputrc
+# $if bash
+#   Space: magic-space						# expand short
+#   "\e\C-d": forward-backward-delete-char
+#   "\C-e\C-w": unix-filename-rubout				# kill backward, stop by / and space
+#   "\C-e\C-d": "\e\C-]|\C-f\C-k"					# delete to last pipe
+#   "\C-x\C-w": "\C-awhile :;do \C-e\C-e;sleep 60;done"		# Wrap current line in while with 60s delay
+#   "\e\C-b": "\e\C-]/"						# jump backward to /
+#   "\e\C-f": "\C-]/"						# jump forward to /
+#   "\C-xq": "\eb\"\ef\""						# wrap current word in "
+#   "\e\C-m": "\C-a \C-m"						# execute, no bash history - ESC-Enter
+#   #"\C-x\C-r": "\C-a#\C-mhistory | sed 'x;$!d' | cut -f 2 -d '#' | pbcopy\C-m"	# comments command, executes it and then copies it from history into clipboard
+#   "\C-]": "\C-e\C-u pbcopy <<EOF\n\C-y\nEOF\n \# content of previous prompt was coppied into OS clipboard\n"
+# $endif
+#
+# $if mysql
+#   "\C-e\C-p": "SHOW PROCESSLIST;\C-j"
+#   "\C-e\C-f": "SHOW FULL PROCESSLIST;\C-j"
+#   "\C-e\C-m": "SHOW MASTER STATUS;\C-j"
+#   "\C-e\C-n": "SHOW SLAVE STATUS\\\G\C-j"
+#   "\C-e\C-h": "SHOW SLAVE HOSTS;\C-j"
+#   "\C-e\C-v": "SHOW VARIABLES;\C-j"
+#   "\C-e\C-d": "SHOW DATABASES;\C-j"
+#   "\C-e\C-t": "SHOW TABLES;\C-j"
+#   "\C-e1": "source /tmp/1.sql;\C-j"
+#   "\C-e2": "source /tmp/2.sql;\C-j"
+#   "\C-e3": "source /tmp/3.sql;\C-j"
+#   "\C-e4": "source /tmp/4.sql;\C-j"
+#   "\C-e5": "source /tmp/5.sql;\C-j"
+#   "\C-e6": "source /tmp/6.sql;\C-j"
+#   "\C-e7": "source /tmp/7.sql;\C-j"
+#   "\C-e8": "source /tmp/8.sql;\C-j"
+#   "\C-e9": "source /tmp/9.sql;\C-j"
+#   "\C-e0": "source /tmp/0.sql;\C-j"
+# $endif
+#
+# $if psql
+#   "\C-e\C-p": "SELECT * FROM pg_stat_activity;\C-j"
+#   "\C-e\C-m": "SELECT * FROM pg_stat_replication;\C-j"
+#   "\C-e\C-d": "SELECT NOW() - pg_last_xact_replay_timestamp() AS replag;\C-j"
+#   "\C-e\C-v": "SHOW ALL;\C-j"
+#   "\C-e1": "\\i /tmp/1.sql;\C-j"
+#   "\C-e2": "\\i /tmp/2.sql;\C-j"
+#   "\C-e3": "\\i /tmp/3.sql;\C-j"
+#   "\C-e4": "\\i /tmp/4.sql;\C-j"
+#   "\C-e5": "\\i /tmp/5.sql;\C-j"
+#   "\C-e6": "\\i /tmp/6.sql;\C-j"
+#   "\C-e7": "\\i /tmp/7.sql;\C-j"
+#   "\C-e8": "\\i /tmp/8.sql;\C-j"
+#   "\C-e9": "\\i /tmp/9.sql;\C-j"
+#   "\C-e0": "\\i /tmp/0.sql;\C-j"
+# $endif
+
+## Modes
+#set show-mode-in-prompt on
+#set keymap emacs
+#  "\C-e\C-m": vi-editing-mode
+#
+#set keymap vi-command
+#  "\C-e\C-m": emacs-editing-mode
+#  "k": history-search-backward
+#  "j": history-search-forward
+#
+#set keymap vi-insert
+#  "\C-e\C-m": emacs-editing-mode

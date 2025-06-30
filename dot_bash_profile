@@ -1,0 +1,28 @@
+# vim: ft=sh:foldmarker=(((,))):fdm=marker:tw=130:syntax=sh:
+# shellcheck disable=1091,2148
+
+# `mise` activate shims to inject them into PATH (((
+if [ -x "$(command -v mise)" ]; then
+  eval "$(mise activate bash --shims)"
+  test -r "$HOME/.config/bash/bashrc_mise_completion_functions.sh" && . "$HOME/.config/bash/bashrc_mise_completion_functions.sh" # Source mise bash completion settings and functions
+fi
+# )))
+
+# Source ~/.profile (which contains common settings across shells such as environment variables)
+test -r "$HOME/.profile" && . "$HOME/.profile"
+
+# ((( Source ~/.bashrc (if present) to have aliases/functions etc defined for login shell sessions also
+# Helps to move most other bash settings into the ~/.bashrc file to consolidate everything in one place
+
+# https://superuser.com/questions/183870/difference-between-bashrc-and-bash-profile/183980
+case "$-" in *i*)
+  test -r "$HOME/.bashrc" && . "$HOME/.bashrc"
+  ;;
+esac
+if [ "$TERM_PROGRAM" = "WezTerm" ]; then
+  case "$-" in *i*)
+    bash
+    ;;
+  esac
+fi
+# )))

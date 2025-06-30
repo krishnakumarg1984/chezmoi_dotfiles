@@ -1,0 +1,242 @@
+# vim: ft=sh:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=145:syntax=sh:
+# shellcheck shell=sh
+# shellcheck disable=SC1091
+
+# Source some useful external shell functions/values/options etc into the current shell (((
+. "$HOME/.config/sh/sh_functions.sh" 2>/dev/null || true
+test -r "$HOME/.config/envman/load.sh" && . "$HOME/.config/envman/load.sh" # TODO: Remove (webi brew)
+# )))
+
+test -d "$HOME/.local/bin" && path_add prepend "$HOME/.local/bin" # ~/.local/bin to PATH
+
+# Incorporate various third-party commands to PATH & set their related environment variables (((
+
+# Incorporate `ansible-*` commands into PATH (((
+if [ -x "$(command -v adt)" ]; then
+  MISE_ADT_BIN_PATH="$HOME/.local/share/mise/installs/pipx-ansible-dev-tools/latest/ansible-dev-tools/bin"
+  test -d "$MISE_ADT_BIN_PATH" && path_add prepend "$MISE_ADT_BIN_PATH"
+fi
+# )))
+
+# Incorporate the `pixi` command to PATH (((
+PIXI_HOME=""
+if [ -d "$HOME/.config/pixi" ]; then
+  PIXI_HOME="$HOME/.config/pixi"
+elif [ -d "$HOME/.pixi" ]; then
+  PIXI_HOME="$HOME/.pixi"
+fi
+export PIXI_HOME
+test -x "$(command -v "$PIXI_HOME/bin/pixi")" && path_add prepend "$PIXI_HOME/bin"
+# )))
+
+# Incorporate TexLive directories to PATH & INFOPATH (((
+TLYEAR=2025 && TLDIR="$HOME/texlive/$TLYEAR"
+if [ -d "$TLDIR" ]; then
+  path_add append "$TLDIR/bin/$(uname -m)-linux"
+  # path_add append INFOPATH "$TLDIR/texmf-dist/doc/info"
+  # path_add append MANPATH "$TLDIR/texmf-dist/doc/man"
+fi
+# )))
+
+# )))
+
+# Set various environment variables provided by shell (but can use third-party tools where available) (((
+
+# Set EDITOR and SUDO_EDITOR (((
+if [ -x "$(command -v nvim)" ]; then
+  if [ -d "$HOME/.config/astronvim" ]; then
+    NVIM_APPNAME=astronvim && export NVIM_APPNAME
+    test -r "$HOME/.local/share/$NVIM_APPNAME/mason/bin" && path_add prepend "$HOME/.local/share/$NVIM_APPNAME/mason/bin" # Prepend Mason-tool-installer binaries to PATH
+  fi
+  VISUAL="$(command -v nvim)"
+  SUDO_EDITOR=$VISUAL
+elif [ -x "$(command -v vim)" ]; then
+  VISUAL="$(command -v vim)"
+  SUDO_EDITOR=$VISUAL
+else
+  VISUAL="$(command -v vi)"
+  SUDO_EDITOR=$VISUAL
+fi
+EDITOR="$SUDO_EDITOR" && export EDITOR && export SUDO_EDITOR && export VISUAL
+# )))
+
+# Set FIGNORE to suppress autocomplete for certain file extensions (((
+
+# https://stackoverflow.com/questions/32189015/can-i-make-tab-completion-filter-files-by-extension
+# https://unix.stackexchange.com/questions/166857/modify-bash-autocomplete-rule-to-exclude-particular-file-names
+FIGNORE=".4ct:.4tc:.a:.acn:.acr:.alg:.aux:.auxlock:.backup:.bak:.bbl:.bcf:.blg:.brf:.cb:.cb2:.cpt:.cut:.dll:.dpth:.DS_Store:.dvi:.dx64fsl:.el:.end:.ent:.fasl:.fdb_latexmk:.fff:.fls:.fmt:.fot:.gaux:.gem:.glg:.glo:.gls:.glsdefs:.glstex:.gtex:.hst:.idea:.idv:.idx:.ilg:.ind:.ist:.la:.lb:.lg:.listing:.loa:.load:.loe:.lof:.lol:.lot:.lox:.ltjruby:.luac:.lx64fsl:.maf:.mf:.mlf:.mlt:.mo:.mod:.mp:.mw:.nav:.nlg:.nlo:.nls:.o:.obj:.pax:.pdfpc:.pdfsync:.pre:.pyc:.pyg:.pytxcode:.rbc:.rbo:.run.xml:.save:.snm:.so:.soc:.sout:.spl:.sta:.swp:.sympy:.synctex:.synctex.gz:.tdo:.texpadtmp:.tfm:.thm:.toc:.trc:.ttt:.upa:.upb:.ver:.vrb:.wrt:.xcp:.xdv:.xdy:.xmpi:.xref:.xyc:$FIGNORE" && export FIGNORE
+
+# )))
+
+# Set HISTCONTROL & HISTSIZE (shell-agnostic history-related environment variables) (((
+HISTCONTROL="erasedups:ignorespace:$HISTCONTROL" && export HISTCONTROL # prevent duplicate lines & lines starting with space
+HISTSIZE=10000 && export HISTSIZE                                      # Keep 10k lines of history
+# )))
+
+# Set LESS_TERMCAP_xx, LESSPIPE, LESS, LESSKEY, LESSHISTFILE for colorising the output of the `less` pager (((
+
+# https://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables/108840#108840
+# Add color in manpages for less https://unix.stackexchange.com/questions/149614/less-command-change-color-of-and-end
+
+# LESS_TERMCAP_so=$'\E[01;47;02m'
+# LESS_TERMCAP_so=$'\E[01;39;33m'
+# LESS_TERMCAP_so=$'\e[01;33m'
+LESS_TERMCAP_mb=$'\E[01;31m' && export LESS_TERMCAP_mb # blinking?
+LESS_TERMCAP_md=$'\E[01;31m' && export LESS_TERMCAP_md # bold?
+LESS_TERMCAP_me=$'\E[0m' && export LESS_TERMCAP_me     # end mode?
+LESS_TERMCAP_se=$'\E[0m' && export LESS_TERMCAP_se     # end standout-mode?
+LESS_TERMCAP_so=$'\E[30;42m' && export LESS_TERMCAP_so # statusbar background colour for 'more/less'
+LESS_TERMCAP_ue=$'\E[0m' && export LESS_TERMCAP_ue     # end underline?
+LESS_TERMCAP_us=$'\E[01;32m' && export LESS_TERMCAP_us # underscore?
+
+test -x "$(command -v bat)" && BAT_PRESENT=1
+if [ "$BAT_PRESENT" != "" ]; then
+  batpipe_location=$(command -v batpipe)
+fi
+
+if [ -x "$batpipe_location" ]; then
+  LESSOPEN="|$batpipe_location %s"
+  export LESSOPEN
+  unset LESSCLOSE
+  BATPIPE="color" && export BATPIPE # will enable colors when using batpipe with less:
+elif [ -x "$(command -v lesspipe)" ] || [ -x "$(command -v lesspipe.sh)" ]; then
+  LESSOPEN="|lesspipe.sh %s" && export LESSOPEN
+fi
+
+# LESS="-eirMX"
+LESS="--quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x:
+<Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$"
+export LESS
+
+LESSKEY="$HOME/.config/less/lesskey" && export LESSKEY
+LESSHISTFILE="$HOME/.local/state/lesshistory.txt" && export LESSHISTFILE
+# )))
+
+# Set locale-related environment variables for (the somewhat new?) UTF-8 terminal support (((
+LANG="en_GB.UTF-8" && export LANG
+LANGUAGE="en_GB.UTF-8" && export LANGUAGE
+LC_COLLATE="C" && export LC_COLLATE
+LC_CTYPE="en_GB.UTF-8" && export LC_CTYPE
+LC_MESSAGES="en_GB.UTF-8" && export LC_MESSAGES
+LC_MONETARY="C" && export LC_MONETARY
+LC_NAME="C" && export LC_NAME
+LC_NUMERIC="C" && export LC_NUMERIC
+LC_PAPER="en_GB.UTF-8" && export LC_PAPER
+LC_TIME="C" && export LC_TIME
+LC_ALL="" && export LC_ALL
+# )))
+
+# MANPAGER='less -MRF --use-color' && export MANPAGER
+
+MANPAGER='less --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$' && export MANPAGER
+MANROFFOPT="-c" && export MANROFFOPT
+
+PAGER="less --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$" && export PAGER
+
+# Set READER/PDFVIEWER etc (((
+if [ -x "$(command -v zathura)" ]; then
+  ASYMPTOTE_PDFVIEWER="zathura" && export ASYMPTOTE_PDFVIEWER
+  PDFVIEWER="zathura" && export PDFVIEWER
+  PDFVIEWER_texdoc="zathura" && export PDFVIEWER_texdoc
+  TEXDOCVIEW_pdf="zathura" && export TEXDOCVIEW_pdf
+  # https://tex.stackexchange.com/questions/451942/how-can-i-make-texdoc1-recognize-its-configuration-file-instead-of-the-environ
+  # PDFVIEWER_texdoc='(nohup ${PDFVIEWER:-xpdf} %s) 2> /dev/null &'
+fi
+# )))
+
+# )))
+
+# Set environment variables related to third-party tools (((
+
+# Ansible environment variables (((
+ANSIBLE_HOME="$HOME/.config/ansible" && export ANSIBLE_HOME
+ANSIBLE_CONFIG="$HOME/.config/ansible/ansible.cfg" && export ANSIBLE_CONFIG
+ANSIBLE_GALAXY_CACHE_DIR="$HOME/.local/state/ansible/galaxy_cache" && export ANSIBLE_GALAXY_CACHE_DIR
+ANSIBLE_NAVIGATOR_CONFIG="$HOME/.config/ansible/ansible-navigator.yml" && export ANSIBLE_NAVIGATOR_CONFIG
+# )))
+
+# https://stackoverflow.com/a/54373833
+ASAN_OPTIONS=abort_on_error=1:detect_leaks=0:report_objects=1:sleep_before_dying=1 && export ASAN_OPTIONS
+
+# BASH_COMPLETION_USER_FILE="$HOME/.config/bash_completion/bash_completion" && export BASH_COMPLETION_USER_FILE
+
+CARGO_HOME="$HOME/.local/share/cargo" && export CARGO_HOME
+
+# DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock && export DOCKER_HOST
+# /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+DOCKER_CONFIG=$HOME/.config/docker && export DOCKER_CONFIG
+
+# fzf environment variables (((
+if [ -x "$(command -v fzf)" ]; then
+  if [ "$BAT_PRESENT" != "" ]; then
+    FZF_CTRL_T_OPTS="
+    --preview 'bat -n --color=always {}'
+    --bind 'ctrl-/:change-preview-window(down|hidden|)'"
+    export FZF_CTRL_T_OPTS
+  fi
+  export FZF_CTRL_R_OPTS="
+  --preview 'echo {}' --preview-window up:3:hidden:wrap
+  --bind 'ctrl-/:toggle-preview'
+  --color header:italic"
+fi
+# )))
+
+GCC_COLORS="error=01;31:warning=01;35:note=01;36:range1=32:range2=34:locus=01:\ quote=01:path=01;36:fixit-insert=32:fixit-delete=31:\ diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32:\ type-diff=01;32" && export GCC_COLORS
+
+GIT_EDITOR="$VISUAL -c 'startinsert'" && export GIT_EDITOR
+test -x "$(command -v difft)" && GIT_EXTERNAL_DIFF=difft && export GIT_EXTERNAL_DIFF
+
+# Set GIT_PAGER (((
+if [ "$BAT_PRESENT" != "" ]; then
+  # https://github.com/sharkdp/bat/issues/72
+  GIT_PAGER="bat --style=plain,header" && export GIT_PAGER
+  # PAGER="bat"
+else
+  GIT_PAGER="less" && export GIT_PAGER
+fi
+# )))
+
+if [ -x "$(command -v brew)" ]; then
+  if [ -d "$HOME/.local/opt/brew" ]; then
+    HOMEBREW_PREFIX="$HOME/.local/opt/brew" && export HOMEBREW_PREFIX
+  fi
+fi
+
+JUPYTER_CONFIG_DIR="$HOME/.config/jupyter" && export JUPYTER_CONFIG_DIR
+
+NODE_REPL_HISTORY="$HOME/.local/state/node_repl_history.txt" && export NODE_REPL_HISTORY
+test -r "$HOME/.config/npm/npmrc" && NPM_CONFIG_USERCONFIG="$HOME/.config/npm/npmrc" && export NPM_CONFIG_USERCONFIG
+
+test -r "$HOME/.config/readline/inputrc" && INPUTRC="$HOME/.config/readline/inputrc" && export INPUTRC
+
+test -r "$HOME/.config/python/pythonrc" && PYTHONSTARTUP="$HOME/.config/python/pythonrc" && export PYTHONSTARTUP
+
+test -x "$(command -v qt6ct)" && QT_QPA_PLATFORMTHEME=qt6ct && export QT_QPA_PLATFORMTHEME
+
+RUFF_CACHE_DIR="$HOME/.local/state/ruff" && export RUFF_CACHE_DIR
+
+RUSTUP_HOME="$HOME/.local/share/rustup" && export RUSTUP_HOME
+
+# Configure SCREENRC and SCREENDIR environment variables (((
+if [ -x "$(command -v screen)" ]; then
+  if [ -r "$HOME/.config/screen/screenrc" ]; then
+    SCREENRC="$HOME/.config/screen/screenrc" && export SCREENRC
+    SCREENDIR="$XDG_RUNTIME_DIR/screen" && export SCREENDIR
+  fi
+fi
+# )))
+
+test -x "$(command -v w3m)" && W3M_DIR="$HOME/.config/w3m" && export W3M_DIR
+
+# VAULT_ADDR=https://vault.arc.ucl.ac.uk && export VAULT_ADDR
+
+test -r "$HOME/.config/wget/wgetrc" && WGETRC="$HOME/.config/wget/wgetrc" && export WGETRC
+
+# )))
+
+# eval ssh-agent (((
+if [ -x "$(command -v ssh-agent)" ] && [ -z "$SSH_AUTH_SOCK" ]; then
+  eval "$(ssh-agent)" >/dev/null
+  ssh-add 2>/dev/null
+fi
+# )))

@@ -1,0 +1,446 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+add_newline = true
+
+# format = "$all$directory$character"
+
+[battery]
+unknown_symbol = '󰁽 '
+empty_symbol = '󰂎 '
+full_symbol = '🔋 '
+charging_symbol = '⚡️ '
+discharging_symbol = '💀 '
+
+
+# Replace the "❯" symbol in the prompt with "➜"
+# The name of the module we are configuring is "character"
+[character]
+success_symbol = "[➜](bold green)" # The "success_symbol" segment is being set to "➜" with the color "bold green"
+error_symbol = "[x](bold red)"
+vimcmd_symbol = "[V](bold green)"
+
+[aws]
+# symbol = '🅰 '
+symbol = " "
+format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
+style = 'bold blue'
+
+[azure]
+disabled = false
+format = 'on [$symbol($subscription)]($style) '
+symbol = '󰠅 '
+style = 'blue bold'
+
+[buf]
+# symbol = '🦬 '
+symbol = " "
+
+[bun]
+symbol = " "
+# symbol = '🥟 '
+# format = '\[[$symbol($version)]($style)\]'
+format = 'via [🍔 $version](bold green) '
+
+[c]
+symbol = " "
+format = '\[[$symbol($version(-$name))]($style)\]'
+
+[cpp]
+symbol = " "
+format = '\[[$symbol($version(-$name))]($style)\]'
+
+[cmake]
+symbol = ' '
+format = '\[[$symbol($version)]($style)\]'
+
+[cmd_duration]
+format = '\[[⏱ $duration]($style)\]'
+
+[cobol]
+symbol = '⚙️'
+format = '\[[$symbol($version)]($style)\]'
+
+[conda]
+symbol = " "
+# format = '\[[$symbol$environment]($style)\]'
+format = '[$symbol$environment](dimmed green) '
+
+[container]
+symbol = " "
+format = '[$symbol \[$name\]]($style) '
+
+[crystal]
+# symbol = '🔮 '
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+# format = 'via [✨ $version](bold blue) '
+
+[daml]
+format = '\[[$symbol($version)]($style)\]'
+
+[dart]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[deno]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[directory]
+read_only = " 󰌾"
+
+[direnv]
+disabled = false
+
+[docker_context]
+symbol = " "
+format = '\[[$symbol$context]($style)\]'
+
+[dotnet]
+symbol = " "
+format = '\[[$symbol($version)(🎯 $tfm)]($style)\]'
+
+[elixir]
+symbol = " "
+format = '\[[$symbol($version \(OTP $otp_version\))]($style)\]'
+
+[elm]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[erlang]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[fennel]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[fossil_branch]
+symbol = " "
+format = '\[[$symbol$branch]($style)\]'
+
+[fossil_metrics]
+added_style = 'bold blue'
+format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+
+[gcloud]
+symbol = " "
+format = '\[[$symbol$account(@$domain)(\($region\))]($style)\]'
+
+[git_branch]
+symbol = " "
+format = '\[[$symbol$branch]($style)\]'
+
+[git_commit]
+tag_symbol = '  '
+
+[git_state]
+format = '[\($state( $progress_current of $progress_total)\)]($style) '
+cherry_pick = '[🍒 PICKING](bold red)'
+
+[git_metrics]
+added_style = 'bold blue'
+format = '[+$added]($added_style)/[-$deleted]($deleted_style) '
+
+[git_status]
+format = '([\[$all_status$ahead_behind\]]($style))'
+
+[gleam]
+format = '(via [$symbol($version )]($style))'
+
+[golang]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[gradle]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[guix_shell]
+symbol = " "
+format = '\[[$symbol]($style)\]'
+
+[haskell]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[haxe]
+symbol = " "
+
+[helm]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[hg_branch]
+symbol = " "
+format = '\[[$symbol$branch]($style)\]'
+
+[hostname]
+ssh_symbol = " "
+
+[java]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[julia]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[jobs]
+symbol = '+ '
+number_threshold = 4
+symbol_threshold = 0
+
+[kotlin]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[kubernetes]
+symbol = " "
+format = '\[[$symbol$context( \($namespace\))]($style)\]'
+
+[localip]
+ssh_only = false
+format = '@[$localipv4](bold red) '
+disabled = false
+
+[lua]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[memory_usage]
+symbol = "󰍛 "
+format = '\[$symbol[$ram( | $swap)]($style)\]'
+
+[meson]
+symbol = "󰔷 "
+format = '\[[$symbol$project]($style)\]'
+
+[mise]
+health = 'ready'
+
+[mojo]
+format = 'via [mojo ($version )($hash )]($style)'
+
+[nats]
+symbol = "nats "
+format = '[$symbol]($style)'
+style = 'bold purple'
+
+[netns]
+style = 'bold yellow'
+symbol = '🌐 '
+
+[nim]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[nix_shell]
+symbol = " "
+format = '\[[$symbol$state( \($name\))]($style)\]'
+
+[nodejs]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[ocaml]
+symbol = " "
+format = '\[[$symbol($version)(\($switch_indicator$switch_name\))]($style)\]'
+
+[odin]
+format = 'via [󰹩 ($version )]($style)'
+show_commit = true
+
+[opa]
+# format = '\[[$symbol($version)]($style)\]'
+format = 'via [⛑️  $version](bold red) '
+
+[openstack]
+symbol = " "
+style = 'bold yellow'
+# format = '\[[$symbol$cloud(\($project\))]($style)\]'
+format = 'on [$symbol$cloud(\($project\))]($style) '
+
+[os.symbols]
+AIX = "➿ "
+Alpaquita = " "
+Alpine = " "
+AlmaLinux = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CachyOS = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Kali = " "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+Nobara = " "
+OpenBSD = "󰈺 "
+OpenCloudOS = "☁️ "
+openEuler = "🦉 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+RockyLinux = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Ultramarine = "🔷 "
+Unknown = " "
+Void = " "
+Windows = "󰍲 "
+
+[package]
+symbol = "󰏗 "
+format = '\[[$symbol$version]($style)\]'
+
+[perl]
+symbol = "🐪 "
+format = '\[[$symbol($version)]($style)\]'
+
+[php]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[pijul_channel]
+symbol = " "
+format = '\[[$symbol$channel]($style)\]'
+
+[pulumi]
+symbol = "🧊 "
+format = '\[[$symbol$stack]($style)\]'
+
+[pixi]
+symbol = "󰏗 "
+format = '[$symbol$environment](yellow) '
+
+[purescript]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[python]
+symbol = " "
+format = '\[[${symbol}${pyenv_prefix}(${version})(\($virtualenv\))]($style)\]'
+
+[quarto]
+symbol = " "
+format = '(via [$symbol($version )]($style))'
+
+[raku]
+format = '\[[$symbol($version-$vm_version)]($style)\]'
+
+[red]
+symbol = '🔴 '
+format = '\[[$symbol($version)]($style)\]'
+
+[rlang]
+symbol = "󰟔 "
+
+[ruby]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[rust]
+symbol = "󱘗 "
+format = '\[[$symbol($version)]($style)\]'
+
+[scala]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[shell]
+fish_indicator = '󰈺 '
+powershell_indicator = '_'
+unknown_indicator = 'mystery shell'
+style = 'cyan bold'
+disabled = false
+
+[shlvl]
+disabled = false
+format = '[$symbol$shlvl]($style)'
+repeat = true
+symbol = '❯'
+repeat_offset = 1
+threshold = 0
+
+[singularity]
+format = '[📦 \[$env\]]($style) '
+
+[solidity]
+symbol = " "
+format = 'via [$symbol]($style)'
+
+[spack]
+symbol = " "
+format = '\[[$symbol$environment]($style)\]'
+
+[status]
+# symbol = "[x](bold red) "
+style = 'bg:blue'
+symbol = '🔴 '
+success_symbol = '🟢 SUCCESS'
+format = '[\[$symbol$common_meaning$signal_name$maybe_int\]]($style) '
+map_symbol = true
+disabled = false
+
+[sudo]
+symbol = " "
+format = '\[[as $symbol]($style)\]'
+
+[swift]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[terraform]
+symbol = "󱁢 "
+format = '\[[$symbol$workspace]($style)\]'
+
+[time]
+format = '\[[$time]($style)\]'
+
+[typst]
+symbol = "t "
+format = '(via [$symbol($version )]($style))'
+
+[username]
+# symbol = " "
+format = '\[[$user]($style)\]'
+
+[vagrant]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[vcsh]
+format = '[🆅 $repo](bold blue) '
+
+[vlang]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'
+
+[zig]
+symbol = " "
+format = '\[[$symbol($version)]($style)\]'

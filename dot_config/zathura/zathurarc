@@ -1,0 +1,219 @@
+# vim: iskeyword+=-
+
+# colors
+# set completion-bg "#fdf6e3"
+# # set completion-bg           "#1e2431"
+# set completion-fg "#657b83"
+# # set completion-fg           "#A6B5C5"
+# set completion-group-bg \#101010
+# set completion-group-fg \#eeeeee
+# # set notification-error-bg "#cc6666"
+# # set notification-error-fg "#17191a"
+# # set completion-highlight-bg "#6B8E23"
+# set completion-highlight-bg "#1e2431"
+# # set completion-highlight-fg "#F0E68C"
+# set completion-highlight-fg "#13AFAF"
+# set default-bg \#191919
+# # set default-bg              "#1e2431"
+# set default-fg \#eeeeee
+# # set default-fg              "#A6B5C5"
+# # set highlight-active-color "#F0E68C"
+# set highlight-active-color "#657b83"
+# # set highlight-active-color  "#EC5252"
+# # set highlight-color "#fdf6e3"
+# set highlight-color "#5294e2"
+# # set highlight-color "#CD853F"
+# # set highlight-color         "#53697F"
+# # set highlight-transparency 0.3
+# set highlight-transparency 0.2
+# set index-active-fg "#657b83"
+# # set index-active-bg "#81a2be"
+# set index-bg "#fdf6e3"
+# set index-fg "#657b83"
+# set inputbar-bg "#333333"
+# set inputbar-fg "#FFFFFF"
+# # set inputbar-bg             "#1e2431"
+# # set inputbar-fg             "#A6B5C5"
+# # set inputbar-fg white
+# set notification-bg "#333333"
+# # set notification-bg         "#A6B5C5"
+# set notification-error-bg "#fdf6e3"
+# set notification-error-fg "#657b83"
+# # set notification-error-bg   "#EC5252"
+# # set notification-error-fg   "#1e2431"
+# set notification-fg "#FFFFFF"
+# # set notification-fg         "#1e2431"
+# set notification-warning-bg "#fdf6e3"
+# set notification-warning-fg "#657b83"
+# # set notification-warning-bg "#EC5252"
+# # set notification-warning-fg "#1e2431"
+# set recolor-darkcolor  "#FFFFFF"
+# # set recolor-darkcolor       "#A6B5C5"
+# set recolor-lightcolor "#333333"
+# # set recolor-lightcolor      "#1e2431"
+# set statusbar-bg "#C2BFA5"
+# set statusbar-fg "#000000"
+# # set statusbar-bg            "#1A2128"
+# # set statusbar-fg            "#13AFAF"
+# # set tabbar-bg \#191919
+# # set tabbar-fg \#98a7b6
+# # set tabbar-focus-bg \#232323
+# # set tabbar-focus-fg \#a488d9
+
+set sandbox none
+
+# https://github.com/benbrastmckie/.config/blob/master/zathura/zathurarc
+# Basic Settings
+set highlight-transparency 0.4375
+set zoom-center "true"
+
+# https://raw.githubusercontent.com/rwrr/zathura-gruvbox/master/zathura-gruvbox-dark
+set notification-error-bg       "#282828" # bg
+set notification-error-fg       "#fb4934" # bright:red
+set notification-warning-bg     "#282828" # bg
+set notification-warning-fg     "#fabd2f" # bright:yellow
+set notification-bg             "#282828" # bg
+set notification-fg             "#b8bb26" # bright:green
+
+set completion-bg               "#504945" # bg2
+set completion-fg               "#ebdbb2" # fg
+set completion-group-bg         "#3c3836" # bg1
+set completion-group-fg         "#928374" # gray
+set completion-highlight-bg     "#83a598" # bright:blue
+set completion-highlight-fg     "#504945" # bg2
+
+# Define the color in index mode
+set index-bg                    "#504945" # bg2
+set index-fg                    "#ebdbb2" # fg
+set index-active-bg             "#83a598" # bright:blue
+set index-active-fg             "#504945" # bg2
+
+set inputbar-bg                 "#282828" # bg
+set inputbar-fg                 "#ebdbb2" # fg
+
+set statusbar-bg                "#504945" # bg2
+set statusbar-fg                "#ebdbb2" # fg
+
+set highlight-color             "#fabd2f" # bright:yellow
+set highlight-active-color      "#fe8019" # bright:orange
+
+set default-bg                  "#282828" # bg
+set default-fg                  "#ebdbb2" # fg
+set render-loading              true
+set render-loading-bg           "#282828" # bg
+set render-loading-fg           "#ebdbb2" # fg
+
+# Recolor book content's color
+set recolor-lightcolor          "#282828" # bg
+set recolor-darkcolor           "#ebdbb2" # fg
+# set recolor                     "true"
+# set recolor-keephue             true      # keep original color
+
+# set recolor-lightcolor          "#ebdbb2" # bg
+# set recolor-darkcolor           "#3c3836" # fg
+
+# set recolor-darkcolor "#d8dee9"
+# set recolor-lightcolor "#2e3440"
+
+
+# settings
+
+# set database sqlite
+# set database null
+# set font "Inconsolata-g Medium 15"
+set font "Verdana 12"
+# set selection-notification false
+# set show-scrollbars true
+set statusbar-home-tilde true
+# set window-height 1024
+set window-title-home-tilde true
+# set window-width 768
+# set zoom-max 1000
+# set zoom-min 5
+set adjust-open "best-fit"
+set first-page-column 1:1
+set guioptions ''
+set incremental-search true
+# set search-hadjust true
+set n-completion-items 10
+# set page-padding 10
+set page-padding 1
+set advance-pages-per-row true
+# One page per row by default
+set pages-per-row 1
+# setting recolor-keep true will keep any color your pdf has.
+# # if it is false, it'll just be black and white
+set recolor-keephue
+
+#stop at page boundries
+set scroll-full-overlap 0.01
+set scroll-page-aware "true"
+# set scroll-wrap true
+
+set selection-clipboard clipboard
+# set smooth-scroll "true"
+set scroll-step 80
+set statusbar-basename true
+set statusbar-h-padding 20
+# set statusbar-h-padding 0
+set statusbar-v-padding 0
+set window-title-basename true
+set window-title-page           "true"
+set show-recent                 "true"
+set zoom-step 5
+set synctex true
+# set synctex-editor-command 'nvim %{line} %{input}'
+set synctex-editor-command "nvr --remote-silent %f -c %l"
+
+
+# key bindings
+# map <C-[> abort # Still doesn't work :(
+map [normal]     <F11> toggle_fullscreen
+map [fullscreen] <F11> toggle_fullscreen
+map [fullscreen] <Return> navigate next
+map [fullscreen] <Esc> toggle_fullscreen
+map [normal]     <C-l> reload
+map [fullscreen] <C-l> reload
+
+#map [normal]     e scroll down
+#map [fullscreen] e scroll down
+map [normal]     <C-e> scroll down
+map [fullscreen] <C-e> scroll down
+#map [normal]     y scroll up
+#map [fullscreen] y scroll up
+map [normal]     <C-y> scroll up
+map [fullscreen] <C-y> scroll up
+map [normal]     R rotate rotate-ccw
+map [fullscreen] R rotate rotate-ccw
+
+map [normal]     <PageUp>   navigate previous
+map [fullscreen] <PageUp>   navigate previous
+map [normal]     <PageDown> navigate next
+map [fullscreen] <PageDown> navigate next
+map <Right> navigate next
+map <Left> navigate previous
+map <BackSpace> navigate previous
+
+map [normal]     <A-1> set "first-page-column 1:1"
+map [fullscreen] <A-1> set "first-page-column 1:1"
+map [normal]     <A-2> set "first-page-column 1:2"
+map [fullscreen] <A-2> set "first-page-column 1:2"
+
+# Why are these only defined for normal mode by default?
+map [fullscreen] a adjust_window best-fit
+map [fullscreen] s adjust_window width
+map [fullscreen] f follow
+map [fullscreen] d toggle_page_mode 2
+map [fullscreen] <Tab> toggle_index
+map [fullscreen] j scroll down
+map [fullscreen] k scroll up
+map [fullscreen] <C-d> scroll half-down
+map [fullscreen] <C-u> scroll half-up
+map [fullscreen] <C-o> jumplist backward
+map [fullscreen] <C-i> jumplist forward
+
+map [index] q toggle_index
+
+map + zoom in
+map - zoom out
+map <C-p> print

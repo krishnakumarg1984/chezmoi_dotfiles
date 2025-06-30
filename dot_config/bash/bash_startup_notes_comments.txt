@@ -1,0 +1,23 @@
+# vim: ft=sh:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=130:syntax=sh:ft=sh
+# shellcheck disable=SC1091
+
+# Source global bashrc definitions from /etc/bashrc if it exists (typically in redhat-like distros) (((
+# https://www.linuxquestions.org/questions/linux-general-1/etc-profile-v-s-etc-bashrc-273992/
+# https://unix.stackexchange.com/questions/570898/what-is-the-debian-equivalent-for-etc-bashrc
+# Bash's own documentation only mentions ~/.bashrc, but having a system-wide bashrc ($SYS_BASHRC) is configurable at compile time and Debian has patched the man page to reflect that it's in use.
+# Debian's configuration is a source patch.
+# The feature itself is there in the original GNU source, it's just `ifdef''d out.
+# https://git.savannah.gnu.org/cgit/bash.git/tree/config-top.h?id=d233b485e83c3a784b803fb894280773f16f2deb#n93
+# /etc/bash.bashrc on Debian is completely different from /etc/bashrc on RHEL.
+# The Debian's bash is a source-modified version of the GNU original with distro-specific patches (including the docs) to source /etc/bash.bashrc before anything else.
+# On RHEL, /etc/bashrc is simply sourced by hand from the users' ~/.bashrc, which means that they can bypass it.
+
+# Bash settings (set -o, set +o, shopt etc) (((
+# The 'set' options are inherited or borrowed from other shells’ options. The shopt options originated in bash.
+
+# https://unix.stackexchange.com/questions/404858/any-occasion-where-bashrc-is-favorable-to-bash-profile
+# Shell options (from shopt or set) are not inherited through the environment. Nor are aliases. So, they must be in ~/.bashrc
+
+# Setting the environment variable BASHOPTS to any of: autocd, failglob, extglob etc will affect all interactive or non-interactive bash shells started while that environment variable is set (unless the shells are invoked as sh).
+# )))
+

@@ -1,0 +1,286 @@
+# vim: ft=gitconfig:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=145:syntax=gitconfig:
+
+# alias (((
+[alias]
+    a = add
+    ap = add --patch    # Get into the habit of using add --patch to create focused commits
+    br = branch -vv     # A more verbose output from branch, showing the commit and upstream branch
+    ca = commit --amend # Amend the latest commit
+    cah = commit --amend --reuse-message=HEAD # Amend the latest commit reuse commit message from latest commit
+    ci = commit
+    co = checkout
+    cp = cherry-pick
+    df = diff
+    dfs = diff --staged
+    dlog = "!f() { GIT_EXTERNAL_DIFF=difft git log -p --ext-diff $@; }; f"
+    g = grep
+    l = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --branches # https://egghead.io/lessons/git-make-my-git-log-look-pretty-and-readable
+    lfc = "!f() { git log --name-only --format= main.. | sort | uniq;  }; f" Show all of the files changed on the current branch i.e. since main
+    lg = log --pretty=concise # Pretty oneline log with a bit more info than git log --oneline
+    lgg = log --pretty=concise --graph # Pretty log showing as a graph
+    lgm = log --pretty=concise main.. # Pretty log showing only the commits on the current branch i.e. since main
+    lol = log --oneline --graph --all --decorate
+    pl = pull
+    ps = push
+    pushfl = push --force-with-lease # Force push with lease (safer than push --force, but still be careful when changing history)
+    pushu = push --set-upstream # When pushing a new branch upstream, set the local branch to track it
+    r = rebase
+    ri = rebase --interactive
+    sb = show-branch
+    sh = show --stat --pretty=detail # Show commit details with file names only
+    shd = show --pretty=detail # Show commit details including diffs (same as git-show but slightly prettier)
+    st = status #--short --branch
+    sts = status --short # --branch  # A more concise output from status
+    stsb = status --short --branch   # A more concise output from status, also showing which branch you're on
+
+    # l = log --pretty=oneline -n 20 --all --graph --decorate
+
+    # Aliases for code review (((
+    # Borrowed from https://blog.jez.io/cli-code-review/
+    files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
+    stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
+    review = !vim -p $(git files) -c \"tabdo Gdiff $REVIEW_BASE\" -c \"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
+    reviewone = !vim -p -c \"tabdo Gdiff $REVIEW_BASE\" -c \"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
+
+    # Check out a pull request for testing. (((
+    # The first argument is the name of the remote and the second is the the pull request number,
+    # e.g. git test-pr origin 12345
+    test-pr = "!f() { git fetch $1 pull/$2/merge:pr/$2-merged && git checkout pr/$2-merged; }; f"
+
+    # Remove all branches starting pr/
+    test-pr-remove-all = "!f() { git branch | grep pr/ | xargs git branch -D; }; f"
+    # )))
+
+    # )))
+
+# alias )))
+# branch (((
+[branch]
+    sort = -committerdate
+# branch )))
+# color (((
+[color]
+    # Use colors in Git commands that are capable of colored output when
+    # outputting to the terminal. (This is the default setting in Git ≥ 1.8.4.)
+    ui = auto
+# color )))
+# color.branch (((
+[color "branch"]
+    current = yellow reverse
+    local = yellow
+    remote = green
+# color.branch )))
+# color.diff (((
+[color "diff"]
+    frag = magenta bold # line info
+    meta = yellow bold
+    new = green # additions
+    old = red # deletions
+    whitespace = red reverse
+# color.diff )))
+# color.status (((
+[color "status"]
+    added = green
+    changed = yellow
+    untracked = red
+    # untracked = cyan
+# color.status )))
+# column (((
+[column]
+    ui = auto
+# column )))
+# commit (((
+[commit]
+    verbose = true
+# commit )))
+# credential (((
+[credential]
+    helper = cache --timeout=7200
+# credential )))
+# delta (((
+[delta]
+    line-numbers = true
+    side-by-side = true
+# syntax-theme = Base16 256
+# features = unobtrusive-line-numbers decorations
+# whitespace-error-style = 22 reverse
+# [interactive]
+# diffFilter = delta --color-only
+# [delta "decorations"]
+# commit-decoration-style = bold yellow box ul
+# file-style = bold yellow ul
+# file-decoration-style = none
+# # hunk-header-decoration-style = cyan box ul
+# hunk-header-decoration-style = yellow box
+# # [delta "line-numbers"]
+# # line-numbers-left-style = cyan
+# # line-numbers-right-style = cyan
+# # line-numbers-minus-style = 124
+# # line-numbers-plus-style = 28
+# [delta "unobtrusive-line-numbers"]
+# line-numbers = true
+# line-numbers-minus-style = "#444444"
+# line-numbers-zero-style = "#444444"
+# line-numbers-plus-style = "#444444"
+# # line-numbers-left-format = "{nm:>4}┊"
+# # line-numbers-right-format = "{np:>4}│"
+# line-numbers-left-style = blue
+# line-numbers-right-style = blue
+# delta )))
+# diff (((
+[diff]
+    algorithm = patience  # histogram
+    colorMoved = true  # or use the option 'default'. Add extra colours for highlighting moved code
+    compactionHeuristic = true
+    indentHeuristic = true
+    mnemonicPrefix = true
+    renames = true
+    wordRegex = "[^[:space:]]|([[:alnum:]]|UTF_8_GUARD)+"
+    # tool = meld # Set up a graphical tool for viewing diffs. I like meld because it looks good and does a good job with directory diffs
+    # whitespace=ignore-all-space
+# diff )))
+# difftool (((
+[difftool]
+    prompt = false # Disable the prompt when opening the difftool
+# [difftool "icdiff"]
+        # cmd = icdiff --line-numbers -L \"$BASE\" -L \"$REMOTE\" \"$LOCAL\" \"$REMOTE\" | less
+# [difftool "diffmerge"]
+        # Linux
+        #cmd = diffmerge $LOCAL $REMOTE
+        # Windows
+        #cmd = "'C:/Program Files/SourceGear/common/DiffMerge/sgdm.exe' $LOCAL $REMOTE"
+# [difftool "meld"]
+        # external = meld
+        # Windows
+        #cmd = "'C:/Program Files (x86)/Meld/Meld.exe' $LOCAL $REMOTE"
+        #path = C:/Program Files (x86)/Meld/Meld.exe
+# difftool )))
+# feature (((
+[feature]
+    experimental = true
+    manyFiles = true
+# feature )))
+# fetch (((
+[fetch]
+    all = true
+    prune = true # Remove remote-tracking references that no longer exist on the remote when you do a fetch/pull
+    # pruneTags = true
+# fetch )))
+# github (((
+[github]
+    user = krishnakumarg1984
+# github )))
+# grep (((
+[grep]
+    lineNumber = true
+    patternType = perl
+# grep )))
+# help (((
+[help]
+    autocorrect = prompt # Automatically correct and execute mistyped commands
+# help )))
+# init (((
+[init]
+    defaultBranch = main
+# init )))
+# lfs (((
+# [filter "lfs"]
+# required = false
+# clean = git-lfs clean -- %f
+# smudge = git-lfs smudge -- %f
+# process = git-lfs filter-process
+# lfs )))
+# log (((
+[log]
+    follow = true # Get the log to follow files even if they were renamed
+# log )))
+# merge (((
+[merge]
+    conflictstyle = zdiff3 # Include the common ancestor in conflict details - very useful for working out which changes to keep
+    log = true # Include summaries of merged commits in newly created merge commit messages
+    # tool = diffmerge # Specify a graphical tool for resolving merge conflicts. I like diffmerge because you can toggle between the merged file and common ancestor
+# merge )))
+# mergetool "diffmerge" (((
+[mergetool "diffmerge"]
+        trustExitCode = true
+        keepBackup = false
+        # Linux
+        #cmd = diffmerge -merge -result=\"$MERGED\" \"$LOCAL\" \"$BASE\" \"$REMOTE\"
+        # Windows
+        #cmd = "'C:/Program Files/SourceGear/common/DiffMerge/sgdm.exe' -merge -result=$MERGED $LOCAL $BASE $REMOTE"
+# mergetool "diffmerge" )))
+# mergetool "meld" (((
+[mergetool "meld"]
+    trustExitCode = true
+    keepBackup = false
+    # Windows
+    #cmd = "'C:/Program Files (x86)/Meld/Meld.exe' $LOCAL $BASE $REMOTE --output=$MERGED"
+    #path = C:/Program Files (x86)/Meld/Meld.exe
+# mergetool "meld" )))
+# pager (((
+[pager]
+    status = true
+# pager )))
+# pretty (((
+[pretty]
+    concise = "%C(yellow)%h%Creset %C(green)[%ar]%Creset %C(auto)%d%Creset %s %C(cyan)<%an>"
+    detail = "%C(auto)%h %s%n  %C(yellow)by %C(blue)%an %C(magenta)<%ae> [%G?] %C(green)%ad%n %C(auto)%d%n"
+    line = "%C(auto)%h %<|(60,trunc)%s %C(green)%ad%C(auto)%d"
+# pretty )))
+# pull (((
+[pull]
+    ff = only # Only allow pull if it can be fast-forwarded (otherwise you explicitly need to merge in the remote or rebase onto it e.g. with git pull --rebase)
+    rebase = true # Only allow pull if it can be fast-forwarded (otherwise you explicitly need to merge in the remote or rebase onto it e.g. with git pull --rebase)
+    # default = current # Only pull the current branch by default
+# pull )))
+# push (((
+[push]
+    autoSetupRemote = true
+    default = simple   # (simple is the default since 2.0). The safest default for git-push: push only the current branch and only if it has the same name as upstream https://git-scm.com/docs/git-config#git-config-pushfollowTags
+    followTags = true
+# push )))
+# rebase (((
+[rebase]
+    autoSquash = true # Automatically reposition !fixup/!squash commits in interactive rebase (useful with git commit --fixup/squash)
+    autoStash = true
+    updateRefs = true
+# rebase )))
+# rerere (((
+[rerere]  # https://developer.mantidproject.org/GitConfig.html
+    enabled = true # Reuse Recorded Resolutions - useful if you find yourself fixing the same conflicts over and over
+    autoupdate = true # Auto-stage files resolved by rerere
+# rerere )))
+# status (((
+[status]
+    submodulesummary = 1
+    # Sometimes a newly-added folder, since it's only one line in git status, can slip under the radar.
+    # https://git-scm.com/docs/git-config#git-config-statusshowUntrackedFiles
+    showUntrackedFiles = all
+# status )))
+# tag (((
+[tag]
+    sort = version:refname
+# tag )))
+# user (((
+[user]
+    email = krishna.kumar@ucl.ac.uk
+    name = Krishnakumar Gopalakrishnan
+# user )))
+
+# Commented-out sections (((
+# blame (((
+# [blame]
+    # ignoreRevsFile = ~/.git-blame-ignore-revs # This file allows to specify commits that should be ignored in git-blame e.g. bulk changes
+# blame )))
+# core (((
+# [core]
+    # attributesfile = ~/.gitattributes
+    # excludesfile = ~/.gitignore
+    # pager = "if [ -x "$(command -v delta)" ]; then PG='delta'; else PG='less'; fi; $PG"
+    # https://stackoverflow.com/questions/14754762/can-gitconfig-options-be-set-conditionally
+# core )))
+# include (((
+# [include]
+    # path = ~/.gitconfig_common # You can split your config into sub-files e.g. to include common config on different OS's
+# include )))
+# )))

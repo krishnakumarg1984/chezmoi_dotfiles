@@ -1,0 +1,157 @@
+debug off
+verbose on
+maxwin 11
+defobuflimit 4096
+
+# Turn off the welcome message
+startup_message off
+
+# Disable visual bell (which is annoying)
+vbell off
+bell_msg " *beep* "
+
+msgwait 6 # 6 second messages
+msgminwait 2
+
+# shell bash
+# shelltitle "$ |terminal"
+
+# Set scrollback buffer to 10000 (larger history)
+defscrollback 10240
+
+
+# mouse tracking allows to switch region focus by clicking
+mousetrack on
+
+
+setenv LC_TYPE en_GB.UTF-8
+
+
+# set the encoding of the windows to utf-8
+defutf8 on
+
+defencoding UTF-8
+
+setenv DISPLAY ':0'		# eg for mplayer
+logfile $HOME/.screen-logs/%Y%m%d-%n.log
+deflog on			  # enable logging
+deflogin on
+
+# nethack off			 # nethack like notifications
+# nethack on		# print wackier status messages
+nonblock on		# If a window goes unresponsive, don't block the whole session waiting for it.
+defnonblock 5	# flaky/slow ssh lines
+defmonitor on	# turn monitoring on
+activity "Activity on %n"	 # activity message
+shell -$SHELL	# use the default shell
+defflow auto	
+# disable Ctrl-S/Ctrl-Q "flow control"
+
+# Get rid of silly xoff stuff
+bind s split
+bind c screen 1
+bind ^c screen 1
+bind 0 select 10	
+screen 1
+
+bind = resize =
+bind + resize +1
+bind - resize -1
+bind _ resize max
+
+# Customize the status line
+hardstatus alwayslastline
+hardstatus string '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%f%t%?(%u)%?%{r})%{w}%?%+Lw%?%?%= %{g}][%{B} %m-%d %{W}%c %{g}]'
+
+# backtick 1 5 5 true
+# termcapinfo rxvt* 'hs:ts=\E]2;:fs=\007:ds=\E]2;\007'
+# hardstatus string "screen (%n: %t)"
+# caption string "%{= kw}%Y-%m-%d;%c %{= kw}%-Lw%{= kG}%{+b}[%n %t]%{-b}%{= kw}%+Lw%1`"
+# caption always
+
+# Get rid of the vertical bars
+rendition so =00
+caption string "%{03} "
+
+
+# enable the altscreen
+# for example in vim, it allows to scroll with the mouse without "overflowing" on the terminal
+# also it doesn't "pollute" the terminal when you quit vim
+altscreen on
+
+# automatically detach the session if the terminal is closed
+autodetach on
+
+#
+## 256 COLOR SUPPORT
+
+#
+## Tell screen how to set colors. AB = background, AF=foreground 
+##termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm' 
+##terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+terminfo rxvt-unicode 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+#
+## Erase background with current bg color 
+defbce on 
+
+## By default, screen uses an 8-color terminal emulator. Use the
+## following line to enable more colors
+term 'xterm-256color'	# 256 terminal for xterm
+# term screen-256color
+term xterm-color
+
+# https://bbs.archlinux.org/viewtopic.php?id=55618&p=4
+# 24bits - True color 
+truecolor on
+
+# Allow scrolling with mouse
+termcapinfo xterm* ti@:te@
+
+## Set terminfo and termcap for nice 256 color terminal
+## Allow bold colors - necessary for some reason
+termcapinfo xterm*|rxvt-* 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+termcapinfo xterm*|rxvt-* 'hs:ts=\E]0;:fs=\007:ds=\E]0;\007'
+termcapinfo xterm*|rxvt-* ti@:te=\E[3J
+termcapinfo xterm*|rxvt-* hs@:cs=\E[%i%d;%dr:im=\E[4h:ei=\E[4l
+termcapinfo xterm*|rxvt-* hs@:cs=\E[%i%p1%d;%p2%dr:im=\E[4h:ei=\E[4l
+termcapinfo gnome* ti@:te@
+termcapinfo xterm|xterms|xs|rxvt ti@:te@
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+defc1 off
+attrcolor b ".I" 
+
+# remove some stupid / dangerous key bindings
+bind k
+bind ^k
+bind ^.
+bind .
+bind ^\
+bind \\
+bind ^h
+bind ^x
+bind x
+bind }
+bind ^}
+bind h  hardcopy
+bind 'K' kill
+bind '}' history
+
+hardcopy_append on	 # hardcopy Ctrl+a h Writes out the current display contents to the file hardcopy.n
+crlf off
+
+bufferfile $HOME/.screen_buffer
+pow_detach_msg "Screen session of \$LOGNAME \$:cr:\$:nl:ended."  # Emulate a logout msg
+
+sorendition =s Gk
+
+# Prepend/append register [/] to the paste if ^a^] is pressed.  autoindent mode in vi.
+register [ "\033:se noai\015a"
+register ] "\033:se ai\015a"
+bind ^] paste [.]
+
+zmodem catch
+
+source /etc/screenrc
+defbce "on" 
+
+# vim: tw=78 ts=3 sw=3 et nowrap ft=screen paste nonumber nofoldenable

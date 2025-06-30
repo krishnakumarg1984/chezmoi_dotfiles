@@ -1,0 +1,117 @@
+# https://raw.githubusercontent.com/jlapolla/infokey-vim/master/.infokey
+
+# Vim keybindings for ``info``.
+
+#info
+0 add-digit-to-numeric-arg
+1 add-digit-to-numeric-arg
+2 add-digit-to-numeric-arg
+3 add-digit-to-numeric-arg
+4 add-digit-to-numeric-arg
+5 add-digit-to-numeric-arg
+6 add-digit-to-numeric-arg
+7 add-digit-to-numeric-arg
+8 add-digit-to-numeric-arg
+9 add-digit-to-numeric-arg
+
+j next-line
+k prev-line
+\^ beginning-of-line
+$ end-of-line
+l forward-char
+h backward-char
+w forward-word
+W forward-word
+b backward-word
+B backward-word
+gg beginning-of-node
+G end-of-node
+# Without numeric argument, moves cursor to middle line of window
+M move-to-window-line
+
+^f scroll-forward-page-only
+^b scroll-backward-page-only
+^e down-line
+^y up-line
+^d scroll-half-screen-down
+^u scroll-half-screen-up
+# '0zt' scrolls until the cursor line is at the top of the screen
+zt redraw-display
+
+^o history-node
+^h list-visited-nodes
+# This is actually ^/, but for some reason it is expressed as ^_
+^_ clear-search
+
+i virtual-index
+I index-apropos
+
+# \kx is the Backspace key on my keyboard
+\kx move-to-prev-xref
+
+^w^w next-window
+^ww next-window
+^wj next-window
+^wk prev-window
+^ws split-window
+^wX delete-window # Inspired by `screen'
+^wq delete-window
+^wQ keep-one-window # Inspired by `screen'
+^w+ grow-window
+^w= tile-windows
+
+#echo-area
+
+# ^B      echo-area-beg-of-line
+#\m0    echo-area-beg-of-line
+#^E     echo-area-end-of-line
+#\m$    echo-area-end-of-line
+\mh     echo-area-backward
+\ml     echo-area-forward
+#\mb    echo-area-backward-word
+#\mf    echo-area-forward-word
+\mw     echo-area-forward-word
+
+^U      echo-area-backward-kill-line
+#^K     echo-area-kill-line
+^W      echo-area-backward-kill-word
+#\md    echo-area-kill-word
+#\mX    echo-area-kill-word
+#\mx    echo-area-delete
+
+# \m0     echo-area-beg-of-line
+# \m$     echo-area-end-of-line
+# \mu     echo-area-abort
+# ^v      echo-area-quoted-insert
+
+
+#var
+highlight-searches=On
+
+# Continuous - keep scrolling right on up
+# Page Only - never change nodes with scroll
+# Next Only - only try to get the next node
+scroll-behavior=Page Only
+
+# https://github.com/mkoskar/dotfiles/blob/master/.infokey
+active-link-style=yellow,underline,bold
+automatic-footnotes=On
+automatic-tiling=On
+cursor-movement-scrolls=Off
+hide-note-references=On
+link-style=white,bold
+match-style=bgred,white,bold
+nodeline=print
+scroll-step=3
+show-index-match=On
+mouse=on
+
+# link-style=yellow
+# active-link-style=yellow,bold
+# match-style=underline,bold,cyan
+
+# What do do when you scroll to the last node
+# Options:
+# Stop - do nothing
+# Top  - return to top of the document
+scroll-last-node='Stop'

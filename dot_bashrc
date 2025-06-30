@@ -1,0 +1,271 @@
+# vim: ft=sh:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=130:syntax=sh:ft=sh
+# shellcheck shell=bash
+# shellcheck disable=SC1091
+
+# Short-circuit the sourcing of ~/.bashrc for non-interactive shells (((
+# Required for portability of bash scripts (i.e. need to be independent of any specific ~/.bashrc)
+case $- in
+*i*) ;;
+*) return ;;
+esac
+# )))
+
+# Source some useful POSIX functions (like non-duplicate adding of directories to PATH)
+[ -r "$HOME/.config/sh/sh_functions.sh" ] && . "$HOME/.config/sh/sh_functions.sh"
+
+# Source global bashrc definitions from /etc/bashrc if it exists (typically in redhat-like distros)
+test -r /etc/bashrc && . /etc/bashrc
+
+# Set up the bash-specific prompt variable PS1 (((
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+xterm-color | *-256color) color_prompt=yes ;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability;
+#force_color_prompt=yes
+if [ "$force_color_prompt" != "" ]; then
+  if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    # We have color support; assume it's compliant with Ecma-48
+    # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+    # a case would tend to support setf rather than setaf.)
+    color_prompt=yes
+  else
+    color_prompt=
+  fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+  PS1='\[\033[38;5;220m\]\u\[$(tput sgr0)\]@\[$(tput sgr0)\]\[\033[38;5;136m\]\h\[$(tput sgr0)\]: {\[$(tput sgr0)\]\[\033[38;5;106m\]\w\[$(tput sgr0)\]}\n\[$(tput bold)\]\\$\[$(tput sgr0)\] \[$(tput sgr0)\]'
+fi
+unset color_prompt force_color_prompt
+
+# If this is an xterm set the title to user@host:dir
+case "$TERM" in xterm* | rxvt*)
+  PS1="\[\e]0;\u@\h: \w\a\]$PS1"
+  ;;
+*) ;;
+esac
+
+if [ -x "$(command -v dircolors)" ]; then
+  if [ -r "$HOME/.config/bash/dircolors" ]; then
+    eval "$(dircolors -b "$HOME/.config/bash/dircolors")"
+  else
+    eval "$(dircolors -b)"
+  fi
+fi
+
+test -r "$HOME/.config/bash/lscolors.sh" && . "$HOME/.config/bash/lscolors.sh"
+# )))
+
+# Set bash-specific environment variables (((
+
+# Set bash-specific history-related env vars HISTFILE, HISTFILESIZE, HISTIGNORE, HISTTIMEFORMAT (((
+test -d "$HOME/.local/state/bash" && export HISTFILE="$HOME/.local/state/bash/bash_history"
+export HISTFILESIZE=$HISTSIZE
+export HISTTIMEFORMAT="[%a, %b %d %Y %T] " # "[%F %T] "
+# export HISTIGNORE="bc:bg:cd:clear:cls:df:dir:exit:fg:free:gd:gg:glog:gp:gpull:groot:h:history:l:la:lg:ll:ls:lt:lx:lz:mc:pwd:sl:su:top:topu:watch" # commands to ignore from bash history
+# )))
+
+export PROMPT_COMMAND='history -a; history -n' # By default, bash only records a session to the .bash_history file on disk when the session terminates. This means that if you crash or your session terminates improperly, you lose the history up to that point. You can fix this by recording each line of history as you issue it, through the PROMPT_COMMAND variable.
+
+# )))
+
+# Bash settings (((
+
+# set -o and unset settings (((
+set -o notify    # Get immediate notification of background job termination
+set -o noclobber # prevents overwriting an existing files with the > operator. Override with >|
+unset MAILCHECK  # Don't check mail when opening terminal.
+# )))
+
+# shopt settings (where available) (((
+# Enable some Bash v4.0.x+ features where possible: https://unix.stackexchange.com/questions/498857/how-can-i-prevent-unsupported-shopt-options-from-causing-errors-in-my-bashrc
+# shopt -q -s cmdhist 2>/dev/null # Combine multiline commands into one in history. Enabled by default
+# shopt -q -s checkwinsize 2>/dev/null    # To check the terminal window. Enabled by default
+# shopt -q -s expand_aliases 2>/dev/null  # Enabled by default for interactive shells
+
+# navigate into a directory without needing to explicitly issue cd
+shopt -q -s autocd 2>/dev/null
+
+# argument to the cd builtin command that is not a directory is assumed to be the name of a variable whose value is the directory to change to
+shopt -q -s cdable_vars 2>/dev/null
+
+# Autocorrect path typos when using `cd`
+shopt -q -s cdspell 2>/dev/null
+
+# checks that a command found in the hash table exists before trying to execute it. If not, use a normal path search
+shopt -q -s checkhash 2>/dev/null
+
+# lists the status of any stopped and running jobs before exiting an interactive shell. If any jobs are running, this causes the exit to be deferred until a second exit is attempted without an intervening command
+shopt -q -s checkjobs 2>/dev/null
+
+# perform any expansions of variables, tildes etc
+shopt -q -s direxpand 2>/dev/null
+
+# attempts spelling correction on directory names during word completion if the directory name initially supplied does not exist
+shopt -q -s dirspell 2>/dev/null
+
+# filenames beginning with a dot are not matched by a glob, unless the glob also begins with a dot. This lets globs match "dot files"
+shopt -q -s dotglob 2>/dev/null
+
+# If set, several extended pattern matching operators are recognized. https://askubuntu.com/questions/889744/what-is-the-purpose-of-shopt-s-extglob. Bash (and Korn Shell) offers extended globs, which have the expressive power of regular expressions. Korn shell enables these by default; The only reason it isn't enabled by default in bash is for backward compatibility with previous versions of bash, and even then, the cases where it breaks compatibility are pretty far-fetched, because most of what extglob enables is a syntax error if it isn't set due to the opening parenthesis occurring in a word.
+shopt -q -s extglob 2>/dev/null
+
+# Recursive globbing, e.g. `echo **/*.txt. Recursively repeats a pattern containing '**'. (since bash 4.0-alpha). The pattern ‘**’ used in a filename expansion context will match all files and zero or more directories and subdirectories. If the pattern is followed by a ‘/’, only directories and subdirectories match.
+shopt -q -s globstar 2>/dev/null
+
+# The history list is appended to the file named by the value of the HISTFILE variable when the shell exits, rather than overwriting the file.
+shopt -q -s histappend 2>/dev/null
+
+# If set, and Readline is being used, a user is given the opportunity to re-edit a failed history substitution.
+shopt -q -s histreedit 2>/dev/null
+
+# By default bash will run the most recent command matching the string immediately, with no prompting, so it might be a problem if it doesn’t match the command you expect. Bash allows you to audit the command as expanded before you enter it, with the histverify option. This option works for any history expansion, and may be a good choice for more cautious users.
+shopt -q -s histverify 2>/dev/null
+
+# Disable completion when the input buffer is empty. i.e. Hitting tab and waiting a long time for bash to expand all of $PATH.  # bash>=2.04 only
+shopt -q -s no_empty_cmd_completion 2>/dev/null
+
+# Case-insensitive globbing (used in pathname expansion). (since bash 2.02-alpha1)
+shopt -q -s nocaseglob 2>/dev/null
+
+# Do not check mail
+shopt -q -u mailwarn 2>/dev/null
+# )))
+
+# )))
+
+# Completions from the `bash-completions` package & other third-party tools (((
+
+# Source `bash-completion` (may already be enabled in /etc/bash.bashrc or /etc/profile) (((
+if ! shopt -oq posix; then
+  if [ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]; then
+    . "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+  elif [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+# )))
+
+test -x "$(command -v aws_completer)" && complete -C aws_completer aws
+
+# tab completion for `helm` (((
+if [ -x "$(command -v helm)" ]; then
+  test -r "$HOME/.config/bash/bashrc_helm_completion_functions.sh" && . "$HOME/.config/bash/bashrc_helm_completion_functions.sh"
+fi
+# )))
+
+# tab completion for `kind` (((
+if [ -x "$(command -v kind)" ]; then
+  test -r "$HOME/.config/bash/bashrc_kind_completion_functions.sh" && . "$HOME/.config/bash/bashrc_kind_completion_functions.sh"
+fi
+# )))
+
+# tab completion for `kubectl` (((
+if [ -x "$(command -v kubectl)" ]; then
+  test -r "$HOME/.config/bash/bashrc_kubectl_completion_functions.sh" && . "$HOME/.config/bash/bashrc_kubectl_completion_functions.sh"
+fi
+# )))
+
+# tab completion for `minikube` (((
+if [ -x "$(command -v minikube)" ]; then
+  test -r "$HOME/.config/bash/bashrc_minikube_completion_functions.sh" && . "$HOME/.config/bash/bashrc_minikube_completion_functions.sh"
+fi
+# )))
+
+# tab completion for `nerdctl` (((
+if [ -x "$(command -v nerdctl)" ]; then
+  test -r "$HOME/.config/bash/bashrc_nerdctl_completion_functions.sh" && . "$HOME/.config/bash/bashrc_nerdctl_completion_functions.sh"
+fi
+# )))
+
+# tab completion for `pixi` (((
+if [ -x "$(command -v pixi)" ]; then
+  eval "$(pixi completion --shell bash)"
+  # source "$PIXI_HOME"/completions/bash/*
+fi
+# )))
+
+# tab completion for `podman` (((
+if [ -x "$(command -v podman)" ]; then
+  test -r "$HOME/.config/bash/bashrc_podman_completion_functions.sh" && . "$HOME/.config/bash/bashrc_podman_completion_functions.sh"
+fi
+
+# tab completion for `docker` based on `podman` script (((
+if [ -x "$(command -v docker)" ]; then
+  test -r "$HOME/.config/bash/bashrc_docker_completion_functions.sh" && . "$HOME/.config/bash/bashrc_docker_completion_functions.sh"
+fi
+# )))
+
+# )))
+
+# tab completion for the `ssh` command for hosts in the user's config file
+test -r "$HOME/.config/bash/bashrc_ssh_hosts_completion_functions.sh" && . "$HOME/.config/bash/bashrc_ssh_hosts_completion_functions.sh"
+
+# tab completion for `tenv` (((
+if [ -x "$(command -v tenv)" ]; then
+  test -r "$HOME/.config/bash/bashrc_tenv_completion_functions.sh" && . "$HOME/.config/bash/bashrc_tenv_completion_functions.sh"
+fi
+test -x "$(command -v tenv)" && complete -C terraform terraform
+# )))
+
+test -x "$(command -v terraform)" && complete -C terraform tf
+
+# )))
+
+test -r "$HOME/.config/bash/bash_aliases" && . "$HOME/.config/bash/bash_aliases"           # Source bash aliases
+test -r "$HOME/.config/bash/bash_functions.sh" && . "$HOME/.config/bash/bash_functions.sh" # Source bash functions
+
+# Use ~/.Xresources to set colors in linux virtual terminal console on the framebuffer (((
+# The colors in the Linux virtual console running on the framebuffer can be changed. This is done by writing the escape code \\e]PXRRGGBB, where X is the hexadecimal index of the color from 0-F, and RRGGBB is a traditional hexadecimal RGB code.
+# For example, to reuse existing colors defined in ~/.Xresources, add the following to the shell initialization file (such as ~/.bashrc):
+if [ "$TERM" = "linux" ]; then
+  _SEDCMD='s/.*\*color\([0-9]\{1,\}\).*#\([0-9a-fA-F]\{6\}\).*/\1 \2/p'
+  for i in "$(sed -n "$_SEDCMD" "$HOME/.Xresources" | awk '$1 < 16 {printf "\\e]P%X%s", $1, $2}')"; do
+    echo -en "$i"
+  done
+  clear
+fi
+# )))
+
+. "$HOME/.tmc-autocomplete.sh" 2>/dev/null || true
+
+[ -f "$HOME/.config/bash/fzf.bash" ] && . "$HOME/.config/bash/fzf.bash"
+export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+
+if [ -x "$(command -v starship)" ]; then
+  eval "$(starship init bash)"
+fi
+
+MAMBA_EXE="$(command -v micromamba)"
+if [ -x "$MAMBA_EXE" ]; then
+  # >>> mamba initialize >>>
+  # !! Contents within this block are managed by 'mamba init' !!
+  export MAMBA_EXE
+  export MAMBA_ROOT_PREFIX="$(dirname "$(dirname "$MAMBA_EXE")")"
+  __mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"
+  # echo $__mamba_setup
+  if [ $? -eq 0 ]; then
+    eval "$__mamba_setup"
+  else
+    alias micromamba="$MAMBA_EXE" # Fallback on help from mamba activate
+  fi
+  unset __mamba_setup
+  alias mamba='micromamba' && alias conda='mamba'
+  # <<< mamba initialize <<<
+  mamba activate mambaenv_base 2>/dev/null
+fi
+
+# eval "$(aliae init zsh --config '/Users/aliae/configs/aliae.yaml')"
+# eval "$(aliae init bash)"
+
+if [ -x "$(command -v batpipe)" ]; then
+  eval "$(batpipe)"
+fi
+
+if [ -x "$(command -v direnv)" ]; then
+  eval "$(direnv hook bash)"
+fi

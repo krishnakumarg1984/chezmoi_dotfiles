@@ -1,0 +1,95 @@
+# vim: ft=sh:
+
+# For more details, man less or man lesskey. (https://gist.github.com/kagorenya/9de96d755d8261abcb68cb47cbdd45d0)
+
+# These are section headers, and *are* significant (https://github.com/jeebak/dotfiles/blob/master/less/.lesskey)
+# https://github.com/nbeaver/lesskey/blob/master/.lesskey
+
+#command
+[ prev-file
+] next-file
+c undo-hilite
+
+# Make spacebar, f-key, and Page Down scroll a full screenful, even if it reaches end-of-file in the process.
+# PageDown
+f forw-screen-force
+# Spacebar (40 in octal)
+\40 forw-screen-force
+# PageDown
+\kD forw-screen-force
+# http://chneukirchen.org/blog/archive/2015/02/six-hacks-for-less-1.html
+# \kd forw-line-force
+j forw-line-force
+
+h left-scroll
+l right-scroll
+i toggle-option i
+
+# Q and :cq will exit with return value 1
+# https://github.com/alok/lesskey/blob/master/lesskey
+Q quit \1
+:cq quit \1
+
+# D noaction j/\^diff | commit | From \n\eu
+D noaction j/\^(diff|commit|From|[a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9]) \n\eu
+C noaction j/\^(commit|[a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9]) \n\eu
+
+# \ed shell rm "%"\n:n\n
+
+# Move to the next file with the left and right arrow keys.
+# Defaults are: :n next-file :p prev-file
+# \kr         next-file
+# \kl         prev-file
+# Inspiration: http://linuxgazette.net/174/grebler.html
+
+#env
+# https://gist.github.com/kagorenya/9de96d755d8261abcb68cb47cbdd45d
+# Highlight only the particular string which was found by the last search command.
+# Causes searches to ignore case except for a pattern contains uppercase letters.
+# Specifies the "target" line of search & jump
+# Causes "raw" control characters to be displayed except for ANSI "color" escape sequences.
+# Disables sending the termcap initialization and deinitialization strings to the terminal.
+# Provides a way to tailor the three prompt styles to your own preference.
+# NOTE: options that require a string are considered to end when a dollar sign ($) is found.
+# Source: https://ascending.wordpress.com/2011/02/11/unix-tip-make-less-more-friendly/
+# LESS= --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --raw-control-chars --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$
+LESS= --use-color --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$
+
+# export LESSOPEN='|~/.lessfilter %s'
+# LESSOPEN="|lesspipe.sh %s"; export LESSOPEN
+# LESSOPEN="|lesspipe %s"; export LESSOPEN
+# LESSOPEN=| /usr/bin/lesspipe %s
+# LESSCLOSE=lesspipe %s %s
+# LESSOPEN="|$(brew --prefix)/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
+
+
+# Turn off command and search history.
+LESSHISTFILE="$HOME/.config/less/lesshistory.txt"
+
+# LESS_TERMCAP_mb, etc. don't seem to work here :/
+# http://unix.stackexchange.com/questions/87261/getting-unexpected-colorized-output-on-several-commands
+
+# https://github.com/tpope/tpope/blob/master/.lesskey
+#line-edit
+\eb word-left
+\ed word-delete
+\ef word-right
+^A home
+^B left
+^E end
+^F right
+^N down
+^P up
+^U kill-line
+# \eD word-delete
+# ^W word-backspace
+# https://github.com/dLuna/config/blob/master/.lesskey
+
+#command
+/ forw-search ^W
+? back-search ^W
+# https://unix.stackexchange.com/questions/255862/search-in-less-with-wrap-around-at-eof
+\eB back-search
+\eF forw-search
+/ noaction gg\eF
+? noaction G\eB

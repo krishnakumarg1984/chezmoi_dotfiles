@@ -1,0 +1,88 @@
+---
+# This is my first, very own configuration file for yamllint!
+# It extends the default conf by adjusting some options.
+
+extends: default
+
+locale: en_GB.UTF-8
+
+rules:
+  braces:
+    level: warning
+    max-spaces-inside: 1
+  comments:
+    level: warning
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  # 100 chars should be enough, but don't fail if a line is longer
+  line-length:
+    max: 100
+    level: warning
+  octal-values:
+    forbid-explicit-octal: true
+    forbid-implicit-octal: true
+  truthy: disable
+
+# defaults (strict)
+# yaml-files:
+#   - '*.yaml'
+#   - '*.yml'
+#   - '.yamllint'
+#
+# rules:
+#   anchors: enable
+#   braces: enable
+#   brackets: enable
+#   colons: enable
+#   commas: enable
+#   comments:
+#     level: warning
+#   comments-indentation:
+#     level: warning
+#   document-end: disable
+#   document-start:
+#     level: warning
+#   empty-lines: enable
+#   empty-values: disable
+#   float-values: disable
+#   hyphens: enable
+#   indentation: enable
+#   key-duplicates: enable
+#   key-ordering: disable
+#   line-length: enable
+#   new-line-at-end-of-file: enable
+#   new-lines: enable
+#   octal-values: disable
+#   quoted-strings: disable
+#   trailing-spaces: enable
+#   truthy:
+#     level: warning
+
+# relaxed
+# extends: default
+#
+# rules:
+#   braces:
+#     level: warning
+#     max-spaces-inside: 1
+#   brackets:
+#     level: warning
+#     max-spaces-inside: 1
+#   colons:
+#     level: warning
+#   commas:
+#     level: warning
+#   comments: disable
+#   comments-indentation: disable
+#   document-start: disable
+#   empty-lines:
+#     level: warning
+#   hyphens:
+#     level: warning
+#   indentation:
+#     level: warning
+#     indent-sequences: consistent
+#   line-length:
+#     level: warning
+#     allow-non-breakable-inline-mappings: true
+#   truthy: disable
