@@ -126,12 +126,13 @@ LC_TIME="C" && export LC_TIME
 LC_ALL="" && export LC_ALL
 # )))
 
-# MANPAGER='less -MRF --use-color' && export MANPAGER
+MANPAGER='less -MRF --use-color' && export MANPAGER
 
-MANPAGER='less --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$' && export MANPAGER
+# MANPAGER='less --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$' && export MANPAGER
 MANROFFOPT="-c" && export MANROFFOPT
 
-PAGER="less --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$" && export PAGER
+# PAGER="less --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$" && export PAGER
+PAGER="less -MRF --use-color" && export PAGER
 
 # Set READER/PDFVIEWER etc (((
 if [ -x "$(command -v zathura)" ]; then
