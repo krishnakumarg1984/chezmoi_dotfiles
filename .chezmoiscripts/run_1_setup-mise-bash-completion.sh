@@ -3,10 +3,10 @@
 set -eu
 
 echo ""
-echo "--- Installing all mise global tools ---"
+echo "--- Setting up mise bash completion ---"
 
 if [ -x "$HOME/.local/bin/mise" ]; then
-  "$HOME/.local/bin/mise" completion bash --include-bash-completion-lib > "$HOME/.local/share/bash-completion/completions/mise"
+  "$HOME/.local/bin/mise" completion bash --include-bash-completion-lib >"$HOME/.local/share/bash-completion/completions/mise"
 fi
 
-echo "--- Finished installing all mise global tools ---"
+echo "--- Finished setting up mise bash completion ---"

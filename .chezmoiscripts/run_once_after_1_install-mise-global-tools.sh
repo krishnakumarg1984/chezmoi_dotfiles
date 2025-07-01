@@ -4,9 +4,11 @@
 set -eu
 
 echo ""
-echo "--- Installing all mise global tools ---"
 
-if [ -x "$HOME/.local/bin/mise" ]; then
+# if [ -x "$HOME/.local/bin/mise" ]; then
+export PATH="$HOME/.local/bin:$PATH"
+if [ -x "$(command -v mise)" ]; then
+  echo "--- Installing all mise global tools ---"
   if [ -x "$(command -v nproc)" ]; then
     NCORES=$(nproc)
   else
@@ -14,7 +16,7 @@ if [ -x "$HOME/.local/bin/mise" ]; then
   fi
   MISE_JOBS=$((NCORES < 8 ? NCORES : 8)) # At most 8 cores. https://stackoverflow.com/a/10415158
 
-  MISE_QUIET=1 "$HOME/.local/bin/mise" --jobs "$MISE_JOBS" --yes --quiet install
+  # MISE_QUIET=1 MISE_VERBOSE=1
+  "$HOME/.local/bin/mise" --jobs "$MISE_JOBS" install
+  echo "--- Finished installing all mise global tools ---"
 fi
-
-echo "--- Finished installing all mise global tools ---"
