@@ -7,7 +7,7 @@
 test -r "$HOME/.config/envman/load.sh" && . "$HOME/.config/envman/load.sh" # TODO: Remove (webi brew)
 # )))
 
-# test -d "$HOME/.local/bin" && path_add prepend "$HOME/.local/bin" # ~/.local/bin to PATH
+test -d "$HOME/.local/bin" && path_add prepend "$HOME/.local/bin" # ~/.local/bin to PATH
 
 # Incorporate various third-party commands to PATH & set their related environment variables (((
 

@@ -6,7 +6,7 @@ set -eu
 echo ""
 
 # if [ -x "$HOME/.local/bin/mise" ]; then
-export PATH="$HOME/.local/bin:$PATH"
+# export PATH="$HOME/.local/bin:$PATH"
 if [ -x "$(command -v mise)" ]; then
   echo "--- Installing all mise global tools ---"
   if [ -x "$(command -v nproc)" ]; then
