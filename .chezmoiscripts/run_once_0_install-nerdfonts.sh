@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -eu
+
+echo ""
+echo "--- Installing nerdfonts ---"
+
+nerd_font_name="VictorMono"
+similar_named_font_found=$(fc-list : family | \sort | \uniq | \grep "$nerd_font_name")
+# echo $similar_named_font_found
+
+# if similarly named font is not installed, runs the following script
+if [ -z "$similar_named_font_found" ]; then
+  echo "--- Installing nerdfont $nerd_font_name ---"
+  nerd_font_name=$nerd_font_name bash <(curl -fsSL https://raw.githubusercontent.com/monoira/nefoin/main/install.sh) # >/dev/null 2>&1
+else
+  echo "The $nerd_font_name fonts are already installed. Skipping ... "
+fi
+echo "--- Finished Installing nerdfonts ---"

@@ -7,7 +7,7 @@
 test -r "$HOME/.config/envman/load.sh" && . "$HOME/.config/envman/load.sh" # TODO: Remove (webi brew)
 # )))
 
-test -d "$HOME/.local/bin" && path_add prepend "$HOME/.local/bin" # ~/.local/bin to PATH
+# test -d "$HOME/.local/bin" && path_add prepend "$HOME/.local/bin" # ~/.local/bin to PATH
 
 # Incorporate various third-party commands to PATH & set their related environment variables (((
 
@@ -44,10 +44,11 @@ fi
 
 # Set EDITOR and SUDO_EDITOR (((
 if [ -x "$(command -v nvim)" ]; then
-  if [ -d "$HOME/.config/astronvim" ]; then
-    NVIM_APPNAME=astronvim && export NVIM_APPNAME
-    test -r "$HOME/.local/share/$NVIM_APPNAME/mason/bin" && path_add prepend "$HOME/.local/share/$NVIM_APPNAME/mason/bin" # Prepend Mason-tool-installer binaries to PATH
-  fi
+  # if [ -d "$HOME/.config/astronvim" ]; then
+  #   NVIM_APPNAME=astronvim && export NVIM_APPNAME
+  #   test -r "$HOME/.local/share/$NVIM_APPNAME/mason/bin" && path_add prepend "$HOME/.local/share/$NVIM_APPNAME/mason/bin" # Prepend Mason-tool-installer binaries to PATH
+  # fi
+  test -r "$HOME/.local/share/nvim/mason/bin" && path_add prepend "$HOME/.local/share/nvim/mason/bin" # Prepend Mason-tool-installer binaries to PATH
   VISUAL="$(command -v nvim)"
   SUDO_EDITOR=$VISUAL
 elif [ -x "$(command -v vim)" ]; then
@@ -196,6 +197,10 @@ else
   GIT_PAGER="less" && export GIT_PAGER
 fi
 # )))
+
+GOCACHE="$HOME/.local/state/go/go-build" && export GOCACHE
+GOMODCACHE="$HOME/.local/state/go/mod" && export GOMODCACHE
+GOPATH="$HOME/.local/share/go" && export GOPATH
 
 if [ -x "$(command -v brew)" ]; then
   if [ -d "$HOME/.local/opt/brew" ]; then

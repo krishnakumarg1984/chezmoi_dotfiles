@@ -216,6 +216,7 @@ test -x "$(command -v terraform)" && complete -C terraform tf
 
 # )))
 
+test -r "$HOME/.config/bash/complete_alias.sh" && . "$HOME/.config/bash/complete_alias.sh" # Source _complete_alias function
 test -r "$HOME/.config/bash/bash_aliases" && . "$HOME/.config/bash/bash_aliases"           # Source bash aliases
 test -r "$HOME/.config/bash/bash_functions.sh" && . "$HOME/.config/bash/bash_functions.sh" # Source bash functions
 
