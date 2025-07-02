@@ -50,7 +50,6 @@ perl = "latest"
 pipx = "latest"  # needed for all "pipx:package" installs below
 python = "latest"
 ripgrep = "latest"
-ripgrep-all = "latest"
 ruff = "latest"
 rust = { version = "latest", profile = "minimal" }
 shellcheck = "latest"
@@ -105,7 +104,6 @@ zig = "latest"
 "pipx:proselint" = "latest"
 "pipx:ptpython" = "latest"
 "pipx:pylama" = "latest"
-"pipx:pylyzer" = "latest"
 "pipx:pytest" = "latest"
 "pipx:sphinx-lint" = "latest"
 "pipx:toml-sort" = "latest"
@@ -150,14 +148,17 @@ idiomatic_version_file_enable_tools = ["ruby"]
 # "cargo:ruplacer" = "latest"
 # "go:github.com/containers/podman-tui" = "latest"
 # "pipx:beautysh" = "latest" # errors out within vim with a module import error (same with pixi global install)
+# "pipx:pylyzer" = "latest"  # not available on linux arm64 as of Jul 2025
 # ccache = "latest"          # not available on linux arm64 as of Jul 2025
 # checkmake = "latest"       # not available on linux arm64 as of Jul 2025
 # dust = "latest"            # not available on linux arm64 as of Jul 2025
 # git-cliff = "latest"       # not available on linux arm64 as of Jul 2025
-# jless = "latest"  # not available for linux arm64 as of Jul 2025
+# jless = "latest"           # not available for linux arm64 as of Jul 2025
 # jnv = "latest"             # not available on linux arm64 as of Jul 2025
 # kubectl-convert = "latest"
 # make = "latest"            # problem downloading for both x86-64 and arm64 as of Jul 2025
+# ripgrep-all = "latest"     # not available on linux arm64 as of Jul 2025
 # terraform-docs = "latest"
+
 
 # vim: ft=toml:

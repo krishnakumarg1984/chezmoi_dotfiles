@@ -170,6 +170,16 @@ channels = ["conda-forge"]
 dependencies = { procs = "*" }
 exposed = { procs = "procs" }
 
+[envs.pylyzer]
+channels = ["conda-forge"]
+dependencies = { pylyzer = "*" }
+exposed = { pylyzer = "pylyzer" }
+
+[envs.ripgrep-all]
+channels = ["conda-forge"]
+dependencies = { ripgrep-all = "*" }
+exposed = { rga = "rga", rga-fzf = "rga-fzf", rga-fzf-open = "rga-fzf-open", rga-preproc = "rga-preproc" }
+
 [envs.selene]
 channels = ["conda-forge"]
 dependencies = { selene = "*" }
