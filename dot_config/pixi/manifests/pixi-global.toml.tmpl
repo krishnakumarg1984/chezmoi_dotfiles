@@ -15,6 +15,16 @@ channels = ["conda-forge"]
 dependencies = { broot = "*" }
 exposed = { broot = "broot" }
 
+[envs.ccache] # mise installer does not work on arm64
+channels = ["conda-forge"]
+dependencies = { ccache = "*" }
+exposed = { ccache = "ccache" }
+
+[envs.checkmake]
+channels = ["conda-forge"]
+dependencies = { checkmake = "*" }
+exposed = { checkmake = "checkmake" }
+
 [envs.chezmoi]
 channels = ["conda-forge"]
 dependencies = { chezmoi = "*" }
@@ -45,6 +55,11 @@ channels = ["conda-forge"]
 dependencies = { diskonaut = "*" }
 exposed = { diskonaut = "diskonaut" }
 
+[envs.dust]
+channels = ["conda-forge"]
+dependencies = { dust = "*" }
+exposed = { dust = "dust" }
+
 [envs.fclones]
 channels = ["conda-forge"]
 dependencies = { fclones = "*" }
@@ -65,6 +80,11 @@ channels = ["conda-forge"]
 dependencies = { git = "*" }
 exposed = { git = "git", git-cvsserver = "git-cvsserver", git-receive-pack = "git-receive-pack", git-shell = "git-shell", git-upload-archive = "git-upload-archive", git-upload-pack = "git-upload-pack", gitk = "gitk", scalar = "scalar" }
 
+[envs.git-cliff]
+channels = ["conda-forge"]
+dependencies = { git-cliff = "*" }
+exposed = { git-cliff = "git-cliff", git-cliff-completions = "git-cliff-completions", git-cliff-mangen = "git-cliff-mangen" }
+
 [envs.goawk]
 channels = ["conda-forge"]
 dependencies = { goawk = "*" }
@@ -74,6 +94,16 @@ exposed = { goawk = "goawk" }
 channels = ["conda-forge"]
 dependencies = { jd = "*" }
 exposed = { jd = "jd" }
+
+[envs.jless]
+channels = ["conda-forge"]
+dependencies = { jless = "*" }
+exposed = { jless = "jless" }
+
+[envs.jnv]
+channels = ["conda-forge"]
+dependencies = { jnv = "*" }
+exposed = { jnv = "jnv" }
 
 [envs.ltex-ls]
 channels = ["conda-forge"]
@@ -89,6 +119,11 @@ exposed = { lua = "lua", luac = "luac" }
 channels = ["conda-forge"]
 dependencies = { macchina = "*" }
 exposed = { macchina = "macchina" }
+
+[envs.make]
+channels = ["conda-forge"]
+dependencies = { make = "*" }
+exposed = { make = "make" }
 
 [envs.markdown-oxide]
 channels = ["conda-forge"]
@@ -204,11 +239,6 @@ exposed = { bunzip2 = "bunzip2", bzcat = "bzcat", bzcmp = "bzcmp", bzdiff = "bzd
 channels = ["conda-forge"]
 dependencies = { beautysh = "*" }
 exposed = { beautysh = "beautysh" }
-
-[envs.ccache] # mise installer does not work on arm64
-channels = ["conda-forge"]
-dependencies = { ccache = "*" }
-exposed = { ccache = "ccache" }
 
 {{- if not (and (eq .chezmoi.arch "arm64") (eq .chezmoi.os "linux")) }}
 
