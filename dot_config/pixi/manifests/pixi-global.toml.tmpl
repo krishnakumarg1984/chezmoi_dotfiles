@@ -175,11 +175,6 @@ channels = ["conda-forge"]
 dependencies = { typstyle = "*" }
 exposed = { typstyle = "typstyle" }
 
-[envs.vale-ls]
-channels = ["conda-forge"]
-dependencies = { vale-ls = "*" }
-exposed = { vale-ls = "vale-ls" }
-
 [envs.vault]
 channels = ["conda-forge"]
 dependencies = { vault = "*" }
@@ -216,10 +211,17 @@ dependencies = { ccache = "*" }
 exposed = { ccache = "ccache" }
 
 {{- if not (and (eq .chezmoi.arch "arm64") (eq .chezmoi.os "linux")) }}
+
 [envs.less]
 channels = ["conda-forge"]
 dependencies = { less = "*" }
 exposed = { less = "less", lesskey = "lesskey" }
+
+[envs.vale-ls]
+channels = ["conda-forge"]
+dependencies = { vale-ls = "*" }
+exposed = { vale-ls = "vale-ls" }
+
 {{- end }}
 
 
