@@ -5,7 +5,7 @@
 README.md
 LICENSE
 {{- if ne .chezmoi.hostname "blend" }}
-.config/bleachbit # only manage .work on blendos-laptop
-dot_config/bleachbit
 .chezmoiscripts/run_once_0_install-nerdfonts.sh
+.config/bleachbit
+.ssh/authorized_keys
 {{- end }}
