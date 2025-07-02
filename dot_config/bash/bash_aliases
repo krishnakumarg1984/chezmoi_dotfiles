@@ -42,6 +42,7 @@ fi
 # )))
 
 # custom aliases and functions using bat (((
+test -x "$(command -v bat)" && BAT_PRESENT=1
 if [ "$BAT_PRESENT" != "" ]; then
   # alias bathelp='bat --plain --language=help'
   helper() {
