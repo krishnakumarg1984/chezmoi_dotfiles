@@ -215,7 +215,7 @@ channels = ["conda-forge"]
 dependencies = { ccache = "*" }
 exposed = { ccache = "ccache" }
 
-{{- if and (eq .chezmoi.arch "arm64") (eq .chezmoi.os "linux") }}
+{{- if not (and (eq .chezmoi.arch "arm64") (eq .chezmoi.os "linux")) }}
 [envs.less]
 channels = ["conda-forge"]
 dependencies = { less = "*" }
