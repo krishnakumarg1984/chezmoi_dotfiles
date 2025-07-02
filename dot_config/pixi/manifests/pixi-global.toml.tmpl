@@ -75,11 +75,6 @@ channels = ["conda-forge"]
 dependencies = { jd = "*" }
 exposed = { jd = "jd" }
 
-[envs.less]
-channels = ["conda-forge"]
-dependencies = { less = "*" }
-exposed = { less = "less", lesskey = "lesskey" }
-
 [envs.ltex-ls]
 channels = ["conda-forge"]
 dependencies = { ltex-ls = "*" }
@@ -220,7 +215,18 @@ channels = ["conda-forge"]
 dependencies = { ccache = "*" }
 exposed = { ccache = "ccache" }
 
+{{- if and (eq .chezmoi.arch "arm64") (eq .chezmoi.os "linux") }}
+[envs.less]
+channels = ["conda-forge"]
+dependencies = { less = "*" }
+exposed = { less = "less", lesskey = "lesskey" }
+{{- end }}
+
+
+
 # [envs.zig] is big (~479 MB)
 # channels = ["conda-forge"]
 # dependencies = { zig = "*" }
 # exposed = { zig = "zig" }
+
+# vim: ft=toml
