@@ -299,7 +299,7 @@ fi
 # vim/neovim aliases (((
 if [ -x "$(command -v nvim)" ]; then
   if [ "$EDITOR" != "" ]; then
-    if ! [ -d "$HOME/.local/state/astronvim" ]; then
+    if ! [ -d "$HOME/.local/state/nvim" ]; then
       alias nvim="nvim --headless -c 'quitall' && \nvim"
     else
       alias nvim="$EDITOR"
