@@ -299,23 +299,17 @@ fi
 # vim/neovim aliases (((
 if [ -x "$(command -v nvim)" ]; then
   if [ "$EDITOR" != "" ]; then
-    if ! [ -d "$HOME/.local/state/nvim" ]; then
-      alias nvim="nvim --headless -c 'quitall' && \nvim"
-    else
-      alias nvim="$EDITOR"
-    fi
+    # if ! [ -d "$HOME/.local/state/nvim" ]; then
+    #   alias nvim="nvim --headless -c 'quitall' && \nvim"
+    # else
+    #   alias nvim="$EDITOR"
+    # fi
     alias vimdiff='nvim -d'
     alias oldvim="\vim"
     alias vim="nvim"
     alias vi="nvim"
     alias view="nvim -R"
-    # astronvim alias(((
-    # if [ -d "$HOME"/.config/astronvim_template ]; then
-    #   alias astronvim="NVIM_APPNAME=astronvim_template nvim"
-    # fi
-    # )))
   fi
-  # fi
 elif [ -x "$(command -v vim)" ]; then
   # alias vim='vim --servername VIM'
   alias vi="vim"
