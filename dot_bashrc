@@ -192,7 +192,7 @@ fi
 # tab completion for `pixi` (((
 if [ -x "$(command -v pixi)" ]; then
   eval "$(pixi completion --shell bash)"
-  # source "$PIXI_HOME"/completions/bash/*
+  source "$PIXI_HOME/completions/bash/*" 2>/dev/null
 fi
 # )))
 

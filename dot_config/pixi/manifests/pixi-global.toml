@@ -2,207 +2,207 @@ version = 1
 
 [envs.bingrep]
 channels = ["conda-forge"]
-dependencies = {bingrep = "*"}
+dependencies = { bingrep = "*" }
 exposed = { bingrep = "bingrep" }
 
 [envs.binsider]
 channels = ["conda-forge"]
-dependencies = {binsider = "*"}
+dependencies = { binsider = "*" }
 exposed = { binsider = "binsider" }
 
 [envs.broot]
 channels = ["conda-forge"]
-dependencies = {broot = "*"}
+dependencies = { broot = "*" }
 exposed = { broot = "broot" }
 
 [envs.chezmoi]
 channels = ["conda-forge"]
-dependencies = {chezmoi = "*"}
+dependencies = { chezmoi = "*" }
 exposed = { chezmoi = "chezmoi" }
 
 [envs.cmake]
 channels = ["conda-forge"]
-dependencies = {cmake = "*"}
+dependencies = { cmake = "*" }
 exposed = { ccmake = "ccmake", cmake = "cmake", cpack = "cpack", ctest = "ctest" }
 
 [envs.cppcheck]
 channels = ["conda-forge"]
-dependencies = {cppcheck = "*"}
+dependencies = { cppcheck = "*" }
 exposed = { cppcheck = "cppcheck", cppcheck-htmlreport = "cppcheck-htmlreport" }
 
 [envs.croc]
 channels = ["conda-forge"]
-dependencies = {croc = "*"}
+dependencies = { croc = "*" }
 exposed = { croc = "croc" }
 
 [envs.curl]
 channels = ["conda-forge"]
-dependencies = {curl = "*"}
+dependencies = { curl = "*" }
 exposed = { curl = "curl" }
 
 [envs.diskonaut]
 channels = ["conda-forge"]
-dependencies = {diskonaut = "*"}
+dependencies = { diskonaut = "*" }
 exposed = { diskonaut = "diskonaut" }
 
 [envs.fclones]
 channels = ["conda-forge"]
-dependencies = {fclones = "*"}
+dependencies = { fclones = "*" }
 exposed = { fclones = "fclones" }
 
 [envs.fontconfig]
 channels = ["conda-forge"]
-dependencies = {fontconfig = "*"}
+dependencies = { fontconfig = "*" }
 exposed = { fc-cache = "fc-cache", fc-cat = "fc-cat", fc-conflist = "fc-conflist", fc-list = "fc-list", fc-match = "fc-match", fc-pattern = "fc-pattern", fc-query = "fc-query", fc-scan = "fc-scan", fc-validate = "fc-validate" }
 
 [envs.fx]
 channels = ["conda-forge"]
-dependencies = {fx = "*"}
+dependencies = { fx = "*" }
 exposed = { fx = "fx" }
 
 [envs.git]
 channels = ["conda-forge"]
-dependencies = {git = "*"}
+dependencies = { git = "*" }
 exposed = { git = "git", git-cvsserver = "git-cvsserver", git-receive-pack = "git-receive-pack", git-shell = "git-shell", git-upload-archive = "git-upload-archive", git-upload-pack = "git-upload-pack", gitk = "gitk", scalar = "scalar" }
 
 [envs.goawk]
 channels = ["conda-forge"]
-dependencies = {goawk = "*"}
+dependencies = { goawk = "*" }
 exposed = { goawk = "goawk" }
 
 [envs.jd]
 channels = ["conda-forge"]
-dependencies = {jd = "*"}
+dependencies = { jd = "*" }
 exposed = { jd = "jd" }
 
 [envs.less]
 channels = ["conda-forge"]
-dependencies = {less = "*"}
-exposed = {less = "less", lesskey = "lesskey"}
+dependencies = { less = "*" }
+exposed = { less = "less", lesskey = "lesskey" }
 
 [envs.ltex-ls]
 channels = ["conda-forge"]
-dependencies = {ltex-ls = "*"}
+dependencies = { ltex-ls = "*" }
 exposed = { ltex-cli = "ltex-cli", "ltex-cli.cmd" = "ltex-cli.cmd", ltex-ls = "ltex-ls", "ltex-ls.cmd" = "ltex-ls.cmd" }
 
 [envs.lua]
 channels = ["conda-forge"]
-dependencies = {lua = "*"}
+dependencies = { lua = "*" }
 exposed = { lua = "lua", luac = "luac" }
 
 [envs.macchina]
 channels = ["conda-forge"]
-dependencies = {macchina = "*"}
+dependencies = { macchina = "*" }
 exposed = { macchina = "macchina" }
 
 [envs.markdown-oxide]
 channels = ["conda-forge"]
-dependencies = {markdown-oxide = "*"}
+dependencies = { markdown-oxide = "*" }
 exposed = { markdown-oxide = "markdown-oxide" }
 
 [envs.mdcat]
 channels = ["conda-forge"]
-dependencies = {mdcat = "*"}
+dependencies = { mdcat = "*" }
 exposed = { mdcat = "mdcat" }
 
 [envs.mdsf]
 channels = ["conda-forge"]
-dependencies = {mdsf = "*"}
+dependencies = { mdsf = "*" }
 exposed = { mdsf = "mdsf" }
 
 [envs.mdslw]
 channels = ["conda-forge"]
-dependencies = {mdslw = "*"}
+dependencies = { mdslw = "*" }
 exposed = { mdslw = "mdslw" }
 
 [envs.micromamba]
 channels = ["conda-forge"]
-dependencies = {micromamba = "*"}
+dependencies = { micromamba = "*" }
 exposed = { micromamba = "micromamba" }
 
 [envs.nasm]
 channels = ["conda-forge"]
-dependencies = {nasm = "*"}
+dependencies = { nasm = "*" }
 exposed = { nasm = "nasm", ndisasm = "ndisasm" }
 
 [envs.neocmakelsp]
 channels = ["conda-forge"]
-dependencies = {neocmakelsp = "*"}
+dependencies = { neocmakelsp = "*" }
 exposed = { neocmakelsp = "neocmakelsp" }
 
 [envs.numbat]
 channels = ["conda-forge"]
-dependencies = {numbat = "*"}
+dependencies = { numbat = "*" }
 exposed = { numbat = "numbat" }
 
 [envs.procs]
 channels = ["conda-forge"]
-dependencies = {procs = "*"}
+dependencies = { procs = "*" }
 exposed = { procs = "procs" }
 
 [envs.selene]
 channels = ["conda-forge"]
-dependencies = {selene = "*"}
+dependencies = { selene = "*" }
 exposed = { selene = "selene" }
 
 [envs.shellharden]
 channels = ["conda-forge"]
-dependencies = {shellharden = "*"}
+dependencies = { shellharden = "*" }
 exposed = { shellharden = "shellharden" }
 
 [envs.terraform-ls]
 channels = ["conda-forge"]
-dependencies = {terraform-ls = "*"}
+dependencies = { terraform-ls = "*" }
 exposed = { terraform-ls = "terraform-ls" }
 
 [envs.tinymist]
 channels = ["conda-forge"]
-dependencies = {tinymist = "*"}
+dependencies = { tinymist = "*" }
 exposed = { tinymist = "tinymist" }
 
 [envs.topgrade]
 channels = ["conda-forge"]
-dependencies = {topgrade = "*"}
+dependencies = { topgrade = "*" }
 exposed = { topgrade = "topgrade" }
 
 [envs.tree-sitter-cli]
 channels = ["conda-forge"]
-dependencies = {tree-sitter-cli = "*"}
+dependencies = { tree-sitter-cli = "*" }
 exposed = { tree-sitter = "tree-sitter" }
 
 [envs.typos-lsp]
 channels = ["conda-forge"]
-dependencies = {typos-lsp = "*"}
+dependencies = { typos-lsp = "*" }
 exposed = { typos-lsp = "typos-lsp" }
 
 [envs.typstyle]
 channels = ["conda-forge"]
-dependencies = {typstyle = "*"}
+dependencies = { typstyle = "*" }
 exposed = { typstyle = "typstyle" }
 
 [envs.vale-ls]
 channels = ["conda-forge"]
-dependencies = {vale-ls = "*"}
+dependencies = { vale-ls = "*" }
 exposed = { vale-ls = "vale-ls" }
 
 [envs.vault]
 channels = ["conda-forge"]
-dependencies = {vault = "*"}
+dependencies = { vault = "*" }
 exposed = { vault = "vault" }
 
 [envs.xz]
 channels = ["conda-forge"]
-dependencies = {xz = "*"}
+dependencies = { xz = "*" }
 exposed = { xz = "xz" }
 
 [envs.yj]
 channels = ["conda-forge"]
-dependencies = {yj = "*"}
+dependencies = { yj = "*" }
 exposed = { yj = "yj" }
 
 [envs.zk]
 channels = ["conda-forge"]
-dependencies = {zk = "*"}
+dependencies = { zk = "*" }
 exposed = { zk = "zk" }
 
 [envs.bzip2]
@@ -214,6 +214,11 @@ exposed = { bunzip2 = "bunzip2", bzcat = "bzcat", bzcmp = "bzcmp", bzdiff = "bzd
 channels = ["conda-forge"]
 dependencies = { beautysh = "*" }
 exposed = { beautysh = "beautysh" }
+
+[envs.ccache] # mise installer does not work on arm64
+channels = ["conda-forge"]
+dependencies = { ccache = "*" }
+exposed = { ccache = "ccache" }
 
 # [envs.zig] is big (~479 MB)
 # channels = ["conda-forge"]

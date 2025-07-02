@@ -26,7 +26,9 @@ elif [ -d "$HOME/.pixi" ]; then
   PIXI_HOME="$HOME/.pixi"
 fi
 export PIXI_HOME
-test -x "$(command -v "$PIXI_HOME/bin/pixi")" && path_add prepend "$PIXI_HOME/bin"
+if [ ! -x "$(command -v pixi)" ]; then
+  test -x "$(command -v "$PIXI_HOME/bin/pixi")" && path_add prepend "$PIXI_HOME/bin"
+fi
 # )))
 
 # Incorporate TexLive directories to PATH & INFOPATH (((
@@ -241,7 +243,7 @@ test -r "$HOME/.config/wget/wgetrc" && WGETRC="$HOME/.config/wget/wgetrc" && exp
 # )))
 
 # eval ssh-agent (((
-if [ -x "$(command -v ssh-agent)" ] && [ -z "$SSH_AUTH_SOCK" ]; then
+if [ -x "$(command -v ssh-agent)" ] && [ "$SSH_AUTH_SOCK" = "" ]; then
   eval "$(ssh-agent)" >/dev/null
   ssh-add 2>/dev/null
 fi
