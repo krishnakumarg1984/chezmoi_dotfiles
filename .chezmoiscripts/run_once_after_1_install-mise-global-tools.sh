@@ -17,9 +17,6 @@ if [ -x "$(command -v mise)" ]; then
   MISE_JOBS=$((NCORES < 8 ? NCORES : 8)) # At most 8 cores. https://stackoverflow.com/a/10415158
 
   # MISE_QUIET=1 MISE_VERBOSE=1
-  echo "$GITHUB_TOKEN"
-  export GITHUB_TOKEN="$GITHUB_TOKEN"
-  echo "$GITHUB_TOKEN"
   "$HOME/.local/bin/mise" --jobs "$MISE_JOBS" install
   echo "--- Finished installing all mise global tools ---"
 fi
