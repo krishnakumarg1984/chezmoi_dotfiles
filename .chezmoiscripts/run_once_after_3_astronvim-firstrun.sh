@@ -3,6 +3,10 @@
 set -eu
 
 echo ""
-echo "--- Running nvim headless for the first time with astronvim config  ---"
-nvim --headless -c 'quitall' && clear
-echo "--- Finished running nvim headless for the first time with astronvim config  --"
+if command -v nvim &>/dev/null; then
+  echo "--- Running nvim headless for the first time with astronvim config  ---"
+
+  nvim --headless -c 'quitall' && clear
+
+  echo "--- Finished running nvim headless for the first time with astronvim config  --"
+fi
