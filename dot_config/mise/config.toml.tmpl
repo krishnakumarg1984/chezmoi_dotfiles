@@ -3,6 +3,7 @@ MISE_ENV_FILE = ".env"
 
 [tools]
 act = "latest"
+{{- eq eq .chezmoi.hostname "blend" }}
 actionlint = "latest"
 age = "latest"
 aqua = "latest"
@@ -141,6 +142,7 @@ zig = "latest"
 "pipx:trash-cli" = "latest"
 "pipx:vulture" = "latest"
 "pipx:yamlfix" = "latest"
+{{ end }}
 
 [settings]
 experimental = true
