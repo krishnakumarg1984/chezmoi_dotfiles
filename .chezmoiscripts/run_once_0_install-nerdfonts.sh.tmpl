@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+{{- if ne .chezmoi.hostname "blend" }}
+
+set -eu
+
+echo ""
+echo "--- Installing nerdfonts ---"
+
+nerd_font_name="VictorMono"
+
+echo "--- Installing nerdfont $nerd_font_name ---"
+echo "Y" | nerd_font_name=$nerd_font_name bash <(curl -fsSL https://raw.githubusercontent.com/monoira/nefoin/main/install.sh) >/dev/null 2>&1
+echo "--- Finished installing nerdfont $nerd_font_name ---"
+
+echo "--- Finished Installing nerdfonts ---"
+
+{{- end }}
+
+# vim: ft=bash:
