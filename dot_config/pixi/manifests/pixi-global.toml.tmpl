@@ -100,6 +100,11 @@ channels = ["conda-forge"]
 dependencies = { jd = "*" }
 exposed = { jd = "jd" }
 
+[envs.jinja-lsp]
+channels = ["conda-forge"]
+dependencies = { jinja-lsp = "*" }
+exposed = { jinja-lsp = "jinja-lsp" }
+
 [envs.jless]
 channels = ["conda-forge"]
 dependencies = { jless = "*" }
@@ -200,6 +205,11 @@ channels = ["conda-forge"]
 dependencies = { terraform-ls = "*" }
 exposed = { terraform-ls = "terraform-ls" }
 
+[envs.tex-fmt]
+channels = ["conda-forge"]
+dependencies = { tex-fmt = "*" }
+exposed = { tex-fmt = "tex-fmt" }
+
 [envs.tinymist]
 channels = ["conda-forge"]
 dependencies = { tinymist = "*" }
@@ -262,10 +272,10 @@ channels = ["conda-forge"]
 dependencies = { less = "*" }
 exposed = { less = "less", lesskey = "lesskey" }
 
-[envs.vale-ls]
-channels = ["conda-forge"]
-dependencies = { vale-ls = "*" }
-exposed = { vale-ls = "vale-ls" }
+# [envs.vale-ls]
+# channels = ["conda-forge"]
+# dependencies = { vale-ls = "*" }
+# exposed = { vale-ls = "vale-ls" }
 
 {{- end }}
 

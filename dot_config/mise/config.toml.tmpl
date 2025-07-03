@@ -74,11 +74,14 @@ zig = "latest"
 "cargo:erdtree" = "latest"
 "cargo:tlrc" = "latest"
 "go:github.com/kubecolor/kubecolor" = "latest"
+"npm:@ansible/ansible-language-server" = "latest"
 "npm:alex" = "latest"
+"npm:awk-language-server" = "latest"  # does not work on linux arm64 as of Jul 2025
 "npm:bash-language-server" = "latest"
 "npm:bibtex-tidy" = "latest"
 "npm:commitlint" = "latest"
 "npm:dockerfile-language-server-nodejs" = "latest"
+"npm:doctoc" = "latest"
 "npm:fixjson" = "latest"
 "npm:gh-actions-language-server" = "latest"
 "npm:jsonlint" = "latest"
@@ -86,28 +89,39 @@ zig = "latest"
 "npm:markdownlint-cli2" = "latest"
 "npm:textlint" = "latest"
 "npm:vim-language-server" = "latest"
+"npm:vscode-json-languageservice" = "latest"
 "npm:write-good" = "latest"
 "npm:yaml-language-server" = "latest"
+"pipx:ansible-lint" = "latest"
+"pipx:autopep8" = "latest"
 "pipx:bandit" = "latest"
+"pipx:basedpyright" = "latest"
+"pipx:black" = "latest"
+"pipx:blue" = "latest"
 "pipx:clang-format" = "latest"
 "pipx:cmakelint" = "latest"
 "pipx:codespell" = "latest"
 "pipx:cpplint" = "latest"
 "pipx:curlylint" = "latest"
+"pipx:darker" = "latest"
 "pipx:docformatter" = "latest"
 "pipx:fortls" = "latest"
 "pipx:git-delete-merged-branches" = "latest"
 "pipx:gitlint-core" = "latest"
 "pipx:ipython" = "latest"
+"pipx:jupytext" = "latest"
 "pipx:mdformat" = "latest"
 "pipx:mypy" = "latest"
 "pipx:proselint" = "latest"
 "pipx:ptpython" = "latest"
+"pipx:pyink" = "latest"
 "pipx:pylama" = "latest"
+"pipx:pymarkdownlnt" = "latest"
 "pipx:pytest" = "latest"
 "pipx:sphinx-lint" = "latest"
 "pipx:toml-sort" = "latest"
 "pipx:trash-cli" = "latest"
+"pipx:usort" = "latest"
 "pipx:vulture" = "latest"
 "pipx:yamlfix" = "latest"
 
@@ -120,23 +134,14 @@ minikube = "latest"
 typst = "latest"
 
 "cargo:carl" = "latest"
-"cargo:jinja-lsp" = "latest" # compiles from source on linux arm64 as of Jul 2025
 "cargo:mcat" = "latest"
 "cargo:prosemd-lsp" = "latest" # compiles from source on linux arm64 as of Jul 2025
-"cargo:tex-fmt" = "latest" # compiles from source on linux arm64 as of Jul 2025
 "go:github.com/marwanhawari/stew" = "latest"
-"npm:@ansible/ansible-language-server" = "latest"
-"npm:awk-language-server" = "latest"  # does not work on linux arm64 as of Jul 2025
 "npm:@microsoft/compose-language-service" = "latest"
-"npm:doctoc" = "latest"
 "pipx:ansible-dev-tools" = { version = "latest", uvx_args = "--with argcomplete" }
-"pipx:ansible-lint" = "latest"
 "pipx:argcomplete" = "latest"
 "pipx:asciinema" = "latest"
-"pipx:darker" = "latest"
-"pipx:jupytext" = "latest"
 "pipx:pymarkdownlint" = "latest"
-"pipx:pymarkdownlnt" = "latest"
 
 {{- end }}
 
@@ -145,7 +150,9 @@ experimental = true
 env_file = '.env'
 idiomatic_version_file_enable_tools = ["ruby"]
 
+# "cargo:jinja-lsp" = "latest" # compiles from source on linux arm64 as of Jul 2025 (but binary available with pixi)
 # "cargo:ruplacer" = "latest"
+# "cargo:tex-fmt" = "latest" # compiles from source on linux arm64 as of Jul 2025. Pixi has a binary available
 # "go:github.com/containers/podman-tui" = "latest"
 # "pipx:beautysh" = "latest" # errors out within vim with a module import error (same with pixi global install)
 # "pipx:pylyzer" = "latest"  # not available on linux arm64 as of Jul 2025
@@ -159,6 +166,5 @@ idiomatic_version_file_enable_tools = ["ruby"]
 # make = "latest"            # problem downloading for both x86-64 and arm64 as of Jul 2025
 # ripgrep-all = "latest"     # not available on linux arm64 as of Jul 2025
 # terraform-docs = "latest"
-
 
 # vim: ft=toml:
