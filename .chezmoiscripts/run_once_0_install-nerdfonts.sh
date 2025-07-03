@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-{{- if eq .chezmoi.hostname "blend" }}
-
 set -eu
 
 echo ""
@@ -19,7 +17,5 @@ else
   echo "The $nerd_font_name fonts are already installed. Skipping ... "
 fi
 echo "--- Finished Installing nerdfonts ---"
-
-{{- end }}
 
 # vim: ft=bash:
