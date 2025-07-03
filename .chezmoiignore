@@ -5,8 +5,6 @@
 README.md
 LICENSE
 {{- if ne .chezmoi.hostname "blend" }}
-.chezmoiscripts/run_once_0_install-nerdfonts.sh
-.chezmoiscripts/0_install-nerdfonts.sh
 .config/bleachbit
 .ssh/authorized_keys
 {{- end }}
