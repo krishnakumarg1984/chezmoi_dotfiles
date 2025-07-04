@@ -9,7 +9,7 @@
 # Run `sudo -v` to cache credentials at the start of the run
 # This avoids a blocking password prompt in the middle of an unattended run
 # (default: false)
-pre_sudo = true
+# pre_sudo = true
 
 # Sudo command to be used
 # sudo_command = "sudo"
@@ -17,27 +17,203 @@ pre_sudo = true
 # Disable specific steps - same options as the command line flag
 # disable = ["system", "emacs"]
 disable = [
-  "chezmoi",
+  {{- if ne .chezmoi.hostname "blend" }}
+  "auto_cpufreq",
+  "brew_cask",
+  "certbot",
+  "chocolatey",
+  "choosenim",
+  "cinnamon_spices",
+  "clam_av_db",
+  "composer",
+  "conda",
+  "config_update",
   "containers",
+  "deb_get",
+  "deno",
+  "distrobox",
+  "dotnet",
+  "elan",
+  "firmware",
+  "flatpak",
+  "flutter",
+  "gcloud",
+  "haxelib",
+  "jetpack",
+  "lure",
+  "macports",
+  "mas",
+  "maza",
+  "microsoft_store",
+  "miktex",
+  "myrepos",
+  "nix",
+  "pacdef",
+  "pacstall",
+  "pkg",
+  "protonup",
+  "raco",
+  "remotes",
+  "restarts",
+  "rtcl",
+  "scoop",
+  "sheldon",
+  "shell",
+  "sparkle",
+  "spicetify",
+  "stack",
+  "tlmgr",
+  "toolbx",
+  "vagrant",
+  "vscode",
+  "vscodium",
+  "winget",
+  "wsl",
+  "wsl_update",
+  "xcodes",
+  "zigup",
+  "zvm",
+  {{- end}}
+  "a_m",
+  "android_studio",
+  "aqua",
+  "atom",
+  "audit",
+  "bin",
+  "bob",
+  "bun",
+  "bun_packages",
+  "chezmoi",
+  "dkp_pacman",
   "emacs",
   "gem",
   "gnome_shell_extensions",
+  "go",
+  "guix",
   "home_manager",
+  "lensfun",
   "nix",
   "node",
   "opam",
+  "pearl",
   "pip3",
+  "pip_review",
+  "pip_review_local",
+  "pipupgrade",
+  "pkgin",
+  "platformio_core",
+  "rcm",
   "ruby_gems",
-  "flatpak",
+  "rye",
   "snap",
   "system",
   "uv",
   "vim",
   "waydroid",
+  "yadm",
 ]
 
 # Ignore failures for these steps
-# ignore_failures = ["powershell"]
+ignore_failures = [
+  {{- if eq .chezmoi.hostname "blend" }}
+  "auto_cpufreq",
+  "brew_cask",
+  "certbot",
+  "chocolatey",
+  "choosenim",
+  "cinnamon_spices",
+  "clam_av_db",
+  "composer",
+  "containers",
+  "deb_get",
+  "deno",
+  "distrobox",
+  "dotnet",
+  "elan",
+  "firmware",
+  "flatpak",
+  "flutter",
+  "gcloud",
+  "haxelib",
+  "jetpack",
+  "lure",
+  "macports",
+  "mas",
+  "maza",
+  "microsoft_store",
+  "miktex",
+  "myrepos",
+  "nix",
+  "pacdef",
+  "pacstall",
+  "pkg",
+  "powershell",
+  "protonup",
+  "raco",
+  "remotes",
+  "restarts",
+  "rtcl",
+  "scoop",
+  "sheldon",
+  "shell",
+  "sparkle",
+  "spicetify",
+  "stack",
+  "tlmgr",
+  "toolbx",
+  "vagrant",
+  "vscode",
+  "vscodium",
+  "winget",
+  "wsl",
+  "wsl_update",
+  "xcodes",
+  "zigup",
+  "zvm",
+  {{- end}}
+  "a_m",
+  "android_studio",
+  "aqua",
+  "atom",
+  "audit",
+  "bin",
+  "bob",
+  "bun",
+  "bun_packages",
+  "chezmoi",
+  "conda",
+  "config_update",
+  "dkp_pacman",
+  "emacs",
+  "gem",
+  "gnome_shell_extensions",
+  "go",
+  "guix",
+  "helm",
+  "home_manager",
+  "lensfun",
+  "nix",
+  "node",
+  "opam",
+  "pearl",
+  "pip3",
+  "pip_review",
+  "pip_review_local",
+  "pipupgrade",
+  "pkgin",
+  "platformio_core",
+  "pnpm",
+  "rcm",
+  "ruby_gems",
+  "rye",
+  "snap",
+  "system",
+  "uv",
+  "vim",
+  "waydroid",
+  "yadm",
+  "yarn",
+]
 
 # List of remote machines with Topgrade installed on them
 # remote_topgrades = ["toothless", "pi", "parnas"]
@@ -64,7 +240,7 @@ assume_yes = true
 no_retry = true
 
 # Run inside tmux (default: false)
-# run_in_tmux = true
+# run_in_tmux = false
 
 # Changes the way topgrade interacts with
 # the tmux session, creating the session
@@ -113,9 +289,9 @@ skip_notify = true
 [commands]
 #"Python Environment" = "~/dev/.env/bin/pip install -i https://pypi.python.org/simple -U --upgrade-strategy eager jupyter"
 #"Custom command using interactive shell (unix)" = "-i vim_upgrade"
-"cargo cache autoclean command" = "cargo cache --autoclean"
-"cargo cache autoclean expensive command" = "cargo cache --autoclean-expensive"
-"cargo cache trim command" = "cargo cache trim -l 0K"
+# "cargo cache autoclean command" = "cargo cache --autoclean"
+# "cargo cache autoclean expensive command" = "cargo cache --autoclean-expensive"
+# "cargo cache trim command" = "cargo cache trim -l 0K"
 # "cargo clean gc command" = "cargo clean gc --max-download-age=1second 2>/dev/null"
 "mise self-update command" = "mise self-update --yes"
 # "pnpm self-update command" = "pnpm self-update"
@@ -250,10 +426,12 @@ enable_tlmgr = true
 [npm]
 # Use sudo if the NPM directory isn't owned by the current user
 #use_sudo = true
+use_sudo = false
 
 [yarn]
 # Run `yarn global upgrade` with `sudo`
 #use_sudo = true
+use_sudo = false
 
 
 [deno]
@@ -286,6 +464,7 @@ enable_tlmgr = true
 [flatpak]
 # Use sudo for updating the system-wide installation
 #use_sudo = true
+use_sudo = false
 
 [distrobox]
 #use_root = false
