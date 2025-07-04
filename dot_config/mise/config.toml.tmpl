@@ -126,22 +126,22 @@ zig = "latest"
 "cargo:cargo-update" = "latest"
 # "cargo:erdtree" = "latest"
 "cargo:tlrc" = "latest"
+"cargo:carl" = "latest"
+"cargo:mcat" = "latest"
+# "cargo:prosemd-lsp" = "latest" # compiles from source on linux arm64 as of Jul 2025
 {{- end }}
 
 {{- if eq .chezmoi.hostname "blend" }}
-helm-docs = "latest"
-kind = "latest"
+# helm-docs = "latest"
+# kind = "latest"
 lychee = "latest"
 minikube = "latest"
 typst = "latest"
 
-"cargo:carl" = "latest"
-"cargo:mcat" = "latest"
-"cargo:prosemd-lsp" = "latest" # compiles from source on linux arm64 as of Jul 2025
 "npm:@microsoft/compose-language-service" = "latest"
 "pipx:ansible-dev-tools" = { version = "latest", uvx_args = "--with argcomplete" }
 "pipx:argcomplete" = "latest"
-"pipx:asciinema" = "latest"
+# "pipx:asciinema" = "latest"
 "pipx:pymarkdownlint" = "latest"
 
 {{- end }}
