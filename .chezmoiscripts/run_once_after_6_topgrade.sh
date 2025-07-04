@@ -6,7 +6,7 @@ echo ""
 if [ -x "$HOME/.config/pixi/bin/topgrade" ] &>/dev/null; then
   echo "--- Updating all installed tools with topgrade ---"
 
-  "$HOME/.config/pixi/bin/topgrade" --yes --cleanup --disable waydroid --disable chezmoi && clear
+  "$HOME/.config/pixi/bin/topgrade" --yes --cleanup --disable waydroid --disable system --disable flatpak --disable firmware
 
   echo "--- Finished updating all installed tools with topgrade  --"
 fi
