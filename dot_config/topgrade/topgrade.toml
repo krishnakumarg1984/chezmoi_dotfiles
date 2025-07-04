@@ -30,7 +30,6 @@ disable = [
   "ruby_gems",
   "flatpak",
   "snap",
-  "sudo",
   "system",
   "uv",
   "vim",
