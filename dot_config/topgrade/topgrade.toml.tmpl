@@ -28,14 +28,14 @@ disable = [
   "opam",
   "pip3",
   "ruby_gems",
-{{- if output "sh" "-c" "sudo -vn 2>&1 || true" | regexMatch "Sorry" }}
+  {{- if output "sh" "-c" "sudo -vn 2>&1 || true" | regexMatch "Sorry" }}
   "flatpak",
   "snap",
   "system",
-{{- end }}
+  {{- end }}
   "uv",
   "vim",
-  "waydroid"
+  "waydroid",
 ]
 
 # Ignore failures for these steps
