@@ -19,13 +19,12 @@ fi
 # )))
 
 # Incorporate the `pixi` command to PATH (((
-PIXI_HOME=""
+# PIXI_HOME=""
 if [ -d "$HOME/.config/pixi" ]; then
-  PIXI_HOME="$HOME/.config/pixi"
-elif [ -d "$HOME/.pixi" ]; then
-  PIXI_HOME="$HOME/.pixi"
+  PIXI_HOME="$HOME/.config/pixi" && export PIXI_HOME
+# elif [ -d "$HOME/.pixi" ]; then
+#   PIXI_HOME="$HOME/.pixi"
 fi
-export PIXI_HOME
 if [ ! -x "$(command -v pixi)" ]; then
   test -x "$(command -v "$PIXI_HOME/bin/pixi")" && path_add prepend "$PIXI_HOME/bin"
 fi
