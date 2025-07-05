@@ -9,7 +9,7 @@ dedup() {
   local v i
   seen[$PWD]=1
   for v in "${copy[@]}"; do
-    if [ -z "${seen[$v]}" ]; then
+    if [ "${seen[$v]}" = "" ]; then
       new+=("$v")
       seen[$v]=1
     fi
@@ -45,94 +45,6 @@ mkcd() {
 # }
 # )))
 
-# mise completions (((
-_mise() {
-  if ! command -v usage &>/dev/null; then
-    echo "Error: usage not found. This is required for completions to work in mise." >&2
-    return 1
-  fi
-
-  if [[ -z ${_USAGE_SPEC_MISE:-} ]]; then
-    _USAGE_SPEC_MISE="$(mise usage)"
-  fi
-
-  COMPREPLY=("$(usage complete-word -s "$_USAGE_SPEC_MISE" --cword="$COMP_CWORD" -- "${COMP_WORDS[@]}")")
-  if [[ $? -ne 0 ]]; then
-    unset COMPREPLY
-  fi
-  return 0
-}
-
-shopt -u hostcomplete && complete -o nospace -o bashdefault -o nosort -F _mise mise
-# )))
-
-# custom tab completions (((
-# https://unix.stackexchange.com/a/6823
-if type complete >/dev/null 2>&1; then
-  if complete -o >/dev/null 2>&1; then
-    COMPDEF="-o complete"
-  else
-    COMPDEF="-o default"
-  fi
-  complete -a alias unalias
-  complete -d cd pushd popd pd po
-  complete $COMPDEF -g chgrp 2>/dev/null
-  complete $COMPDEF -u chown
-  complete -j fg
-  complete -j kill
-  complete $COMPDEF -c command
-  complete $COMPDEF -c exec
-  complete $COMPDEF -c man
-  complete -e printenv
-  complete -G "*.java" javac
-  complete -F complete_runner -o nospace -o default nohup 2>/dev/null
-  complete -F complete_runner -o nospace -o default sudo 2>/dev/null
-  complete -F complete_services service
-  # completion function for commands such as sudo that take a
-  # command as the first argument but should complete the second
-  # argument as if it was the first
-  complete_runner() {
-    # completing the command name
-    # $1 = sudo
-    # $3 = sudo
-    # $2 = partial command (or complete command but no space was typed)
-    if test "$1" = "$3"; then
-      set -- $(compgen -c "$2")
-    # completing other arguments
-    else
-      # $1 = sudo
-      # $3 = command after sudo (i.e. second word)
-      # $2 = arguments to command
-      # use the custom completion as printed by complete -p,
-      # fall back to filename/bashdefault
-      local comps
-      comps=$(complete -p "$3" 2>/dev/null)
-      # "complete -o default -c man" => "-o default -c"
-      # "" => "-o bashdefault -f"
-      comps=${comps#complete }
-      comps=${comps% *}
-      comps=${comps:--o bashdefault -f}
-      set -- $(compgen $comps "$2")
-    fi
-    COMPREPLY=("$@")
-  }
-
-  # completion function for Red Hat service command
-  complete_services() {
-    OIFS="$IFS"
-    IFS='
-        '
-    local i=0
-    for file in $(find /etc/init.d/ -type f -name "$2*" -perm -u+rx); do
-      file=${file##*/}
-      COMPREPLY[$i]=$file
-      i=$(($i + 1))
-    done
-    IFS="$OIFS"
-  }
-fi
-# )))
-
 # ccd() for changing into chezmoi's data directory (((
 if [ -x "$(command -v chezmoi)" ]; then
   ccd() {
@@ -154,6 +66,95 @@ function goup {
 # )))
 
 # commented-out functions (((
+
+# # custom tab completions (((
+
+# # https://unix.stackexchange.com/a/6823
+# if type complete >/dev/null 2>&1; then
+#   if complete -o >/dev/null 2>&1; then
+#     COMPDEF="-o complete"
+#   else
+#     COMPDEF="-o default"
+#   fi
+#   complete -a alias unalias
+#   complete -d cd pushd popd pd po
+#   complete "$COMPDEF" -g chgrp 2>/dev/null
+#   complete "$COMPDEF" -u chown
+#   complete -j fg
+#   complete -j kill
+#   complete "$COMPDEF" -c command
+#   complete "$COMPDEF" -c exec
+#   complete "$COMPDEF" -c man
+#   complete -e printenv
+#   complete -G "*.java" javac
+#   complete -F complete_runner -o nospace -o default nohup 2>/dev/null
+#   complete -F complete_runner -o nospace -o default sudo 2>/dev/null
+#   complete -F complete_services service
+#   # completion function for commands such as sudo that take a
+#   # command as the first argument but should complete the second
+#   # argument as if it was the first
+#   complete_runner() {
+#     # completing the command name
+#     # $1 = sudo
+#     # $3 = sudo
+#     # $2 = partial command (or complete command but no space was typed)
+#     if test "$1" = "$3"; then
+#       set -- "$(compgen -c "$2")"
+#     # completing other arguments
+#     else
+#       # $1 = sudo
+#       # $3 = command after sudo (i.e. second word)
+#       # $2 = arguments to command
+#       # use the custom completion as printed by complete -p,
+#       # fall back to filename/bashdefault
+#       local comps
+#       comps=$(complete -p "$3" 2>/dev/null)
+#       # "complete -o default -c man" => "-o default -c"
+#       # "" => "-o bashdefault -f"
+#       comps=${comps#complete }
+#       comps=${comps% *}
+#       comps=${comps:--o bashdefault -f}
+#       set -- "$(compgen "$comps" "$2")"
+#     fi
+#     COMPREPLY=("$@")
+#   }
+#
+#   # completion function for Red Hat service command
+#   complete_services() {
+#     OIFS="$IFS"
+#     IFS='
+#         '
+#     local i=0
+#     for file in "$(find /etc/init.d/ -type f -name "$2*" -perm -u+rx)"; do
+#       file=${file##*/}
+#       COMPREPLY[$i]=$file
+#       i=$(($i + 1))
+#     done
+#     IFS="$OIFS"
+#   }
+# fi
+# # )))
+
+# # mise completions (((
+# _mise() {
+#   if ! command -v usage &>/dev/null; then
+#     echo "Error: usage not found. This is required for completions to work in mise." >&2
+#     return 1
+#   fi
+#
+#   if [[ -z ${_USAGE_SPEC_MISE:-} ]]; then
+#     _USAGE_SPEC_MISE="$(mise usage)"
+#   fi
+#
+#   COMPREPLY=("$(usage complete-word -s "$_USAGE_SPEC_MISE" --cword="$COMP_CWORD" -- "${COMP_WORDS[@]}")")
+#   if [[ $? -ne 0 ]]; then
+#     unset COMPREPLY
+#   fi
+#   return 0
+# }
+#
+# shopt -u hostcomplete && complete -o nospace -o bashdefault -o nosort -F _mise mise
+# # )))
 
 # https://wiki.archlinux.org/title/Bash
 # run-help() { help "$READLINE_LINE" 2>/dev/null || man "$READLINE_LINE"; }
@@ -374,7 +375,7 @@ if [ -x "$(command -v paru)" ]; then
 
   pmnig() {
     local installed="|$(pmig "$1" | tr '\n' '|')"
-    pmrg "$1" | grep -E -v \'"${installed}"\'
+    pmrg "$1" | grep -E -v \'"$installed"\'
   }
 
   pmnigv() {

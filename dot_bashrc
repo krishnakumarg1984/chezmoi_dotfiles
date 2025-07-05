@@ -226,6 +226,8 @@ test -x "$(command -v terraform)" && complete -C terraform tf
 test -r "$HOME/.config/bash/complete_alias.sh" && . "$HOME/.config/bash/complete_alias.sh" # Source _complete_alias function
 test -r "$HOME/.config/bash/bash_aliases" && . "$HOME/.config/bash/bash_aliases"           # Source bash aliases
 test -r "$HOME/.config/bash/bash_functions.sh" && . "$HOME/.config/bash/bash_functions.sh" # Source bash functions
+[ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh ssh-copy-id
+[ -d "$HOME/.ssh/config/modular_ssh_configs" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config/modular_ssh_configs/* | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh ssh-copy-id
 
 # Use ~/.Xresources to set colors in linux virtual terminal console on the framebuffer (((
 # The colors in the Linux virtual console running on the framebuffer can be changed. This is done by writing the escape code \\e]PXRRGGBB, where X is the hexadecimal index of the color from 0-F, and RRGGBB is a traditional hexadecimal RGB code.
