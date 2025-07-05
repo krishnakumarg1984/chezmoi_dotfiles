@@ -5,6 +5,16 @@ channels = ["conda-forge"]
 dependencies = { awk-language-server = "*" }
 exposed = { awk-language-server = "awk-language-server" }
 
+[envs.beautysh]
+channels = ["conda-forge"]
+dependencies = { beautysh = "*" }
+exposed = { beautysh = "beautysh" }
+
+[envs.ccache] # mise installer does not work on arm64
+channels = ["conda-forge"]
+dependencies = { ccache = "*" }
+exposed = { ccache = "ccache" }
+
 [envs.bingrep]
 channels = ["conda-forge"]
 dependencies = { bingrep = "*" }
@@ -20,10 +30,10 @@ channels = ["conda-forge"]
 dependencies = { broot = "*" }
 exposed = { broot = "broot" }
 
-[envs.ccache] # mise installer does not work on arm64
+[envs.bzip2]
 channels = ["conda-forge"]
-dependencies = { ccache = "*" }
-exposed = { ccache = "ccache" }
+dependencies = { bzip2 = "*" }
+exposed = { bunzip2 = "bunzip2", bzcat = "bzcat", bzcmp = "bzcmp", bzdiff = "bzdiff", bzegrep = "bzegrep", bzfgrep = "bzfgrep", bzgrep = "bzgrep", bzip2 = "bzip2", bzip2recover = "bzip2recover", bzless = "bzless", bzmore = "bzmore" }
 
 [envs.checkmake]
 channels = ["conda-forge"]
@@ -84,6 +94,11 @@ exposed = { fc-cache = "fc-cache", fc-cat = "fc-cat", fc-conflist = "fc-conflist
 channels = ["conda-forge"]
 dependencies = { fx = "*" }
 exposed = { fx = "fx" }
+
+[envs.graphviz]
+channels = ["conda-forge"]
+dependencies = { graphviz = "*" }
+exposed = { ".graphviz-post-link" = ".graphviz-post-link", acyclic = "acyclic", bcomps = "bcomps", ccomps = "ccomps", circo = "circo", cluster = "cluster", diffimg = "diffimg", dijkstra = "dijkstra", dot = "dot", dot2gxl = "dot2gxl", dot_builtins = "dot_builtins", dot_sandbox = "dot_sandbox", edgepaint = "edgepaint", fdp = "fdp", gc = "gc", gml2gv = "gml2gv", graphml2gv = "graphml2gv", gv2gml = "gv2gml", gv2gxl = "gv2gxl", gvcolor = "gvcolor", gvgen = "gvgen", gvmap = "gvmap", gvpack = "gvpack", gvpr = "gvpr", gxl2dot = "gxl2dot", gxl2gv = "gxl2gv", mm2gv = "mm2gv", neato = "neato", nop = "nop", osage = "osage", patchwork = "patchwork", prune = "prune", sccmap = "sccmap", sfdp = "sfdp", tred = "tred", twopi = "twopi", unflatten = "unflatten" }
 
 [envs.git]
 channels = ["conda-forge"]
@@ -270,16 +285,6 @@ channels = ["conda-forge"]
 dependencies = { zk = "*" }
 exposed = { zk = "zk" }
 
-[envs.bzip2]
-channels = ["conda-forge"]
-dependencies = { bzip2 = "*" }
-exposed = { bunzip2 = "bunzip2", bzcat = "bzcat", bzcmp = "bzcmp", bzdiff = "bzdiff", bzegrep = "bzegrep", bzfgrep = "bzfgrep", bzgrep = "bzgrep", bzip2 = "bzip2", bzip2recover = "bzip2recover", bzless = "bzless", bzmore = "bzmore" }
-
-[envs.beautysh]
-channels = ["conda-forge"]
-dependencies = { beautysh = "*" }
-exposed = { beautysh = "beautysh" }
-
 {{- if not (and (eq .chezmoi.arch "arm64") (eq .chezmoi.os "linux")) }}
 
 [envs.less]
@@ -294,10 +299,5 @@ exposed = { less = "less", lesskey = "lesskey" }
 
 {{- end }}
 
-
-# [envs.zig] is big (~479 MB)
-# channels = ["conda-forge"]
-# dependencies = { zig = "*" }
-# exposed = { zig = "zig" }
 
 # vim: ft=toml:
