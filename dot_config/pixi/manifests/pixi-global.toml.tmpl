@@ -304,5 +304,14 @@ exposed = { less = "less", lesskey = "lesskey" }
 
 {{- end }}
 
+{{- if eq .chezmoi.hostname "blend" }}
+
+[envs.weasyprint]
+channels = ["conda-forge"]
+dependencies = { weasyprint = "*" }
+exposed = { weasyprint = "weasyprint" }
+
+{{- end }}
+
 
 # vim: ft=toml:
