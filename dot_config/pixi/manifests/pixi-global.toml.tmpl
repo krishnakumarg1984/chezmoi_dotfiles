@@ -306,10 +306,10 @@ exposed = { less = "less", lesskey = "lesskey" }
 
 {{- if eq .chezmoi.hostname "blend" }}
 
-[envs.weasyprint]
-channels = ["conda-forge"]
-dependencies = { weasyprint = "*" }
-exposed = { weasyprint = "weasyprint" }
+# [envs.weasyprint]
+# channels = ["conda-forge"]
+# dependencies = { weasyprint = "*" }
+# exposed = { weasyprint = "weasyprint" }
 
 {{- end }}
 

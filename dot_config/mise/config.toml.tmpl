@@ -126,7 +126,6 @@ yamllint = "latest"
 
 {{- if ne .chezmoi.hostname "blend" }}
 zig = "latest"
-# "cargo:erdtree" = "latest"
 # "cargo:prosemd-lsp" = "latest" # compiles from source on linux arm64 as of Jul 2025
 {{- end }}
 
@@ -136,6 +135,7 @@ minikube = "latest"
 typst = "latest"
 
 "cargo:presenterm" = "latest"
+"cargo:erdtree" = "latest"
 
 "npm:@microsoft/compose-language-service" = "latest"
 "npm:@mermaid-js/mermaid-cli"  = "latest"
@@ -145,6 +145,7 @@ typst = "latest"
 "pipx:ansible-lint" = "latest"
 "pipx:argcomplete" = "latest"
 "pipx:pymarkdownlint" = "latest"
+"pipx:weasyprint" = "latest"
 
 # "pipx:asciinema" = "latest"
 # "pipx:segno" = "latest"
