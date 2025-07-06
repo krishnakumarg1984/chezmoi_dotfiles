@@ -131,20 +131,25 @@ zig = "latest"
 {{- end }}
 
 {{- if eq .chezmoi.hostname "blend" }}
-# helm-docs = "latest"
-# kind = "latest"
 lychee = "latest"
 minikube = "latest"
 typst = "latest"
 
 "cargo:presenterm" = "latest"
+
 "npm:@microsoft/compose-language-service" = "latest"
+"npm:@mermaid-js/mermaid-cli"  = "latest"
+
 "pipx:ansible-dev-tools" = { version = "latest", uvx_args = "--with argcomplete" }
 "pipx:ansible-inventory-grapher" = "latest"
 "pipx:ansible-lint" = "latest"
 "pipx:argcomplete" = "latest"
 "pipx:pymarkdownlint" = "latest"
+
 # "pipx:asciinema" = "latest"
+# "pipx:segno" = "latest"
+# helm-docs = "latest"
+# kind = "latest"
 
 {{- end }}
 
