@@ -8,6 +8,7 @@ LICENSE
 .hushlogin
 {{- end }}
 {{- if ne .chezmoi.hostname "blend" }}
+.config/presenterm
 .config/bleachbit
 .ssh/authorized_keys
 {{- end }}
