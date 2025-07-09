@@ -100,6 +100,11 @@ channels = ["conda-forge"]
 dependencies = { fx = "*" }
 exposed = { fx = "fx" }
 
+[envs.gdb]
+channels = ["conda-forge"]
+dependencies = { gdb = "*" }
+exposed = { ".gdb-post-link" = ".gdb-post-link", gcore = "gcore", gdb = "gdb", gdb-add-index = "gdb-add-index", gdbserver = "gdbserver", gstack = "gstack" }
+
 [envs.graphviz]
 channels = ["conda-forge"]
 dependencies = { graphviz = "*" }
