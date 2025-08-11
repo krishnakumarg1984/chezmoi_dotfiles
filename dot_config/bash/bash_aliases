@@ -271,20 +271,22 @@ test -x "$(command -v mtr)" && alias traceroute='mtr'
 
 # tree aliases (((
 if [ -x "$(command -v erd)" ]; then
-  alias tree='erd --level 2 --icons --suppress-size --pattern ".*" --layout inverted --sort name'
-  alias tree3='tree --level 3 --pattern ".*"'
+  alias tree='erd --hidden --no-git --level 2 --icons --suppress-size --layout inverted --sort name'
+  alias treestd='\tree -a -C -I .git -I .vendor -L 2'
+  # alias tree='erd --level 2 --icons --suppress-size --pattern ".*" --layout inverted --sort name'
+  # alias tree3='tree --level 3 --pattern ".*"'
 
-  alias stree='erd -H --level 2 --icons --pattern ".*" --layout inverted'
-  alias stree3='stree --level 3'
+  # alias stree='erd -H --level 2 --icons --pattern ".*" --layout inverted'
+  # alias stree3='stree --level 3'
 
-  alias treel='erd -H --level 2 --icons --suppress-size --layout inverted --sort name'
-  alias treel3='treel --level 3'
+  # alias treel='erd -H --level 2 --icons --suppress-size --layout inverted --sort name'
+  # alias treel3='treel --level 3'
 
-  alias streel='erd -H --level 2 --icons --layout inverted'
-  alias streel3='streel --level 3'
+  # alias streel='erd -H --level 2 --icons --layout inverted'
+  # alias streel3='streel --level 3'
 elif [ -x "$(command -v tree)" ]; then
   alias tree='tree -a -C -I .git -I .vendor -L 2'
-  alias ttree='tree --noreport'
+  # alias ttree='tree --noreport'
 fi
 # )))
 

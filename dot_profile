@@ -31,7 +31,7 @@ fi
 # )))
 
 # Incorporate TexLive directories to PATH & INFOPATH (((
-TLYEAR=2025 && TLDIR="$HOME/texlive/$TLYEAR"
+TLYEAR=2025 && TLDIR="$HOME/.local/texlive/$TLYEAR"
 if [ -d "$TLDIR" ]; then
   path_add append "$TLDIR/bin/$(uname -m)-linux"
   # path_add append INFOPATH "$TLDIR/texmf-dist/doc/info"
