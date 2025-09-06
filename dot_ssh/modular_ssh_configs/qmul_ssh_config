@@ -1,0 +1,7 @@
+# vim: ft=sshconfig
+
+Host apocrita_parvathy
+    Hostname login.hpc.qmul.ac.uk
+    IdentityFile ~/.ssh/parvathy_id_rsa_apocrita
+    User eex654
+

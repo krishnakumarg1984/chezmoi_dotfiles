@@ -1,0 +1,7 @@
+# vim: ft=sshconfig
+
+Host archer
+    HostName login.archer.ac.uk
+    IdentityFile ~/.ssh/id_rsa_archer
+    User krishna
+

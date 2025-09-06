@@ -1,0 +1,39 @@
+# vim: ft=sshconfig
+
+# password-only
+Host hydra
+    User krishna
+    HostName hydra-vpn.epcc.ed.ac.uk
+    # rahasya vaakku: naalu capital Delta [at] builder_name flat_name. [hint: sub Delta with corresponding char, the palakkad builder & flat are in lowercases, no spaces anywhere in whole rahasya vaakku]
+
+Host nextgenio_hydra
+    User krishna
+    HostName nextgenio-login2
+    
+    ProxyJump hydra
+    
+    # IdentityFile ~/.ssh/id_rsa_fpga<system_name>.rc.ucl.ac.uk
+    # proxyCommand ssh -W nextgenio-login2:22 krishna@hydra-vpn.epcc.ed.ac.uk
+    # rahasya vaakku: naalu capital Delta [at] builder_name flat_name. [hint: sub Delta with corresponding char, the palakkad builder & flat are in lowercases, no spaces anywhere in whole rahasya vaakku]
+
+Host nextgenio_amd01_hydra
+    User krishna
+    HostName nextgenio-amd01
+    
+    ProxyJump nextgenio_hydra
+    
+    # IdentityFile ~/.ssh/id_rsa_fpga<system_name>.rc.ucl.ac.uk
+    # proxyCommand ssh -W nextgenio-login2:22 krishna@hydra-vpn.epcc.ed.ac.uk
+    # rahasya vaakku: naalu capital Delta [at] builder_name flat_name. [hint: sub Delta with corresponding char, the palakkad builder & flat are in lowercases, no spaces anywhere in whole rahasya vaakku]
+
+Host nextgenio
+    User krishna
+    HostName nextgenio-login2
+
+# Host nextgeniol2
+    # HostName nextgenio-login2.localdomain
+    # HostName 172.24.54.2
+    # ProxyCommand ssh hydra -W %h:%p
+    # ProxyJump hydra
+
+

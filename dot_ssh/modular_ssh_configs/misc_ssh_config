@@ -1,0 +1,5 @@
+# vim: ft=sshconfig
+
+Host KKLinuxUpskillChallenge2022
+    HostName 51.142.169.49
+    User krishnakumar

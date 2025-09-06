@@ -1,0 +1,19 @@
+# vim: ft=sshconfig
+
+Host icelake_cpu_csd3_peta4
+    User dc-gopa1
+    HostName login-icelake.hpc.cam.ac.uk
+    ForwardX11 no
+    ForwardX11Trusted no
+
+Host cpu_csd3_peta4
+    User dc-gopa1
+    HostName login-cpu.hpc.cam.ac.uk
+
+Host knl_csd3_peta4
+    User dc-gopa1
+    HostName login-knl.hpc.cam.ac.uk
+
+Host gpu_csd3_peta4
+    User dc-gopa1
+    HostName login-gpu.hpc.cam.ac.uk

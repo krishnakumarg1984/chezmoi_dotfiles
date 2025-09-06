@@ -1,0 +1,10 @@
+# vim: ft=sshconfig
+
+Host scarf_stfc
+    HostName scarf.rl.ac.uk
+    User scarf1001
+
+Host mari_stfc
+    HostName marilnx01.isis.cclrc.ac.uk
+    User krishnakumar
+
