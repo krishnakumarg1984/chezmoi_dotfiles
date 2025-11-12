@@ -1,8 +1,0 @@
-# vim: ft=sshconfig
-
-Host d05_linaro
-    HostName 10.40.88.169
-    User ubuntu
-
-Host fx700_linaro
-    HostName 10.40.88.103

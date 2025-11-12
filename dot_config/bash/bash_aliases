@@ -9,11 +9,6 @@ if [ -x "$(command -v ansible)" ]; then
   alias al='ansible-lint'
   alias an='ansible-navigator'
   alias ap='ansible-playbook'
-  # alias acl='ansible-config list'
-  # alias aig='ansible-inventory --graph'
-  # alias aigv='ansible-inventory --graph --vars'
-  # alias ail='ansible-inventory --list -y'
-  # alias av='ansible-vault'
   if [ -x "$(command -v register-python-argcomplete)" ]; then
     eval "$(register-python-argcomplete ansible)"
     eval "$(register-python-argcomplete ansible-config)"
@@ -35,22 +30,14 @@ if [ -x "$(command -v ansible)" ]; then
 fi
 # )))
 
-# apt alias (((
-if [ -x "$(command -v nala)" ]; then
-  alias apt='nala'
-fi
-# )))
-
 # custom aliases and functions using bat (((
 test -x "$(command -v bat)" && BAT_PRESENT=1
 if [ "$BAT_PRESENT" != "" ]; then
-  # alias bathelp='bat --plain --language=help'
   helper() {
     "$@" --help 2>&1 | bat --plain --language=help
   }
   alias cat='bat'
   alias path='echo -e ${PATH//:/\\n} | bat' # Print each PATH entry on a separate line
-  # alias dmesg='dmesg -HL --color=always | bat'
 
   # man() function using `batman` (((
   if [ -x "$(command -v batman)" ]; then
@@ -62,7 +49,6 @@ if [ "$BAT_PRESENT" != "" ]; then
   # )))
 else
   alias path='echo -e ${PATH//:/\\n} | less' # Print each PATH entry on a separate line
-  # alias dmesg='dmesg -HL --color=always | less'
 fi
 # )))
 
@@ -148,7 +134,6 @@ if [ -x "$(command -v kubectl)" ]; then
     alias kubectl='kubecolor --paging'
   fi
   alias k='kubectl'
-  # complete -F __start_kubectl k # https://stackoverflow.com/a/56227981
   complete -o default -F __start_kubectl k # https://kubernetes.io/docs/reference/kubectl/quick-reference/#bash
 fi
 # )))
@@ -162,17 +147,13 @@ fi
 # )))
 
 # ls aliases in linux (((
-# if xhost >&/dev/null && [[ "$(command -v eza)" ]]; then
 if [[ "$(command -v eza)" ]]; then
   alias ls='eza --icons=automatic -L 2'
   alias la='eza --icons=automatic -labghHmF --all'
   alias lg='eza --icons=automatic -labghHmF --group-directories-first'
   alias ll='eza --icons=automatic -labghHmF'
   alias lt='eza --icons=automatic -labghHF --sort newest' # sort by date
-  # alias lsf='eza --icons=automatic -f'                  # https://stackoverflow.com/a/70698721
-  # alias lsfa='lsf --icons=automatic --all'
 else
-  # if xhost >&/dev/null && [[ "$(command -v lsd)" ]]; then
   if [[ "$(command -v lsd)" ]]; then
     alias ls='lsd -F'
     alias lg='ls -lAhFv --group-dirs'
@@ -184,13 +165,10 @@ else
   alias sl='ls -v'
   alias ll='ls -lAhFv'
   alias la='ls -lahv'
-  # alias lt='ls -lAhFvrt | less' # sort by date
   alias lt='ls -lAhFvrt' # sort by date
   alias lx='ls -lAhFvBX' # sort by extension
   alias lz='ls -lAhFvrS' # sort by size
-  # alias l='ls -CF'
   alias l='ls -F'
-  # alias lr='ls -R'       # recursive ls
 fi
 # )))
 
@@ -210,13 +188,7 @@ else
 fi
 # )))
 
-# ps alias (((
-# if [ -x "$(command -v procs)" ]; then
-#   alias ps='procs --tree'
-# else
 alias ps='ps uxf -j --cols $COLUMNS | less' # linux alias for ps
-# fi
-# )))
 
 # rm alias (((
 if [ -x "$(command -v gtrash)" ]; then
@@ -235,8 +207,6 @@ else
   alias rm='rm -Iv --preserve-root --one-file-system'
 fi
 # )))
-
-# test -x "$(command -v spack)" && alias spackupgrade='cd $SPACK_ROOT && git stash && git pull && git stash apply && spack mark -i -a && spack concretize --fresh --force && spack install && spack gc -y && cd -'
 
 test -x "$(command -v termimage)" && alias termimage='termimage -s 51x14'
 
@@ -273,20 +243,8 @@ test -x "$(command -v mtr)" && alias traceroute='mtr'
 if [ -x "$(command -v erd)" ]; then
   alias tree='erd --hidden --no-git --level 2 --icons --suppress-size --layout inverted --sort name'
   alias treestd='\tree -a -C -I .git -I .vendor -L 2'
-  # alias tree='erd --level 2 --icons --suppress-size --pattern ".*" --layout inverted --sort name'
-  # alias tree3='tree --level 3 --pattern ".*"'
-
-  # alias stree='erd -H --level 2 --icons --pattern ".*" --layout inverted'
-  # alias stree3='stree --level 3'
-
-  # alias treel='erd -H --level 2 --icons --suppress-size --layout inverted --sort name'
-  # alias treel3='treel --level 3'
-
-  # alias streel='erd -H --level 2 --icons --layout inverted'
-  # alias streel3='streel --level 3'
 elif [ -x "$(command -v tree)" ]; then
   alias tree='tree -a -C -I .git -I .vendor -L 2'
-  # alias ttree='tree --noreport'
 fi
 # )))
 
@@ -301,11 +259,6 @@ fi
 # vim/neovim aliases (((
 if [ -x "$(command -v nvim)" ]; then
   if [ "$EDITOR" != "" ]; then
-    # if ! [ -d "$HOME/.local/state/nvim" ]; then
-    #   alias nvim="nvim --headless -c 'quitall' && \nvim"
-    # else
-    #   alias nvim="$EDITOR"
-    # fi
     alias vimdiff='nvim -d'
     alias oldvim="\vim"
     alias vim="nvim"
@@ -313,39 +266,11 @@ if [ -x "$(command -v nvim)" ]; then
     alias view="nvim -R"
   fi
 elif [ -x "$(command -v vim)" ]; then
-  # alias vim='vim --servername VIM'
   alias vi="vim"
 fi
 # )))
 
 # aliases for compression tools (((
-
-# Cross-platform compression file-formats (((
-# Updated on 10 Feb 2024
-# 7z: default lzma2. (7z decompression is single threaded). It does multithread compression (by default even). The 7z format does not store filesystem permissions (such as UNIX owner/group permissions or NTFS ACLs), and hence can be inappropriate for backup/archival purposes
-# dar: disk archive (also the name of the tool is dar). Is GPL
-# packARC: Good for media files. https://github.com/packjpg/packARC
-# zip: introduced: 1989. latest update: 2016
-# zpaq: introduced: 2009. latest update: 2016
-# )))
-
-# Notes on multi-core compresson tools (((
-
-# lbzip2: *nix only. Parallel bzip2 compression utility, suited for serial and parallel processing
-# lrzip: Compression utility that excels at compressing large files
-# pbzip2: Parallel implementation of the bzip2 block-sorting file compressor
-# pigz: Parallel implementation of gzip. It's a fully functional replacement for gzip
-# pixz: Parallel indexing XZ compression, fully compatible with XZ. LZMA and LZMA2
-# plzip: Has windows port. Massively parallel (multi-threaded) lossless data compressor based on lzlib
-# PXZ: Runs LZMA compression on multiple cores and processors
-
-# migz (lz format) tarlz (lz format), pixz (xz format), pzstd (zstd format) and lbzip2 (bz2 format) are the best since they support parallel decompression
-
-# smallest filesize: pxz and pixz are faster; plzip and lrzip are slower
-# largest filesize: pigz
-
-# for algorithms, zpaq produces the smallest archives, but is the slowest
-# )))
 
 # aliases for bzip2 format (((
 if [ -x "$(command -v lbzip2)" ]; then # supports parallel decompression
@@ -397,15 +322,6 @@ if [ -x "$(command -v rg)" ]; then
   fi
   alias rg='rg --engine=auto'
   alias rgi='rg -p'
-  # if [ -x "$(command -v delta)" ]; then
-  #     rgp() {
-  #         if [ -t 1 ]; then
-  #             command rg --engine=auto --json "$@" | delta
-  #         else
-  #             command rg --engine=auto "$@"
-  #         fi
-  #     }
-  # fi
 else
   alias hisgrep='history|grep'
 fi
@@ -468,10 +384,3 @@ alias tracert="traceroute"
 # )))
 
 # )))
-
-# # fd aliases (((
-# if [ -x "$(command -v fd)" ]; then
-#   alias fdc='fd --color always'
-# fi
-# # )))
-# alias gitbr='git rev-parse --abbrev-ref HEAD' # https://stackoverflow.com/questions/6245570/how-to-get-the-current-branch-name-in-git

@@ -1,5 +1,0 @@
-# vim: ft=sshconfig
-
-Host eagle_psnc
-    HostName ui.eagle.man.poznan.pl
-    User plgkrishna

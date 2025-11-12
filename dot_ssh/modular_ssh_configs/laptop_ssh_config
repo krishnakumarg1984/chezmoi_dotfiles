@@ -1,0 +1,6 @@
+# vim: ft=sshconfig:syntax=sshconfig:
+
+Host blend_laptop
+  Hostname blend
+  User demo
+

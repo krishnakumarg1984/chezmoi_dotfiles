@@ -19,11 +19,8 @@ fi
 # )))
 
 # Incorporate the `pixi` command to PATH (((
-# PIXI_HOME=""
 if [ -d "$HOME/.config/pixi" ]; then
   PIXI_HOME="$HOME/.config/pixi" && export PIXI_HOME
-# elif [ -d "$HOME/.pixi" ]; then
-#   PIXI_HOME="$HOME/.pixi"
 fi
 if [ ! -x "$(command -v pixi)" ]; then
   test -x "$(command -v "$PIXI_HOME/bin/pixi")" && path_add prepend "$PIXI_HOME/bin"
@@ -34,8 +31,6 @@ fi
 TLYEAR=2025 && TLDIR="$HOME/.local/texlive/$TLYEAR"
 if [ -d "$TLDIR" ]; then
   path_add append "$TLDIR/bin/$(uname -m)-linux"
-  # path_add append INFOPATH "$TLDIR/texmf-dist/doc/info"
-  # path_add append MANPATH "$TLDIR/texmf-dist/doc/man"
 fi
 # )))
 
@@ -45,10 +40,6 @@ fi
 
 # Set EDITOR and SUDO_EDITOR (((
 if [ -x "$(command -v nvim)" ]; then
-  # if [ -d "$HOME/.config/astronvim" ]; then
-  #   NVIM_APPNAME=astronvim && export NVIM_APPNAME
-  #   test -r "$HOME/.local/share/$NVIM_APPNAME/mason/bin" && path_add prepend "$HOME/.local/share/$NVIM_APPNAME/mason/bin" # Prepend Mason-tool-installer binaries to PATH
-  # fi
   test -r "$HOME/.local/share/nvim/mason/bin" && path_add prepend "$HOME/.local/share/nvim/mason/bin" # Prepend Mason-tool-installer binaries to PATH
   VISUAL="$(command -v nvim)"
   SUDO_EDITOR=$VISUAL
@@ -130,10 +121,8 @@ LC_ALL="" && export LC_ALL
 
 MANPAGER='less -MRF --use-color' && export MANPAGER
 
-# MANPAGER='less --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$' && export MANPAGER
 MANROFFOPT="-c" && export MANROFFOPT
 
-# PAGER="less --quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x: <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$" && export PAGER
 PAGER="less -MRF --use-color" && export PAGER
 
 # Set READER/PDFVIEWER etc (((
@@ -191,9 +180,7 @@ test -x "$(command -v difft)" && GIT_EXTERNAL_DIFF=difft && export GIT_EXTERNAL_
 
 # Set GIT_PAGER (((
 if [ "$BAT_PRESENT" != "" ]; then
-  # https://github.com/sharkdp/bat/issues/72
-  GIT_PAGER="bat --style=plain,header" && export GIT_PAGER
-  # PAGER="bat"
+  GIT_PAGER="bat --style=plain,header" && export GIT_PAGER  # https://github.com/sharkdp/bat/issues/72
 else
   GIT_PAGER="less" && export GIT_PAGER
 fi
@@ -235,8 +222,6 @@ fi
 
 test -x "$(command -v w3m)" && W3M_DIR="$HOME/.config/w3m" && export W3M_DIR
 
-# VAULT_ADDR=https://vault.arc.ucl.ac.uk && export VAULT_ADDR
-
 test -r "$HOME/.config/wget/wgetrc" && WGETRC="$HOME/.config/wget/wgetrc" && export WGETRC
 
 # )))
@@ -244,6 +229,6 @@ test -r "$HOME/.config/wget/wgetrc" && WGETRC="$HOME/.config/wget/wgetrc" && exp
 # eval ssh-agent (((
 if [ -x "$(command -v ssh-agent)" ] && [ "$SSH_AUTH_SOCK" = "" ]; then
   eval "$(ssh-agent)" >/dev/null
-  ssh-add 2>/dev/null
+  ssh-add ~/.ssh/id_ed25519_nov13_2025 2>/dev/null
 fi
 # )))
