@@ -13,6 +13,7 @@ bat-extras = "latest"
 biome = "latest"
 bottom = "latest"
 btop = "latest"
+bun = "latest"
 cargo-binstall = "latest"
 ccache = "latest"
 checkmake = "latest"
@@ -106,7 +107,6 @@ zellij = "latest"
 "pipx:cmakelint" = "latest"
 "pipx:codespell" = "latest"
 "pipx:cpplint" = "latest"
-"pipx:docformatter" = "latest"
 "pipx:git-delete-merged-branches" = "latest"
 "pipx:jupytext" = "latest"
 "pipx:mbake" = "latest"
@@ -122,6 +122,7 @@ zellij = "latest"
 "pipx:usort" = "latest"
 "pipx:vulture" = "latest"
 "pipx:yamlfix" = "latest"
+# "pipx:docformatter" = "latest"
 # "pipx:pyrefly" = "latest"
 # "pipx:ty" = "latest"
 # "pipx:zuban" = "latest"
@@ -143,8 +144,11 @@ typstyle = "latest"
 {{- end }}
 
 [settings]
-experimental = true
+auto_install = true
 env_file = ".env"
+experimental = true
 idiomatic_version_file_enable_tools = ["ruby"]
+quiet = true
+npm.bun = true
 
 # vim: ft=toml:
