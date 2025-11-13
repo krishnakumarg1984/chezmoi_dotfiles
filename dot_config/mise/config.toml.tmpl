@@ -2,7 +2,9 @@
 MISE_ENV_FILE = ".env"
 
 [tools]
-
+node = "latest"
+# rust = { version = "latest", profile = "minimal" }
+rust = { version = "nightly", profile = "minimal" }
 act = "latest"
 actionlint = "latest"
 age = "latest"
@@ -10,129 +12,119 @@ bat = "latest"
 bat-extras = "latest"
 biome = "latest"
 bottom = "latest"
-# btop = "latest"
+btop = "latest"
+cargo-binstall = "latest"
+ccache = "latest"
+checkmake = "latest"
+chezmoi = "latest"
 cosign = "latest"
 delta = "latest"
 difftastic = "latest"
-# direnv = "latest"
+direnv = "latest"
 dive = "latest"
 dua = "latest"
 duf = "latest"
-# dyff = "latest"
+dust = "latest"
+dyff = "latest"
 eza = "latest"
-# fastfetch = "latest"
+fastfetch = "latest"
 fd = "latest"
+fx = "latest"
 fzf = "latest"
 gdu = "latest"
 gh = "latest"
-# gitleaks = "latest"
+git-cliff = "latest"
 gitui = "latest"
 glow = "latest"
 go = "latest"
 hadolint = "latest"
-harper-cli = "latest"
 harper-ls = "latest"
-helm = "latest"
-java = "temurin-jre-21"
+java = "temurin-jre-25"
+jless = "latest"
 jq = "latest"
-k9s = "latest"
-kubectl = "latest"
 lazydocker = "latest"
 lazygit = "latest"
-lazyjournal = "latest"
+lua = "latest"
 lua-language-server = "latest"
+make = "latest"
+markdownlint-cli2 = "latest"
 marksman = "latest"
 meson = "latest"
 ninja = "latest"
-node = "latest"
+oxlint = "latest"
 pandoc = "latest"
-perl = "latest"
-pipx = "latest"  # needed for all "pipx:package" installs below
-python = "latest"
+pipx = "latest"
 ripgrep = "latest"
+ripgrep-all = "latest"
 ruff = "latest"
-rust = { version = "latest", profile = "minimal" }
 shellcheck = "latest"
 shfmt = "latest"
 starship = "latest"
 stylua = "latest"
 taplo = "latest"
-terraform = "latest"
-tflint = "latest"
+tlrc = "latest"
+tree-sitter = "latest"
 usage = "latest"
 uv = "latest"
 viddy = "latest"
 yamlfmt = "latest"
 yamllint = "latest"
-# yq = "latest"
 zellij = "latest"
-
+# python = "latest"
+# tombi = "latest"
 "asdf:richin13/asdf-neovim" = "latest"
-
-"cargo:cargo-binstall" = "latest"
+"cargo:binsider" = "latest"
 "cargo:cargo-cache" = "latest"
 "cargo:cargo-update" = "latest"
 "cargo:carl" = "latest"
 "cargo:erdtree" = "latest"
-"cargo:makewiz" = "latest"
-"cargo:mcat" = "latest"
-"cargo:tlrc" = "latest"
-"cargo:unmake" = "latest"
-
 "cargo:https://github.com/kyu08/fzf-make" = { version = "latest", locked = true }
-
-"npm:@ansible/ansible-language-server" = "latest"
-"npm:alex" = "latest"
+"cargo:macchina" = "latest"
+"cargo:mcat" = "latest"
+"cargo:mdsf" = "latest"
+"cargo:neocmakelsp" = "latest"
+"cargo:procs" = "latest"
+# "cargo:rumdl" = "latest"
+"cargo:shellharden" = "latest"
+"cargo:tex-fmt" = "latest"
+"cargo:topgrade" = "latest"
+"npm:awk-language-server" = "latest"
 "npm:bash-language-server" = "latest"
-"npm:bibtex-tidy" = "latest"
+"npm:basics-language-server" = "latest"
 "npm:commitlint" = "latest"
-"npm:dockerfile-language-server-nodejs" = "latest"
-"npm:doctoc" = "latest"
-"npm:fixjson" = "latest"
 "npm:gh-actions-language-server" = "latest"
-"npm:jsonlint" = "latest"
-"npm:markdown-toc" = "latest"
-"npm:markdownlint-cli2" = "latest"
 "npm:textlint" = "latest"
 "npm:vim-language-server" = "latest"
-"npm:write-good" = "latest"
+"npm:vscode-json-languageservice" = "latest"
 "npm:yaml-language-server" = "latest"
-
 "pipx:autopep8" = "latest"
 "pipx:autotools-language-server" = "latest"
 "pipx:bandit" = "latest"
 "pipx:basedpyright" = "latest"
-"pipx:blue" = "latest"
+"pipx:beautysh" = "latest"
 "pipx:clang-format" = "latest"
 "pipx:cmakelint" = "latest"
 "pipx:codespell" = "latest"
 "pipx:cpplint" = "latest"
-"pipx:darker" = "latest"
 "pipx:docformatter" = "latest"
-"pipx:fortls" = "latest"
 "pipx:git-delete-merged-branches" = "latest"
-"pipx:gitlint-core" = "latest"
 "pipx:jupytext" = "latest"
 "pipx:mbake" = "latest"
 "pipx:mdformat" = "latest"
 "pipx:mypy" = "latest"
-"pipx:proselint" = "latest"
-"pipx:pyink" = "latest"
-"pipx:pylama" = "latest"
 "pipx:pymarkdownlnt" = "latest"
+"pipx:pyproject-fmt" = "latest"
 "pipx:pytest" = "latest"
-"pipx:sphinx-lint" = "latest"
+"pipx:refurb" = "latest"
+"pipx:reorder-python-imports" = "latest"
+"pipx:textlsp" = "latest"
 "pipx:trash-cli" = "latest"
 "pipx:usort" = "latest"
 "pipx:vulture" = "latest"
 "pipx:yamlfix" = "latest"
-
-# "npm:vscode-json-languageservice" = "latest" # no suitable binary provided by the package
-# "pipx:black" = "latest"
-# "pipx:curlylint" = "latest"
-# "pipx:ipython" = "latest"
-# "pipx:ptpython" = "latest"
-# "pipx:toml-sort" = "latest"
+# "pipx:pyrefly" = "latest"
+# "pipx:ty" = "latest"
+# "pipx:zuban" = "latest"
 
 {{- if ne .chezmoi.hostname "blend" }}
 zig = "latest"
@@ -140,52 +132,19 @@ zig = "latest"
 {{- end }}
 
 {{- if eq .chezmoi.hostname "blend" }}
-lychee = "latest"
-minikube = "latest"
 typst = "latest"
-
+tinymist = "latest"
+typstyle = "latest"
+"cargo:fclones" = "latest"
+"cargo:https://github.com/antonWetzel/prettypst" = { version = "latest", locked = true }
 "cargo:presenterm" = "latest"
-
-"npm:@microsoft/compose-language-service" = "latest"
-"npm:@mermaid-js/mermaid-cli"  = "latest"
-
-"pipx:ansible-dev-tools" = { version = "latest", uvx_args = "--with argcomplete" }
-"pipx:ansible-inventory-grapher" = "latest"
-"pipx:ansible-lint" = "latest"
-"pipx:argcomplete" = "latest"
-"pipx:pymarkdownlint" = "latest"
-"pipx:weasyprint" = "latest"
-
-# "pipx:asciinema" = "latest"
-# "pipx:segno" = "latest"
-# helm-docs = "latest"
-# kind = "latest"
-
+# "cargo:codebook" = "latest"
+# "cargo:unmake" = "latest"
 {{- end }}
 
 [settings]
 experimental = true
-env_file = '.env'
+env_file = ".env"
 idiomatic_version_file_enable_tools = ["ruby"]
-
-# "cargo:fzf-make" = "latest" # build failure
-# "cargo:jinja-lsp" = "latest" # compiles from source on linux arm64 as of Jul 2025 (but binary available with pixi)
-# "cargo:ruplacer" = "latest"
-# "cargo:tex-fmt" = "latest" # compiles from source on linux arm64 as of Jul 2025. Pixi has a binary available
-# "npm:awk-language-server" = "latest"  # does not work on linux arm64 as of Jul 2025. Use Pixi
-# "pipx:beautysh" = "latest" # errors out within vim with a module import error (same with pixi global install)
-# "pipx:pylyzer" = "latest"  # not available on linux arm64 as of Jul 2025
-# aqua = "latest"
-# ccache = "latest"          # not available on linux arm64 as of Jul 2025
-# checkmake = "latest"       # not available on linux arm64 as of Jul 2025
-# dust = "latest"            # not available on linux arm64 as of Jul 2025
-# git-cliff = "latest"       # not available on linux arm64 as of Jul 2025
-# gup = "latest"
-# jless = "latest"           # not available for linux arm64 as of Jul 2025
-# jnv = "latest"             # not available on linux arm64 as of Jul 2025
-# kubectl-convert = "latest"
-# make = "latest"            # problem downloading for both x86-64 and arm64 as of Jul 2025
-# ripgrep-all = "latest"     # not available on linux arm64 as of Jul 2025
-# terraform-docs = "latest"
 
 # vim: ft=toml:
