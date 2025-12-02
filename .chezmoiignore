@@ -4,11 +4,9 @@
 .vscode/
 README.md
 LICENSE
-{{- if eq .chezmoi.hostname "blend" }}
-.hushlogin
-{{- end }}
-{{- if ne .chezmoi.hostname "blend" }}
-.config/presenterm
+{{- if ne .chezmoi.hostname "blend" }} # the below files can be skipped on various remote machines
+.config/appman
 .config/bleachbit
-.ssh/authorized_keys
+.config/presenterm
+.hushlogin
 {{- end }}
