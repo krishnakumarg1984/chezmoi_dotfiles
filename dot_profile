@@ -7,7 +7,17 @@
 test -r "$HOME/.config/envman/load.sh" && . "$HOME/.config/envman/load.sh" # TODO: Remove (webi brew)
 # )))
 
-test -d "$HOME/.local/bin" && path_add prepend "$HOME/.local/bin" # ~/.local/bin to PATH
+if type 'path_add' 2>/dev/null | grep -q 'function'; then
+  IDEMPOTENT_PATH="1" # shell functions have been sourced
+fi
+
+if [ -d "$HOME/.local/bin" ]; then  # Prepend "~/.local/bin" to the user's PATH
+  if [ -n "${IDEMPOTENT_PATH}" ]; then
+    path_add prepend "$HOME/.local/bin"
+  else
+    PATH="$HOME/.local/bin:$PATH"
+  fi
+fi
 
 # Incorporate various third-party commands to PATH & set their related environment variables (((
 
