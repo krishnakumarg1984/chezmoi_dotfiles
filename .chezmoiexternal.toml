@@ -1,9 +1,9 @@
 [".config/bash/complete_alias.sh"]
-    type = "file"
-    url = "https://raw.githubusercontent.com/cykerway/complete-alias/refs/heads/master/complete_alias"
-    refreshPeriod = "168h"
+type = "file"
+url = "https://raw.githubusercontent.com/cykerway/complete-alias/refs/heads/master/complete_alias"
+refreshPeriod = "168h"
 
-[".config/nvim"]
-    type = "git-repo"
-    url = "git@github.com:krishnakumarg1984/astronvim_config.git"
-    refreshPeriod = "168h"
+[".config/astronvim"]
+type = "git-repo"
+url = "git@github.com:krishnakumarg1984/astronvim_config.git"
+refreshPeriod = "168h"
