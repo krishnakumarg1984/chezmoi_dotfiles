@@ -1,74 +1,72 @@
-# ================================
-# Bash Completion for update_env_var_generic and remove_from_env_var
-# ================================
+#!/bin/bash
 
-# Complete environment variable names (e.g., PATH, LD_LIBRARY_PATH)
-_complete_env_var_names() {
-    local cur
-    cur="${COMP_WORDS[COMP_CWORD]}"
+# ============================================================
+# Bash Completion Script for Ultra High-Performance POSIX
+# Environment Variable Manager
+# ------------------------------------------------------------
+# This script provides autocompletion for the shell functions
+# defined in the environment variable manager script. It includes:
+#   - Autocompletion for environment variable names (e.g., PATH).
+#   - Autocompletion for the options available for update_env_var_generic and remove_from_env_var.
+#
+# This script should be sourced in the shell's initialization files
+# like `.bashrc` for bash completion support.
+# ============================================================
 
-    # Complete environment variable names using compgen
-    COMPREPLY=($(compgen -v -- "$cur"))
+# Function to generate completion for environment variable names.
+complete_env_vars() {
+    # List of environment variables that are commonly used in the shell
+    # and can be dynamically sourced from the environment.
+    # Using `compgen` to list all variables set in the shell environment.
+    compgen -v
 }
 
-# Complete function arguments for update_env_var_generic (e.g., prepend, append, move, verbose, quiet)
-_complete_update_env_var_generic_args() {
-    local cur
-    cur="${COMP_WORDS[COMP_CWORD]}"
+# Function to complete the options for `update_env_var_generic`.
+complete_update_env_var_options() {
+    # The valid options for the function `update_env_var_generic`.
+    # Arguments like 'prepend', 'append', 'move' are expected.
+    COMPREPLY=()
+    local current_word="${COMP_WORDS[COMP_CWORD]}"
+    local valid_options="prepend append move"
 
-    # Complete flags: prepend, append, move, verbose, quiet
-    local options="prepend append move verbose quiet"
-    COMPREPLY=($(compgen -W "$options" -- "$cur"))
-}
-
-# Complete function arguments for remove_from_env_var (e.g., entry to remove)
-_complete_remove_from_env_var_args() {
-    local cur var entries
-    var="${COMP_WORDS[1]}"
-    cur="${COMP_WORDS[COMP_CWORD]}"
-
-    # Get current value of environment variable for removal (e.g., PATH entries)
-    entries=$(eval echo \$$var)
-
-    # Complete entries within the environment variable (based on the colon-separated list)
-    IFS=':' read -r -a entry_array <<< "$entries"
-    COMPREPLY=($(compgen -W "${entry_array[*]}" -- "$cur"))
-}
-
-# Main completion function for update_env_var_generic and remove_from_env_var
-_complete_env_var_operations() {
-    local cur prev
-    prev="${COMP_WORDS[COMP_CWORD]-1}"
-    cur="${COMP_WORDS[COMP_CWORD]}"
-
-    # If it's the first word, complete environment variable names
-    if [ $COMP_CWORD -eq 1 ]; then
-        _complete_env_var_names
-    # If it's the second word, complete entry to add (optional)
-    elif [ $COMP_CWORD -eq 2 ]; then
-        # Optionally, you can complete known paths (e.g., based on $PATH entries)
-        COMPREPLY=($(compgen -f -- "$cur"))
-    # If it's the third word, complete the flags for update_env_var_generic (prepend, append, move, verbose, quiet)
-    elif [ $COMP_CWORD -ge 3 ]; then
-        _complete_update_env_var_generic_args
+    if [[ $current_word == * ]] ; then
+        # If no word is typed, complete all the options.
+        COMPREPLY=( $(compgen -W "$valid_options" -- "$current_word") )
     fi
 }
 
-# Main completion handler for remove_from_env_var
-_complete_remove_from_env_var() {
-    local cur prev
-    prev="${COMP_WORDS[COMP_CWORD]-1}"
-    cur="${COMP_WORDS[COMP_CWORD]}"
+# Function to complete environment variables for `remove_from_env_var`.
+complete_remove_from_env_var() {
+    # This function handles autocompletion for the `remove_from_env_var` function
+    # It will first complete the environment variable name and then the entry to be removed.
+    if [ "${COMP_CWORD}" -eq 2 ]; then
+        # Complete environment variables (like PATH)
+        complete_env_vars
+    elif [ "${COMP_CWORD}" -eq 3 ]; then
+        # Complete entries inside the selected environment variable
+        local var_name="${COMP_WORDS[2]}"
+        local var_value
+        var_value=$(eval echo \$$var_name)  # Get the value of the environment variable.
 
-    # If the first word is remove_from_env_var, complete entries to remove
-    if [ "$prev" = "remove_from_env_var" ]; then
-        _complete_remove_from_env_var_args
+        # If the variable has a value, we complete its entries (split by $ENV_SEP)
+        if [ -n "$var_value" ]; then
+            local entries=""
+            IFS="$ENV_SEP" # Separator for colon-separated values (e.g., PATH).
+            for entry in $var_value; do
+                entries="$entries$entry"$'\n'
+            done
+            COMPREPLY=( $(compgen -W "$entries" -- "${COMP_WORDS[COMP_CWORD]}") )
+        fi
     fi
 }
 
-# Register the completion function for the update_env_var_generic command
-complete -F _complete_env_var_operations update_env_var_generic
+# Main Completion Setup
+# ----------------------------------------------
+# 1. Autocompletion for environment variable names (e.g., PATH, LD_LIBRARY_PATH).
+complete -F complete_env_vars update_env_var_generic remove_from_env_var
 
-# Register the completion function for the remove_from_env_var command
-complete -F _complete_remove_from_env_var remove_from_env_var
+# 2. Autocompletion for options like prepend, append, move for update_env_var_generic.
+complete -F complete_update_env_var_options update_env_var_generic
 
+# 3. Autocompletion for entries to remove from environment variables.
+complete -F complete_remove_from_env_var remove_from_env_var
