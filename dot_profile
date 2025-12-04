@@ -7,8 +7,8 @@
 test -r "$HOME/.config/envman/load.sh" && . "$HOME/.config/envman/load.sh" # TODO: Remove (webi brew)
 # )))
 
-if type 'path_add' 2>/dev/null | grep -q 'function'; then
-  IDEMPOTENT_PATH="1" # shell functions have been sourced
+if declare -f update_env_var_generic >/dev/null; then
+  IDEMPOTENT_PATH="1"  # Function has been defined or sourced
 fi
 
 if [ -d "$HOME/.local/bin" ]; then  # Prepend "~/.local/bin" to the user's PATH
@@ -20,13 +20,6 @@ if [ -d "$HOME/.local/bin" ]; then  # Prepend "~/.local/bin" to the user's PATH
 fi
 
 # Incorporate various third-party commands to PATH & set their related environment variables (((
-
-# Incorporate `ansible-*` commands into PATH (((
-if [ -x "$(command -v adt)" ]; then
-  MISE_ADT_BIN_PATH="$HOME/.local/share/mise/installs/pipx-ansible-dev-tools/latest/ansible-dev-tools/bin"
-  test -d "$MISE_ADT_BIN_PATH" && path_add prepend "$MISE_ADT_BIN_PATH"
-fi
-# )))
 
 # Incorporate the `pixi` command to PATH (((
 if [ -d "$HOME/.config/pixi" ]; then
@@ -50,29 +43,30 @@ fi
 
 # Set EDITOR and SUDO_EDITOR (((
 if [ -x "$(command -v nvim)" ]; then
-  test -r "$HOME/.local/share/nvim/mason/bin" && path_add prepend "$HOME/.local/share/nvim/mason/bin" # Prepend Mason-tool-installer binaries to PATH
   VISUAL="$(command -v nvim)"
-  SUDO_EDITOR=$VISUAL
 elif [ -x "$(command -v vim)" ]; then
   VISUAL="$(command -v vim)"
-  SUDO_EDITOR=$VISUAL
-else
+elif [ -x "$(command -v vi)" ]; then
   VISUAL="$(command -v vi)"
-  SUDO_EDITOR=$VISUAL
+elif [ -x "$(command -v nano)" ]; then
+  VISUAL="$(command -v nano)"
 fi
+SUDO_EDITOR=$VISUAL
 EDITOR="$SUDO_EDITOR" && export EDITOR && export SUDO_EDITOR && export VISUAL
 # )))
+# test -r "$HOME/.local/share/nvim/mason/bin" && path_add prepend "$HOME/.local/share/nvim/mason/bin" # Prepend Mason-tool-installer binaries to PATH
 
 # Set FIGNORE to suppress autocomplete for certain file extensions (((
 
 # https://stackoverflow.com/questions/32189015/can-i-make-tab-completion-filter-files-by-extension
 # https://unix.stackexchange.com/questions/166857/modify-bash-autocomplete-rule-to-exclude-particular-file-names
-FIGNORE=".4ct:.4tc:.a:.acn:.acr:.alg:.aux:.auxlock:.backup:.bak:.bbl:.bcf:.blg:.brf:.cb:.cb2:.cpt:.cut:.dll:.dpth:.DS_Store:.dvi:.dx64fsl:.el:.end:.ent:.fasl:.fdb_latexmk:.fff:.fls:.fmt:.fot:.gaux:.gem:.glg:.glo:.gls:.glsdefs:.glstex:.gtex:.hst:.idea:.idv:.idx:.ilg:.ind:.ist:.la:.lb:.lg:.listing:.loa:.load:.loe:.lof:.lol:.lot:.lox:.ltjruby:.luac:.lx64fsl:.maf:.mf:.mlf:.mlt:.mo:.mod:.mp:.mw:.nav:.nlg:.nlo:.nls:.o:.obj:.pax:.pdfpc:.pdfsync:.pre:.pyc:.pyg:.pytxcode:.rbc:.rbo:.run.xml:.save:.snm:.so:.soc:.sout:.spl:.sta:.swp:.sympy:.synctex:.synctex.gz:.tdo:.texpadtmp:.tfm:.thm:.toc:.trc:.ttt:.upa:.upb:.ver:.vrb:.wrt:.xcp:.xdv:.xdy:.xmpi:.xref:.xyc:$FIGNORE" && export FIGNORE
+# FIGNORE=".4ct:.4tc:.a:.acn:.acr:.alg:.aux:.auxlock:.backup:.bak:.bbl:.bcf:.blg:.brf:.cb:.cb2:.cpt:.cut:.dll:.dpth:.DS_Store:.dvi:.dx64fsl:.el:.end:.ent:.fasl:.fdb_latexmk:.fff:.fls:.fmt:.fot:.gaux:.gem:.glg:.glo:.gls:.glsdefs:.glstex:.gtex:.hst:.idea:.idv:.idx:.ilg:.ind:.ist:.la:.lb:.lg:.listing:.loa:.load:.loe:.lof:.lol:.lot:.lox:.ltjruby:.luac:.lx64fsl:.maf:.mf:.mlf:.mlt:.mo:.mod:.mp:.mw:.nav:.nlg:.nlo:.nls:.o:.obj:.pax:.pdfpc:.pdfsync:.pre:.pyc:.pyg:.pytxcode:.rbc:.rbo:.run.xml:.save:.snm:.so:.soc:.sout:.spl:.sta:.swp:.sympy:.synctex:.synctex.gz:.tdo:.texpadtmp:.tfm:.thm:.toc:.trc:.ttt:.upa:.upb:.ver:.vrb:.wrt:.xcp:.xdv:.xdy:.xmpi:.xref:.xyc:$FIGNORE" && export FIGNORE
 
 # )))
 
 # Set HISTCONTROL & HISTSIZE (shell-agnostic history-related environment variables) (((
-HISTCONTROL="erasedups:ignorespace:$HISTCONTROL" && export HISTCONTROL # prevent duplicate lines & lines starting with space
+# HISTCONTROL="erasedups:ignorespace:$HISTCONTROL" && export HISTCONTROL # prevent duplicate lines & lines starting with space
+path_add prepend "erasedups:ignorespace" HISTCONTROL
 HISTSIZE=10000 && export HISTSIZE                                      # Keep 10k lines of history
 # )))
 
@@ -222,23 +216,21 @@ RUFF_CACHE_DIR="$HOME/.local/state/ruff" && export RUFF_CACHE_DIR
 RUSTUP_HOME="$HOME/.local/share/rustup" && export RUSTUP_HOME
 
 # Configure SCREENRC and SCREENDIR environment variables (((
-if [ -x "$(command -v screen)" ]; then
-  if [ -r "$HOME/.config/screen/screenrc" ]; then
+if [ -x "$(command -v screen)" ] && [ -r "$HOME/.config/screen/screenrc" ]; then
     SCREENRC="$HOME/.config/screen/screenrc" && export SCREENRC
     SCREENDIR="$XDG_RUNTIME_DIR/screen" && export SCREENDIR
-  fi
 fi
 # )))
 
-test -x "$(command -v w3m)" && W3M_DIR="$HOME/.config/w3m" && export W3M_DIR
+# test -x "$(command -v w3m)" && W3M_DIR="$HOME/.config/w3m" && export W3M_DIR
 
-test -r "$HOME/.config/wget/wgetrc" && WGETRC="$HOME/.config/wget/wgetrc" && export WGETRC
+test -r "$HOME/.config/wget/wgetrc" && test -r "$HOME/.cache/wget-hsts" && WGETRC="$HOME/.config/wget/wgetrc" && export WGETRC
 
 # )))
 
 # eval ssh-agent (((
 if [ -x "$(command -v ssh-agent)" ] && [ "$SSH_AUTH_SOCK" = "" ]; then
   eval "$(ssh-agent)" >/dev/null
-  ssh-add ~/.ssh/id_ed25519_nov13_2025 2>/dev/null
+  ssh-add "$HOME/.ssh/id_ed25519_nov13_2025" 2>/dev/null
 fi
 # )))

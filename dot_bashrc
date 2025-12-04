@@ -201,6 +201,8 @@ if [ -x "$(command -v podman)" ]; then
   test -r "$HOME/.config/bash/bashrc_podman_completion_functions.sh" && . "$HOME/.config/bash/bashrc_podman_completion_functions.sh"
 fi
 
+test -r "/home/demo/.config/bash/update_env_variables_tab_completion.sh" && . "/home/demo/.config/bash/update_env_variables_tab_completion.sh"
+
 # tab completion for `docker` based on `podman` script (((
 if [ -x "$(command -v docker)" ]; then
   test -r "$HOME/.config/bash/bashrc_docker_completion_functions.sh" && . "$HOME/.config/bash/bashrc_docker_completion_functions.sh"
@@ -208,6 +210,8 @@ fi
 # )))
 
 # )))
+
+
 
 # tab completion for the `ssh` command for hosts in the user's config file
 test -r "$HOME/.config/bash/bashrc_ssh_hosts_completion_functions.sh" && . "$HOME/.config/bash/bashrc_ssh_hosts_completion_functions.sh"
