@@ -1,132 +1,74 @@
-# ============================================================
-# Tab Completion for update_env_var_generic and remove_from_env_var
-# ============================================================
-#
-# This script provides efficient and fast tab completion
-# for `update_env_var_generic` and `remove_from_env_var`.
-# It works for:
-# 1. Environment variable names (e.g., PATH, HOME, etc.).
-# 2. Modes (e.g., prepend, append, move).
-# 3. Entries within environment variables (e.g., removing entries in PATH).
-#
-# Add this code to your .bashrc or .bash_profile to enable the tab completion.
-# ============================================================
+# ================================
+# Bash Completion for update_env_var_generic and remove_from_env_var
+# ================================
 
-# ------------------------------------------------------------
-# Tab Completion for Environment Variable Names (e.g., PATH)
-# ------------------------------------------------------------
-_env_var_completions() {
-    local cur="${COMP_WORDS[COMP_CWORD]}"  # Current word being typed
-    COMPREPLY=()  # Initialize completion results
+# Complete environment variable names (e.g., PATH, LD_LIBRARY_PATH)
+_complete_env_var_names() {
+    local cur
+    cur="${COMP_WORDS[COMP_CWORD]}"
 
-    # Iterate over the environment variable names and match against the current input
-    for var in $(compgen -v); do
-        if [[ "$var" == "$cur"* && "$var" != "$cur" ]]; then
-            COMPREPLY+=("$var")  # Add matching variable name to the list of completions
-        fi
-    done
-
-    return 0  # Success, so return completions
+    # Complete environment variable names using compgen
+    COMPREPLY=($(compgen -v -- "$cur"))
 }
 
-# ------------------------------------------------------------
-# Tab Completion for Modes (prepend, append, move)
-# ------------------------------------------------------------
-_mode_completions() {
-    local cur="${COMP_WORDS[COMP_CWORD]}"  # Current word being typed
-    COMPREPLY=()  # Initialize completion results
+# Complete function arguments for update_env_var_generic (e.g., prepend, append, move, verbose, quiet)
+_complete_update_env_var_generic_args() {
+    local cur
+    cur="${COMP_WORDS[COMP_CWORD]}"
 
-    # Match the mode keywords: prepend, append, move
-    if [[ "$cur" == prepend* ]]; then
-        COMPREPLY=("prepend")
-    elif [[ "$cur" == append* ]]; then
-        COMPREPLY=("append")
-    elif [[ "$cur" == move* ]]; then
-        COMPREPLY=("move")
-    fi
-
-    return 0  # Success, so return completions
+    # Complete flags: prepend, append, move, verbose, quiet
+    local options="prepend append move verbose quiet"
+    COMPREPLY=($(compgen -W "$options" -- "$cur"))
 }
 
-# ------------------------------------------------------------
-# Tab Completion for Removing Entries from Environment Variables
-# ------------------------------------------------------------
-_remove_entry_completions() {
-    local var="${COMP_WORDS[1]}"  # Environment variable name to modify (e.g., PATH)
-    local cur="${COMP_WORDS[COMP_CWORD]}"  # Current word being typed
-    COMPREPLY=()  # Initialize completion results
+# Complete function arguments for remove_from_env_var (e.g., entry to remove)
+_complete_remove_from_env_var_args() {
+    local cur var entries
+    var="${COMP_WORDS[1]}"
+    cur="${COMP_WORDS[COMP_CWORD]}"
 
-    # If the environment variable is empty or not set, return no completions
-    if [[ -z "${!var}" ]]; then
-        return 0  # No completions since the variable is unset or empty
-    fi
+    # Get current value of environment variable for removal (e.g., PATH entries)
+    entries=$(eval echo \$$var)
 
-    # Split the value of the environment variable (e.g., PATH) by colon `:`
-    IFS=":"  # Set the Internal Field Separator to colon
-    for entry in ${!var}; do
-        # Match the entry against the current word being typed (`$cur`)
-        if [[ "$entry" == "$cur"* && "$entry" != "$cur" ]]; then
-            COMPREPLY+=("$entry")  # Add matching entry to the list of completions
-        fi
-    done
-
-    return 0  # Success, so return completions
+    # Complete entries within the environment variable (based on the colon-separated list)
+    IFS=':' read -r -a entry_array <<< "$entries"
+    COMPREPLY=($(compgen -W "${entry_array[*]}" -- "$cur"))
 }
 
-# ------------------------------------------------------------
-# Tab Completion for update_env_var_generic (Environment Variables, Modes, Entries)
-# ------------------------------------------------------------
-_complete_update_env_var_generic() {
-    local cur="${COMP_WORDS[COMP_CWORD]}"  # Get the current word being typed
-    local var="${COMP_WORDS[1]}"  # Environment variable to modify (e.g., PATH)
-    COMPREPLY=()  # Initialize completion results
+# Main completion function for update_env_var_generic and remove_from_env_var
+_complete_env_var_operations() {
+    local cur prev
+    prev="${COMP_WORDS[COMP_CWORD]-1}"
+    cur="${COMP_WORDS[COMP_CWORD]}"
 
-    # Case 1: Completing environment variable names (first argument)
-    if [[ "$COMP_CWORD" -eq 1 ]]; then
-        _env_var_completions
-    # Case 2: Completing entries inside a variable (e.g., PATH entries)
-    elif [[ "$COMP_CWORD" -eq 2 && -n "$var" ]]; then
-        _remove_entry_completions
-    fi
-
-    # Case 3: Completing modes (prepend, append, move) in the second argument
-    if [[ "$COMP_CWORD" -eq 2 ]]; then
-        _mode_completions
+    # If it's the first word, complete environment variable names
+    if [ $COMP_CWORD -eq 1 ]; then
+        _complete_env_var_names
+    # If it's the second word, complete entry to add (optional)
+    elif [ $COMP_CWORD -eq 2 ]; then
+        # Optionally, you can complete known paths (e.g., based on $PATH entries)
+        COMPREPLY=($(compgen -f -- "$cur"))
+    # If it's the third word, complete the flags for update_env_var_generic (prepend, append, move, verbose, quiet)
+    elif [ $COMP_CWORD -ge 3 ]; then
+        _complete_update_env_var_generic_args
     fi
 }
 
-# ------------------------------------------------------------
-# Bind Tab Completion Functions to Shell Commands
-# ------------------------------------------------------------
-# This part binds the tab completion functions to specific shell commands:
-# - `update_env_var_generic` for environment variable and mode completions.
-# - `remove_from_env_var` for environment variable and entry completions.
+# Main completion handler for remove_from_env_var
+_complete_remove_from_env_var() {
+    local cur prev
+    prev="${COMP_WORDS[COMP_CWORD]-1}"
+    cur="${COMP_WORDS[COMP_CWORD]}"
 
-complete -F _complete_update_env_var_generic update_env_var_generic  # Bind environment variable and entry completions
-complete -F _complete_update_env_var_generic remove_from_env_var    # Bind environment variable and entry completions for remove
-
-# ------------------------------------------------------------
-# Define the `update_env_var_generic` and `remove_from_env_var`
-# Functions (Sample)
-# ------------------------------------------------------------
-
-# Example placeholder functions for `update_env_var_generic` and `remove_from_env_var`
-# These functions are just an example, replace them with your actual implementations.
-
-update_env_var_generic() {
-    local var="$1"
-    local mode="$2"
-    local entry="$3"
-
-    echo "Updating $var with mode $mode and entry $entry"
-    # Add your actual implementation here
+    # If the first word is remove_from_env_var, complete entries to remove
+    if [ "$prev" = "remove_from_env_var" ]; then
+        _complete_remove_from_env_var_args
+    fi
 }
 
-remove_from_env_var() {
-    local var="$1"
-    local entry="$2"
+# Register the completion function for the update_env_var_generic command
+complete -F _complete_env_var_operations update_env_var_generic
 
-    echo "Removing $entry from $var"
-    # Add your actual implementation here
-}
+# Register the completion function for the remove_from_env_var command
+complete -F _complete_remove_from_env_var remove_from_env_var
 

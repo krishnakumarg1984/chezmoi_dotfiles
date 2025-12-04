@@ -2,65 +2,8 @@
 # shellcheck shell=sh
 # shellcheck disable=SC1091
 
-# Ultra High-Performance POSIX Environment Variable Manager (((
-#
-# This script provides an ultra-fast and POSIX-compliant way to:
-#  - Deduplicate entries in colon-separated environment variables (like PATH).
-#  - Add new entries idempotently (only if not already present).
-#  - Optionally move an existing entry to the beginning or end of the list.
-#
-# It avoids external tools like `grep`, `awk`, `sed`, and `tr`, ensuring maximum performance
-# and compatibility across all POSIX-compliant shells.
-#
-# ------------------------------------------------------------
-# Key Features:
-#   - **Speed Optimized**: Processes the environment variable in a single pass.
-#   - **POSIX Compliant**: Works in any POSIX shell, like `sh`, `bash`, `dash`, `zsh`.
-#   - **No External Tools**: Completely avoids reliance on tools like `grep`, `tr`, etc.
-#   - **Flexible**: Supports **prepending**, **appending**, **moving**, and **deduplication** of entries.
-#
-# ============================================================
-
-# Default separator for colon-separated environment variable entries.
-ENV_SEP=":"
-
-# ============================================================
-# FUNCTION: get_env_var
-# ------------------------------------------------------------
-# Purpose:
-#   - Retrieve the value of an environment variable.
-#
-# Arguments:
-#   $1 - Name of the environment variable (e.g., PATH).
-#
-# Returns:
-#   - Prints the current value of the environment variable.
-# ============================================================
-get_env_var() {
-    var="$1"
-    eval "printf '%s\n' \"\${$var}\""
-}
-
-# ============================================================
-# FUNCTION: set_env_var
-# ------------------------------------------------------------
-# Purpose:
-#   - Set and export an environment variable.
-#
-# Arguments:
-#   $1 - Name of the environment variable.
-#   $2 - Value to set.
-# ============================================================
-set_env_var() {
-    var="$1"
-    val="$2"
-    eval "$var=\$val"
-    export "$var"
-}
-
-# ============================================================
-# FUNCTION: update_env_var_generic
-# ------------------------------------------------------------
+# FUNCTION: update_env_var_generic (((
+# ------------------------------------
 # Purpose:
 #   - Deduplicate entries in a colon-separated environment variable.
 #   - Add a new entry idempotently (only if it isn't already present).
@@ -73,6 +16,8 @@ set_env_var() {
 #         "prepend" - Add new entry at the beginning.
 #         "append"  - Add new entry at the end (default).
 #         "move"    - Move the existing entry to the beginning or end.
+#         "verbose" - Enable verbose output (override default).
+#         "quiet"   - Suppress verbose output (override default).
 #
 # Returns:
 #   - Updates the specified environment variable.
@@ -82,15 +27,23 @@ update_env_var_generic() {
     new="$2"        # New entry to add.
     mode="append"   # Default mode is "append".
     move="no"       # Default: don't move entry.
+    verbose=0       # Default to quiet mode
     shift 1         # Shift past the variable name.
 
-    # Parse optional arguments (prepend, append, move).
+    # Check if running interactively or via script (quiet mode by default)
+    if [[ "$-" == *i* ]]; then
+        verbose=1  # Default to verbose in interactive shells
+    fi
+
+    # Parse optional arguments (prepend, append, move, verbose, quiet).
     if [ -n "$new" ]; then
         shift
         for arg in "$@"; do
             case "$arg" in
                 prepend|append) mode="$arg" ;;  # Set mode.
                 move) move="yes" ;;             # Enable move.
+                verbose) verbose=1 ;;           # Enable verbose output.
+                quiet) verbose=0 ;;             # Enable quiet output.
                 *) echo "Invalid argument '$arg'" >&2; return 1 ;;
             esac
         done
@@ -134,6 +87,9 @@ update_env_var_generic() {
                 entries="$entries$ENV_SEP$new"
             fi
             seen=":$seen:$new"   # Mark new entry as seen.
+            if [ "$verbose" -eq 1 ]; then
+                echo "Added new entry '$new' to $var ($mode)"
+            fi
         elif [ "$move" = "yes" ]; then
             # Move the entry by removing and adding it back at the correct position.
             entries=""
@@ -153,113 +109,20 @@ update_env_var_generic() {
             else
                 entries="$entries$ENV_SEP$new"
             fi
+            if [ "$verbose" -eq 1 ]; then
+                echo "Moved entry '$new' in $var to $mode"
+            fi
         fi
     fi
 
     # Final step: Export the updated environment variable.
     set_env_var "$var" "$entries"
+
+    # Verbose output for completion (if interactive or VERBOSE=true)
+    if [ "$verbose" -eq 1 ]; then
+        echo "Updated $var: $entries"
+    fi
 }
-
-# ============================================================
-# FUNCTION: remove_from_env_var
-# ------------------------------------------------------------
-# Purpose:
-#   - Remove a specific entry from a colon-separated environment variable.
-#
-# Arguments:
-#   $1 - Name of the environment variable.
-#   $2 - Entry to remove.
-#
-# Returns:
-#   - Updates the specified environment variable.
-# ============================================================
-remove_from_env_var() {
-    var="$1"
-    target="$2"
-    val=$(get_env_var "$var")
-
-    # Efficiently build new entries without the target entry.
-    entries=""
-    IFS="$ENV_SEP"
-    for entry in $val; do
-        if [ "$entry" != "$target" ]; then
-            # Append entries that are not the target.
-            if [ -z "$entries" ]; then
-                entries="$entry"
-            else
-                entries="$entries$ENV_SEP$entry"
-            fi
-        fi
-    done
-
-    # Export the final result.
-    set_env_var "$var" "$entries"
-}
-
-# ============================================================
-# EXAMPLES (Commented Out)
-# ============================================================
-
-# 1. Deduplicate PATH only (no addition)
-# update_env_var_generic PATH
-
-# 2. Add a new entry to the beginning, move it if already exists
-# update_env_var_generic PATH "/usr/local/bin" prepend move
-
-# 3. Add a new entry to the end
-# update_env_var_generic PATH "/opt/tools" append
-
-# 4. Remove a specific entry
-# remove_from_env_var PATH "/old/path"
-
-# ============================================================
-# ASCII Flow Diagram (for update_env_var_generic)
-# -----------------------------------------------------------
-#
-#   +-----------------------------+
-#   |  Start                       |
-#   +-----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   | Retrieve environment var    |
-#   | (e.g., PATH)                 |
-#   +-----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   | Loop through entries and     |
-#   | deduplicate (if not seen)    |
-#   +-----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   | Is new entry provided?       |
-#   +-----------------------------+
-#       |         |
-#       v         v
-#   +---------------------+   +---------------------------+
-#   | Entry exists?       |   | Add new entry (prepend/    |
-#   | (move is "yes")     |   | append) and return final  |
-#   +---------------------+   | result                     |
-#       |                   +---------------------------+
-#       v
-#   +----------------------------+
-#   | Add new entry to position   |
-#   | (prepend or append)         |
-#   +----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   | Export final result         |
-#   +-----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   |  End                        |
-#   +-----------------------------+
-#
-
 
 # )))
 
