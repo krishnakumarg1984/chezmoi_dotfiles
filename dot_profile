@@ -209,206 +209,218 @@ command_type_path() {
 
 # )))
 
-# Function: update_env_var (((
-# Purpose:
-#   This function modifies a colon-separated environment variable (e.g., PATH)
-#   by performing operations like prepend, append, remove, movefirst, movelast.
-#   It also handles deduplication by default to ensure no duplicate entries in the variable.
-#
-# Arguments:
-#   $1 - (Required) The environment variable to modify (e.g., PATH).
-#   $2 - (Optional) The operation to perform on the variable: prepend, append, movefirst, movelast, remove (default: deduplication).
-#   $3 - (Required) The new entry to add, prepend, remove, or move.
-#   $4 - (Optional) Custom delimiter to use for splitting the environment variable (default is colon ":").
-#   $5 - (Optional) Flags: --verbose, -v (prints the updated variable after modification) or --quiet, -q (suppresses output).
-#
-# Returns:
-#   - Updates the specified environment variable by modifying its value based on the specified operation.
-#
+# Modern POSIX Shell Environment Manager (((
+# ------------------------------------------------------------
+# Features:
+# 1. Fully POSIX `command_type` detection with caching.
+# 2. Pure POSIX `update_env_var` for manipulating environment variables.
+# 3. Supports deduplication, prepend/append, movefirst/movelast, remove.
+# 4. Handles multi-character delimiters.
+# 5. Verbose/quiet modes.
 # ============================================================
-update_env_var() {
-    # 1. **Determine if the shell is interactive or non-interactive**
-    # ============================================================
-    # The shell is interactive if:
-    # - The PS1 variable is set (indicating an interactive terminal).
-    # - The `-` flag contains "i" (indicating an interactive shell).
-    if [ -n "$PS1" ] || [[ "$-" == *i* ]]; then
-        verbose="yes"  # Interactive shell -> verbose mode
-    else
-        verbose="no"   # Non-interactive shell (e.g., sourcing a script) -> quiet mode by default
-    fi
 
-    # 2. **Initialize default values**
-    # ============================================================
-    var="$1"           # The environment variable to modify (e.g., PATH)
-    operation="deduplicate"  # Default operation: deduplicate duplicates
-    delimiter=":"      # Default delimiter is colon ":"
-    entry=""           # The new entry to be modified/added to the environment variable
-    quiet="no"         # Quiet mode flag (suppress output when set)
+# ============================================================
+# -------------------- COMMAND TYPE DETECTION -----------------
+# ============================================================
 
-    # 3. **Parse the remaining arguments to configure the function's behavior**
-    # ============================================================
-    shift  # Shift off the first argument (var)
+# Convert any string into a valid shell variable name
+_ct_cache_key() {
+    key="$1"
+    key=${key//[^a-zA-Z0-9_]/_}
+    printf '%s' "$key"
+}
 
-    while [ $# -gt 0 ]; do
-        case "$1" in
-            --verbose|-v) verbose="yes" ;;    # Verbose flag (prints output after operation)
-            --quiet|-q) quiet="yes" ;;       # Quiet flag (suppresses output)
-            prepend|append|movefirst|movelast|remove) operation="$1" ;;  # Operation flags
-            --delimiter|-d) delimiter="$2"; shift ;;  # Custom delimiter flag, shift for the delimiter value
-            *) entry="$1" ;;  # Entry to add, prepend, remove, or move
-        esac
-        shift  # Move to the next argument
+# Cache set/get
+_ct_cache_set() {
+    key=$(_ct_cache_key "$1")
+    eval "__ct_cache_$key=$2"
+}
+
+_ct_cache_get() {
+    key=$(_ct_cache_key "$1")
+    eval "printf '%s' \"\${__ct_cache_$key:-}\""
+}
+
+# Return command type code:
+# 0=notfound, 1=builtin, 2=function, 3=keyword, 4=external, 5=alias
+command_type() {
+    name=$1
+
+    # Check cache first
+    cached=$(_ct_cache_get "$name")
+    [ -n "$cached" ] && { printf '%s\n' "$cached"; return; }
+
+    # Explicit path
+    case $name in */*) [ -x "$name" ] && [ ! -d "$name" ] && _ct_cache_set "$name" 4 && printf '4\n' && return || _ct_cache_set "$name" 0 && printf '0\n' && return ;; esac
+
+    # type builtin
+    out=$(type "$name" 2>/dev/null) || out=
+    case $out in
+        *"is a function"*) _ct_cache_set "$name" 2; printf '2\n'; return ;;
+        *"is a shell builtin"*) _ct_cache_set "$name" 1; printf '1\n'; return ;;
+        *"is a reserved word"*) _ct_cache_set "$name" 3; printf '3\n'; return ;;
+    esac
+
+    # alias detection
+    if alias "$name" >/dev/null 2>&1; then _ct_cache_set "$name" 5; printf '5\n'; return; fi
+
+    # PATH scan
+    oldIFS=$IFS
+    IFS=:
+    for dir in $PATH; do
+        [ -d "$dir" ] || continue
+        [ -x "$dir/$name" ] && IFS=$oldIFS && _ct_cache_set "$name" 4 && printf '4\n' && return
     done
+    IFS=$oldIFS
 
-    # 4. **Default operation is deduplication if no entry is provided**
-    # ============================================================
-    if [ -z "$entry" ] && [ "$operation" != "remove" ]; then
-        operation="deduplicate"  # If no entry is specified, deduplication is performed by default
-    fi
+    _ct_cache_set "$name" 0
+    printf '0\n'
+}
 
-    # 5. **Check if entry is required for non-deduplication operations**
-    # ============================================================
-    if [ -z "$entry" ] && [ "$operation" != "deduplicate" ]; then
-        echo "Error: No entry specified to modify the variable." >&2
-        return 1
-    fi
+# Convert type code to name
+command_type_name() {
+    case $1 in
+        0) printf 'notfound\n' ;;
+        1) printf 'builtin\n' ;;
+        2) printf 'function\n' ;;
+        3) printf 'keyword\n' ;;
+        4) printf 'external\n' ;;
+        5) printf 'alias\n' ;;
+        *) printf 'unknown\n' ;;
+    esac
+}
 
-    # 6. **Retrieve the current value of the environment variable**
-    # ============================================================
-    val="${!var}"  # Indirect variable expansion to get the value of the environment variable
+# Existence checks
+command_type_exists() { [ "$(command_type "$1")" -ne 0 ]; }
+command_type_does_not_exist() { [ "$(command_type "$1")" -eq 0 ]; }
 
-    # If the variable is empty, set it to an empty string
-    if [ -z "$val" ]; then
-        val=""
-    fi
-
-    # 7. **Split the current value into an array using the delimiter**
-    # ============================================================
-    IFS="$delimiter" read -r -a entries <<< "$val"
-
-    # 8. **Perform deduplication**
-    # ============================================================
-    seen=""  # String to track seen entries
-    result=()  # Array to hold the deduplicated result
-
-    for e in "${entries[@]}"; do
-        # If the entry has already been seen, skip it.
-        if echo "$seen" | grep -q "$delimiter$e$delimiter\|^$e$delimiter\|$delimiter$e$"; then
-            continue
-        fi
-        result+=("$e")
-        seen="$seen$delimiter$e"
-    done
-
-    # 9. **Handle remove operation**
-    # ============================================================
-    if [ "$operation" = "remove" ]; then
-        found="no"
-        result=()
-        for e in "${entries[@]}"; do
-            if [ "$e" != "$entry" ]; then
-                result+=("$e")
-            else
-                found="yes"
-            fi
-        done
-
-        if [ "$found" = "no" ]; then
-            echo "Error: Entry '$entry' not found in $var." >&2
-            return 1
-        fi
-    fi
-
-    # 10. **Handle adding or moving the new entry**
-    # ============================================================
-    if [ -n "$entry" ]; then
-        if echo "$seen" | grep -q "$delimiter$entry$delimiter\|^$entry$delimiter\|$delimiter$entry$"; then
-            # If entry already exists, move it to the specified position
-            if [ "$operation" = "movefirst" ]; then
-                result=("$entry" "${result[@]/$entry}")
-            elif [ "$operation" = "movelast" ]; then
-                result=("${result[@]/$entry}" "$entry")
-            fi
-        else
-            # If entry doesn't exist, perform prepend or append
-            if [ "$operation" = "prepend" ]; then
-                result=("$entry" "${result[@]}")
-            elif [ "$operation" = "append" ]; then
-                result+=("$entry")
-            fi
-        fi
-    fi
-
-    # 11. **Reassemble the variable and update it**
-    # ============================================================
-    new_value=$(IFS="$delimiter"; echo "${result[*]}")
-    export "$var=$new_value"  # Update the environment variable
-
-    # 12. **Handle quiet mode and verbose mode**
-    # ============================================================
-    if [ "$quiet" = "yes" ]; then
-        return 0  # Suppress any output if quiet mode is enabled
-    fi
-
-    if [ "$verbose" = "yes" ]; then
-        echo "$new_value"  # Print the updated environment variable if verbose mode is enabled
-    fi
+# Return absolute path (or command name for builtin/alias)
+command_type_path() {
+    name=$1
+    t=$(command_type "$name")
+    case "$t" in
+        0) printf '' ;;
+        4)
+            case $name in */*) printf '%s' "$name" ;;
+            *) oldIFS=$IFS; IFS=:; for dir in $PATH; do [ -x "$dir/$name" ] && IFS=$oldIFS && printf '%s' "$dir/$name" && return; done; IFS=$oldIFS ;;
+            esac ;;
+        1|2|3|5) printf '%s' "$name" ;;
+        *) printf '' ;;
+    esac
 }
 
 # ============================================================
-# Example Use Cases (Commented out)
+# -------------------- UPDATE_ENV_VAR ------------------------
 # ============================================================
 
-# 1. **Prepending an Entry to a Non-Empty Variable**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Prepend "/new/path" to the front of the PATH variable.
-# Expected Output: /new/path:/usr/bin:/bin:/usr/sbin:/sbin
-# update_env_var PATH "/new/path" prepend --verbose
+update_env_var() {
+    var="$1"
+    operation="deduplicate"
+    delimiter=":"
+    entry=""
+    verbose="no"
+    quiet="no"
 
-# 2. **Appending an Entry to a Non-Empty Variable**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Append "/opt/bin" to the end of the PATH variable.
-# Expected Output: /usr/bin:/bin:/usr/sbin:/sbin:/opt/bin
-# update_env_var PATH "/opt/bin" append --verbose
+    shift
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --verbose|-v) verbose="yes" ;;
+            --quiet|-q) quiet="yes" ;;
+            prepend|append|movefirst|movelast|remove) operation="$1" ;;
+            --delimiter|-d) delimiter="$2"; shift ;;
+            *) entry="$1" ;;
+        esac
+        shift
+    done
 
-# 3. **Removing an Existing Entry**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Remove "/bin" from the PATH variable.
-# Expected Output: /usr/bin:/usr/sbin:/sbin
-# update_env_var PATH "/bin" remove --verbose
+    eval "val=\$$var"
+    [ -z "$val" ] && val=""
 
-# 4. **Removing a Non-Existent Entry**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Try to remove "/opt/bin" (which does not exist).
-# Expected Output: Error: Entry '/opt/bin' not found in PATH.
-# update_env_var PATH "/opt/bin" remove --verbose
+    # Split into pseudo-array
+    result_list=""
+    remainder="$val"
+    while [ -n "$remainder" ]; do
+        case "$remainder" in
+            *"$delimiter"*) tmp=${remainder%%"$delimiter"*}; result_list="$result_list
+$tmp"; remainder=${remainder#*"$delimiter"} ;;
+            *) result_list="$result_list
+$remainder"; remainder="" ;;
+        esac
+    done
 
-# 5. **Moving an Entry to the Front (movefirst)**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Move "/usr/sbin" to the front of the PATH variable.
-# Expected Output: /usr/sbin:/usr/bin:/bin:/sbin
-# update_env_var PATH "/usr/sbin" movefirst --verbose
+    # Deduplicate
+    dedup_list=""
+    seen=""
+    oldIFS=$IFS
+    IFS='
+'
+    for e in $result_list; do
+        [ -z "$e" ] && continue
+        case "$seen" in
+            *"$delimiter$e$delimiter"*) continue ;;
+            *) dedup_list="$dedup_list
+$e"; seen="$seen$delimiter$e$delimiter" ;;
+        esac
+    done
+    IFS=$oldIFS
 
-# 6. **Moving an Entry to the End (movelast)**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Move "/bin" to the end of the PATH variable.
-# Expected Output: /usr/bin:/usr/sbin:/sbin:/bin
-# update_env_var PATH "/bin" movelast --verbose
+    # Remove
+    if [ "$operation" = "remove" ]; then
+        new_list=""
+        found="no"
+        IFS='
+'
+        for e in $dedup_list; do
+            [ "$e" = "$entry" ] && found="yes" || new_list="$new_list$delimiter$e"
+        done
+        IFS=$oldIFS
+        [ "$found" != "yes" ] && { echo "Error: Entry '$entry' not found in $var." >&2; return 1; }
+        dedup_list="$new_list"
+    fi
 
-# 7. **Test for Deduplication (Default Operation)**
-# Initial: PATH="/usr/bin:/bin:/usr/bin:/usr/sbin:/sbin"
-# Operation: The default operation is deduplication (no entry passed).
-# Expected Output: /usr/bin:/bin:/usr/sbin:/sbin
-# update_env_var PATH "" --verbose
+    # Prepend/Append/Move
+    if [ -n "$entry" ] && [ "$operation" != "remove" ]; then
+        new_list=""
+        IFS='
+'
+        for e in $dedup_list; do
+            [ "$e" != "$entry" ] && new_list="$new_list$delimiter$e"
+        done
+        IFS=$oldIFS
+        case "$operation" in
+            prepend|movefirst) dedup_list="$entry$new_list" ;;
+            append|movelast) dedup_list="$new_list$delimiter$entry" ;;
+        esac
+    fi
 
-# 8. **Test Quiet Mode**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Prepend "/new/path" to the front, with quiet mode enabled.
-# Expected Output: (No output, since quiet mode suppresses it)
-# update_env_var PATH "/new/path" prepend -q
+    # Cleanup leading delimiter
+    case "$dedup_list" in "$delimiter"*) dedup_list=${dedup_list#"$delimiter"} ;; esac
 
+    # Export variable
+    eval "$var=\"\$dedup_list\""
+
+    # Verbose
+    [ "$quiet" != "yes" ] && [ "$verbose" = "yes" ] && printf '%s\n' "$dedup_list"
+}
+
+# ============================================================
+# -------------------- USAGE EXAMPLES ------------------------
+# ============================================================
+# All examples are commented out for safe sourcing.
+#
+# PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/bin"
+# update_env_var PATH deduplicate --verbose
+# update_env_var PATH prepend "/opt/bin" --verbose
+# update_env_var PATH append "/home/user/bin" --verbose
+# update_env_var PATH movefirst "/usr/sbin" --verbose
+# update_env_var PATH movelast "/bin" --verbose
+# update_env_var PATH remove "/sbin" --verbose
+# update_env_var PATH prepend "/new/path" --delimiter "::" --verbose
+# ============================================================
+
+# End of modern POSIX environment manager
 # )))
+
 
 # # Source some useful external shell functions/values/options etc into the current shell (((
 # . "$HOME/.config/sh/sh_functions.sh" 2>/dev/null || true
