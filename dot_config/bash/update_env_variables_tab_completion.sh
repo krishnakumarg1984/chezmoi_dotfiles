@@ -1,89 +1,151 @@
-#!/bin/bash
-
+# update_env_var_completions.sh
 # ============================================================
-# Bash Completion Script for Ultra High-Performance POSIX
-# Environment Variable Manager with Verbosity Options
-# ------------------------------------------------------------
-# This script provides autocompletion for the shell functions
-# defined in the environment variable manager script. It includes:
-#   - Autocompletion for environment variable names (e.g., PATH).
-#   - Autocompletion for the options available for update_env_var_generic and remove_from_env_var.
-#   - Autocompletion for verbosity options (verbose, quiet).
+# Purpose:
+#   This script provides Bash tab-completion for the `update_env_var`
+#   function. It uses an optimized approach with associative arrays and
+#   precomputed lists to speed up the completion process, particularly
+#   for large environments or complex variable setups.
 #
-# This script should be sourced in the shell's initialization files
-# like `.bashrc` for bash completion support.
+# ============================================================
+# Suggested Testing Plan:
+#
+# 1. **Basic Tab Completion**:
+#    - **Test 1**: Type `update_env_var` and press **Tab**.
+#      - **Expected Result**: It should complete common environment variables like `PATH`, `HOME`, etc.
+#    - **Test 2**: Type `update_env_var PATH` and press **Tab**.
+#      - **Expected Result**: It should complete available operations like `prepend`, `append`, `remove`, etc.
+#
+# 2. **File Path Completion**:
+#    - **Test 3**: Type `update_env_var PATH /new/path` and press **Tab**.
+#      - **Expected Result**: It should complete valid paths like `/usr`, `/bin`, `/home`, etc., and optionally regular files.
+#
+# 3. **Flags Completion**:
+#    - **Test 4**: Type `update_env_var PATH /new/path append` and press **Tab**.
+#      - **Expected Result**: It should complete flags like `--verbose`, `-v`, `--quiet`, etc.
+#
+# 4. **Edge Case Testing**:
+#    - **Test 5**: Test with an environment variable that includes special characters or spaces (e.g., `PATH="/opt/bin /home/user/special path"`).
+#      - **Expected Result**: The script should correctly handle spaces and special characters, without misinterpreting them.
+#    - **Test 6**: Type an invalid operation or flag (e.g., `update_env_var PATH /new/path invalidflag`).
+#      - **Expected Result**: It should either not complete or return a warning/error.
+#
+# 5. **Large Environment Test**:
+#    - **Test 7**: Add a large number of environment variables (`100+`), either manually or with a script.
+#      - **Expected Result**: Tab completion should still function quickly and correctly.
+#
+# 6. **Cross-Platform Testing**:
+#    - **Test 8**: Test on **macOS** vs **Linux** (e.g., Ubuntu, CentOS).
+#      - **Expected Result**: Tab completion should work consistently on both platforms, with no issues in finding variables or paths.
+#
+# 7. **Completion with Nested Paths**:
+#    - **Test 9**: Test with nested directories in `PATH` or other variables (e.g., `/usr/bin:/usr/local/bin:/home/user/dir`).
+#      - **Expected Result**: Tab completion should work on directories with subdirectories without issues.
+#
+# 8. **Test Cache Populating**:
+#    - **Test 10**: Ensure that the environment variables are cached correctly.
+#      - **Test**: After sourcing the script, manually test completion. Ensure that once cached, the environment variables are accessed directly from the associative array and not recalculated on every tab press.
+#
 # ============================================================
 
-# Function to generate completion for environment variable names.
-complete_env_vars() {
-    # Use `compgen -v` to complete environment variable names
-    compgen -v
-}
+# Declare an associative array to store environment variable names
+# This helps speed up the lookup by storing them in a cached array.
+declare -A env_cache
 
-# Function to complete the options for `update_env_var_generic`.
-complete_update_env_var_options() {
-    # The valid options for the function `update_env_var_generic`.
-    # Arguments like 'prepend', 'append', 'move' are expected.
-    COMPREPLY=()
-    local current_word="${COMP_WORDS[COMP_CWORD]}"
-    local valid_options="prepend append move"
+# Precomputed static list of common environment variables
+# These are some of the most commonly used environment variables that
+# we expect users to modify frequently. This static list avoids
+# unnecessary dynamic searching.
+env_vars="PATH HOME USER LANG SHELL EDITOR TERM LD_LIBRARY_PATH HISTFILE"
 
-    # Complete valid options for update_env_var_generic function
-    if [[ $current_word == * ]] ; then
-        COMPREPLY=( $(compgen -W "$valid_options" -- "$current_word") )
+# Function to cache the environment variables
+# This function populates the `env_cache` associative array with common
+# environment variables for fast completion.
+_cache_env_vars() {
+    # Check if the cache is already populated (i.e., it's empty)
+    if [ ${#env_cache[@]} -eq 0 ]; then
+        # Populate cache with predefined common environment variables
+        for var in $env_vars; do
+            env_cache["$var"]=1  # Mark the variable as cached
+        done
+
+        # Optionally, dynamically add more environment variables from the system
+        # Uncomment below if you want to fetch more variables dynamically.
+        # Here we use `compgen -v` to list all environment variables and add them.
+        # for var in $(compgen -v); do
+        #     env_cache["$var"]=1
+        # done
     fi
 }
 
-# Function to complete verbosity options (verbose, quiet).
-complete_verbosity_options() {
-    # Verbosity options that are used to control script verbosity
-    COMPREPLY=()
-    local current_word="${COMP_WORDS[COMP_CWORD]}"
-    local valid_options="verbose quiet"
+# Function to complete environment variable names (e.g., PATH, HOME)
+_env_var_completions() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"  # Current word being typed in the completion
 
-    # Complete verbosity options
-    if [[ $current_word == * ]] ; then
-        COMPREPLY=( $(compgen -W "$valid_options" -- "$current_word") )
+    # Ensure that the environment variables are cached
+    _cache_env_vars
+
+    # Use the cached environment variables for completion
+    # `compgen -W` generates completions from the list of environment variable names
+    COMPREPLY=($(compgen -W "${!env_cache[@]}" -- "$cur"))
+}
+
+# Function to complete operation types (e.g., prepend, append, movefirst)
+_operations_completions() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"  # Current word being typed in the completion
+    local operations="prepend append movefirst movelast remove"  # List of operations
+
+    # Complete from the predefined list of operations
+    COMPREPLY=($(compgen -W "$operations" -- "$cur"))
+}
+
+# Function to complete flags (e.g., --verbose, -v, --quiet, -q)
+_flags_completions() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"  # Current word being typed in the completion
+    local flags="--verbose -v --quiet -q --delimiter -d"  # List of flags
+
+    # Complete from the predefined list of flags
+    COMPREPLY=($(compgen -W "$flags" -- "$cur"))
+}
+
+# Function to complete entries (file paths or values) for environment variables
+_entries_completions() {
+    local cur="${COMP_WORDS[COMP_CWORD]}"  # Current word being typed in the completion
+
+    # Predefined list of common system paths (to speed up matching)
+    # These paths are common directories in Unix-based systems that users are
+    # likely to complete when updating an environment variable.
+    local common_paths="/usr /etc /home /var /opt /tmp /bin /sbin"
+
+    # First attempt to complete against the common system paths
+    COMPREPLY=($(compgen -W "$common_paths" -- "$cur"))
+
+    # If no match was found, fall back to regular file path completion
+    if [[ ${#COMPREPLY[@]} -eq 0 ]]; then
+        COMPREPLY=($(compgen -f -- "$cur"))  # `compgen -f` completes file paths
     fi
 }
 
-# Function to complete environment variables for `remove_from_env_var`.
-complete_remove_from_env_var() {
-    # This function handles autocompletion for the `remove_from_env_var` function.
-    # First complete the environment variable name and then complete entries to remove from that variable.
+# Main function that handles tab completion logic for `update_env_var`
+_update_env_var_completions() {
+    # Determine which part of the command we are completing based on the argument position
 
-    if [ "${COMP_CWORD}" -eq 2 ]; then
-        # Complete environment variables (like PATH)
-        complete_env_vars
-    elif [ "${COMP_CWORD}" -eq 3 ]; then
-        # Complete entries inside the selected environment variable
-        local var_name="${COMP_WORDS[2]}"
-        local var_value
-        var_value=$(eval echo \$$var_name)  # Get the value of the environment variable.
-
-        # If the variable has a value, split it by ":" (colon) and offer completions for each entry.
-        if [ -n "$var_value" ]; then
-            local entries=""
-            IFS=":"  # Split colon-separated entries (e.g., PATH).
-            for entry in $var_value; do
-                entries="$entries$entry"$'\n'
-            done
-            COMPREPLY=( $(compgen -W "$entries" -- "${COMP_WORDS[COMP_CWORD]}") )
-        fi
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        # Complete environment variable names (e.g., PATH, HOME)
+        _env_var_completions
+    elif [[ ${COMP_CWORD} -eq 2 ]]; then
+        # Complete the operation types (e.g., prepend, append, movefirst)
+        _operations_completions
+    elif [[ ${COMP_CWORD} -eq 3 ]]; then
+        # Complete entries (values or file paths) for the variable
+        _entries_completions
+    elif [[ ${COMP_CWORD} -eq 4 ]]; then
+        # Complete flags (e.g., --verbose, -v, --quiet)
+        _flags_completions
     fi
 }
 
-# Main Completion Setup
-# ----------------------------------------------
-# 1. Autocompletion for environment variable names (e.g., PATH, LD_LIBRARY_PATH).
-complete -F complete_env_vars update_env_var_generic remove_from_env_var
-
-# 2. Autocompletion for options like prepend, append, move for update_env_var_generic.
-complete -F complete_update_env_var_options update_env_var_generic
-
-# 3. Autocompletion for entries to remove from environment variables.
-complete -F complete_remove_from_env_var remove_from_env_var
-
-# 4. Autocompletion for verbosity options (verbose, quiet).
-complete -F complete_verbosity_options update_env_var_generic remove_from_env_var
+# Register the completion function for `update_env_var`
+# This tells Bash to use the `_update_env_var_completions` function for completing
+# the `update_env_var` command.
+complete -F _update_env_var_completions update_env_var
 
