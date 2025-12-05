@@ -2,269 +2,308 @@
 # shellcheck shell=sh
 # shellcheck disable=SC1091
 
-# Shell Command Type Detection (Optimized for speed and minimal dependencies) (((
-#
-# This function suite allows you to check if a command is:
-# - A Builtin command
-# - A Shell function
-# - An External command (found in the PATH environment)
-# - An Alias (for shells that support aliases)
-#
-# The implementation avoids using external tools, predefined environment variables,
-# and is optimized for speed and portability across POSIX-compliant shells.
-#
-# Type codes returned by `command_type`:
-#   0 = notfound      # Command does not exist.
-#   1 = builtin       # Built-in shell command (e.g., `echo`, `cd`).
-#   2 = function      # User-defined function.
-#   3 = keyword       # Shell keyword (e.g., `if`, `then`, `else`).
-#   4 = external      # External command found in `PATH`.
-#   5 = alias         # Shell alias (for shells that support aliases).
-#
-# ------------------------------------------------------------------------------
-# `command_type` - Check the type of a command
-# ------------------------------------------------------------------------------
+# -------------------- COMMAND TYPE DETECTION SUITE (((
+# Fully POSIX-compliant, zero external dependencies
+# Works on: ash, dash, busybox sh, bash, sh, ksh, ksh93, mksh, zsh
+# Detectable types:
+#   0 = notfound
+#   1 = builtin
+#   2 = function
+#   3 = keyword (reserved word)
+#   4 = external command in PATH or explicit/relative path
+#   5 = alias (only supported in shells: bash, zsh, mksh, ksh)
+# Features:
+#   • Safe caching
+#   • Handles absolute and relative paths
+#   • Alias detection where available
+#   • Returns absolute path if requested
+# -----------------------------------------------------------------------
+
+# -------------------- INTERNAL SAFE CACHE -----------------------------
+
+# Convert any string into a valid shell variable name (POSIX-only, no sed)
+_ct_cache_key() {
+    key="$1"
+    key=${key//[^a-zA-Z0-9_]/_}  # replace non-alnum/_ with _
+    printf '%s' "$key"
+}
+
+# Set a cache entry
+_ct_cache_set() {
+    key=$(_ct_cache_key "$1")
+    eval "__ct_cache_$key=$2"
+}
+
+# Get a cache entry
+_ct_cache_get() {
+    key=$(_ct_cache_key "$1")
+    eval "printf '%s' \"\${__ct_cache_$key:-}\""
+}
+
+# -------------------- COMMAND TYPE FUNCTION ---------------------------
+
+# Usage: command_type <name>
+# Returns type code:
+# 0=notfound, 1=builtin, 2=function, 3=keyword, 4=external, 5=alias
 command_type() {
     name=$1
-    # Create a variable for caching the command type (using associative array for efficiency)
-    declare -gA __ct_cache
 
-    # Skip lookup if the type is already cached (i.e., it's already identified as a builtin, function, etc.)
-    if [[ -n "${__ct_cache[$name]}" ]]; then
-        printf '%s\n' "${__ct_cache[$name]}"  # Return cached type
+    # 1. Check cached type
+    cached=$(_ct_cache_get "$name")
+    if [ -n "$cached" ]; then
+        printf '%s\n' "$cached"
         return
     fi
 
-    # Cache builtins and keywords for fast lookups (only once)
-    if [[ -z "${__ct_builtins_cached}" ]]; then
-        # Common builtins for most POSIX shells
-        for b in : . break cd continue eval exec exit export getopts hash pwd readonly return shift test times trap unset wait; do
-            __ct_cache["$b"]=1  # Mark as built-in command
-        done
-        # Common keywords for most POSIX shells
-        for k in if then else elif fi case esac for select while until do done function time in ! { } [[ ]]; do
-            __ct_cache["$k"]=3  # Mark as keyword
-        done
-        __ct_builtins_cached=1  # Mark builtins as cached
-    fi
-
-    # Check if it's a function by testing its existence in the shell
-    if [[ "$(type -t "$name")" == "function" ]]; then
-        __ct_cache["$name"]=2  # Mark as function
-        printf '2\n'
-        return
-    fi
-
-    # Check if it's a builtin by using `type` and verifying if it's a builtin
-    if [[ "$(type -t "$name")" == "builtin" ]]; then
-        __ct_cache["$name"]=1  # Mark as built-in
-        printf '1\n'
-        return
-    fi
-
-    # Alias check (only for Bash/Zsh, since other shells don't support aliases)
-    case "$(basename "$0")" in
-        bash|zsh)
-            # Check if it's an alias for Bash/Zsh
-            alias "$name" >/dev/null 2>&1 && { __ct_cache["$name"]=5; printf '5\n'; return; }
-            ;;
-        *)
-            # No alias check for other shells (e.g., ksh93, ash, dash)
+    # 2. Explicit path detection
+    case $name in
+        */*)
+            if [ -x "$name" ] && [ ! -d "$name" ]; then
+                _ct_cache_set "$name" 4
+                printf '4\n'
+                return
+            else
+                _ct_cache_set "$name" 0
+                printf '0\n'
+                return
+            fi
             ;;
     esac
 
-    # Check for external command in PATH (only if not found yet)
-    if [[ -z "${__ct_path_cached}" ]]; then
-        old_IFS=$IFS  # Save the original IFS
-        IFS=":"  # Split PATH into directories
-        for dir in $PATH; do
-            [[ -d "$dir" ]] || continue  # Skip non-directory entries
-            if [[ -x "$dir/$name" ]]; then  # Check if the command is executable
-                __ct_cache["$name"]=4  # Mark as external command
-                printf '4\n'
-                return
-            fi
-        done
-        IFS=$old_IFS  # Restore the original IFS
-        __ct_path_cached=1  # Mark PATH as cached
+    # 3. POSIX type detection via type builtin
+    out=$(type "$name" 2>/dev/null) || out=
+    case $out in
+        *"is a function"*)
+            _ct_cache_set "$name" 2
+            printf '2\n'
+            return
+            ;;
+        *"is a shell builtin"*)
+            _ct_cache_set "$name" 1
+            printf '1\n'
+            return
+            ;;
+        *"is a reserved word"*)
+            _ct_cache_set "$name" 3
+            printf '3\n'
+            return
+            ;;
+    esac
+
+    # 4. Alias detection (bash/zsh/mksh/ksh)
+    if alias "$name" >/dev/null 2>&1; then
+        _ct_cache_set "$name" 5
+        printf '5\n'
+        return
     fi
 
-    # If still not found, mark as not found
-    __ct_cache["$name"]=0  # Mark as not found
+    # 5. PATH scan for external commands
+    oldIFS=$IFS
+    IFS=:
+    for dir in $PATH; do
+        [ -d "$dir" ] || continue
+        if [ -x "$dir/$name" ]; then
+            IFS=$oldIFS
+            _ct_cache_set "$name" 4
+            printf '4\n'
+            return
+        fi
+    done
+    IFS=$oldIFS
+
+    # 6. Not found
+    _ct_cache_set "$name" 0
     printf '0\n'
 }
 
-# ------------------------------------------------------------------------------
-# `command_type_name` - Convert type code to human-readable command type name
-# ------------------------------------------------------------------------------
+# -------------------- CONVERT TYPE CODE TO NAME -----------------------
+
 command_type_name() {
-    # Converts the numeric type code to a human-readable type name
     case $1 in
-        0) printf 'notfound\n' ;;  # Not found
-        1) printf 'builtin\n' ;;   # Built-in command
-        2) printf 'function\n' ;;  # User-defined function
-        3) printf 'keyword\n' ;;   # Shell keyword
-        4) printf 'external\n' ;;  # External command
-        5) printf 'alias\n' ;;     # Alias (Bash/Zsh)
-        *) printf 'unknown\n' ;;   # Unknown type
+        0) printf 'notfound\n' ;;
+        1) printf 'builtin\n' ;;
+        2) printf 'function\n' ;;
+        3) printf 'keyword\n' ;;
+        4) printf 'external\n' ;;
+        5) printf 'alias\n' ;;
+        *) printf 'unknown\n' ;;
     esac
 }
 
-# ------------------------------------------------------------------------------
-# `command_type_refresh_path` - Refresh cached PATH entries
-# ------------------------------------------------------------------------------
-command_type_refresh_path() {
-    unset __ct_path_cached  # Reset the cached PATH entries
-}
+# -------------------- EXISTENCE CHECK FUNCTIONS -----------------------
 
-# ------------------------------------------------------------------------------
-# `command_type_exists` - Check if any valid command type exists
-# ------------------------------------------------------------------------------
 command_type_exists() {
-    result=$(command_type "$1")  # Capture the output of command_type
-
-    # If the result is 0 (not found), return false (1)
-    if [[ "$result" -eq 0 ]]; then
-        return 1  # False: command not found
-    fi
-
-    # Otherwise, return true (0) because the command is either a builtin, function, or external
-    return 0  # True: command exists (found as builtin, function, or external)
+    t=$(command_type "$1")
+    [ "$t" -ne 0 ]
 }
 
-# ------------------------------------------------------------------------------
-# Usage Examples (Commented Out):
-# ------------------------------------------------------------------------------
-# 1. Check command type:
-#    command_type echo    # → 1 (builtin)
-#    command_type ls      # → 4 (external)
-#    command_type myfunc  # → 2 (function)
-#    command_type bogus   # → 0 (not found)
+command_type_does_not_exist() {
+    t=$(command_type "$1")
+    [ "$t" -eq 0 ]
+}
 
-# 2. Convert type code to human-readable name:
-#    command_type_name $(command_type ls)  # → external
-#    command_type_name $(command_type echo)  # → builtin
-#    command_type_name $(command_type bogus)  # → notfound
+# -------------------- GET ABSOLUTE PATH OF COMMAND --------------------
 
-# 3. Check if a command exists (builtin, function, or external):
-#    if command_type_exists "ls"; then
-#        echo "'ls' exists!"
-#    else
-#        echo "'ls' does not exist."
-#    fi
+# Returns absolute path for external commands, explicit paths,
+# or command name for builtin/function/alias/keyword
+command_type_path() {
+    name=$1
+    t=$(command_type "$name")
 
-# 4. Refresh cached PATH entries manually if PATH changes:
-#    command_type_refresh_path
+    case "$t" in
+        0)  # not found
+            printf ''
+            ;;
+        4)  # external
+            case $name in
+                */*)  # explicit path
+                    printf '%s' "$name"
+                    ;;
+                *)    # search PATH
+                    oldIFS=$IFS
+                    IFS=:
+                    for dir in $PATH; do
+                        [ -d "$dir" ] || continue
+                        if [ -x "$dir/$name" ]; then
+                            IFS=$oldIFS
+                            printf '%s' "$dir/$name"
+                            return
+                        fi
+                    done
+                    IFS=$oldIFS
+                    ;;
+            esac
+            ;;
+        1|2|3|5)  # builtin, function, keyword, alias
+            printf '%s' "$name"
+            ;;
+        *) printf '' ;;
+    esac
+}
+
+# -------------------- USAGE EXAMPLES ----------------------------------
+# Uncomment to test
 #
-# Notes:
-#   - This function is optimized for speed with caching and minimal overhead.
-#   - It works across most shells (Bash, Ksh, Mksh, Zsh, Ash, Dash, Ksh93, and POSIX sh).
-#   - It checks builtins, functions, and external commands in PATH efficiently.
+# echo "echo:" $(command_type_name $(command_type echo))
+# echo "ls:" $(command_type_name $(command_type ls))
+# myfunc() { :; }
+# echo "myfunc:" $(command_type_name $(command_type myfunc))
+# echo "if:" $(command_type_name $(command_type if))
+# alias ll='ls -l'
+# echo "ll:" $(command_type_name $(command_type ll))
+#
+# # Absolute paths
+# echo "ls path:" $(command_type_path ls)
+# echo "echo path:" $(command_type_path echo)
+# echo "myfunc path:" $(command_type_path myfunc)
+# echo "ll path:" $(command_type_path ll)
+#
+# # Explicit file
+# touch ./tmp_test_exe && chmod +x ./tmp_test_exe
+# echo "./tmp_test_exe path:" $(command_type_path ./tmp_test_exe)
+# rm ./tmp_test_exe
+#
+# # Existence checks
+# command_type_exists ls && echo "ls exists"
+# command_type_does_not_exist bogus && echo "bogus does not exist"
 
 # )))
 
-# FUNCTION: update_env_var (((
+# Function: update_env_var (((
 # Purpose:
 #   This function modifies a colon-separated environment variable (e.g., PATH)
-#   by performing operations such as prepending, appending, removing, moving first,
-#   or moving last entries. It also performs **deduplication** by default, ensuring
-#   no duplicates are present in the variable.
+#   by performing operations like prepend, append, remove, movefirst, movelast.
+#   It also handles deduplication by default to ensure no duplicate entries in the variable.
 #
 # Arguments:
 #   $1 - (Required) The environment variable to modify (e.g., PATH).
-#   $2 - (Optional) The operation: prepend, append, movefirst, movelast, remove (default: deduplication).
+#   $2 - (Optional) The operation to perform on the variable: prepend, append, movefirst, movelast, remove (default: deduplication).
 #   $3 - (Required) The new entry to add, prepend, remove, or move.
-#   $4 - (Optional) Delimiter to use for splitting the environment variable (default is colon ":").
-#   $5 - (Optional) Flags: --verbose, -v, --quiet, -q (overrides default behavior).
+#   $4 - (Optional) Custom delimiter to use for splitting the environment variable (default is colon ":").
+#   $5 - (Optional) Flags: --verbose, -v (prints the updated variable after modification) or --quiet, -q (suppresses output).
 #
 # Returns:
-#   - Updates the specified environment variable by modifying its value.
-#
-# Operations:
-#   1. **prepend** - Adds the new entry at the beginning of the environment variable.
-#   2. **append** - Adds the new entry at the end of the environment variable (default behavior).
-#   3. **movefirst** - Moves the specified entry to the beginning of the environment variable.
-#   4. **movelast** - Moves the specified entry to the end of the environment variable.
-#   5. **remove** - Removes the specified entry from the environment variable. If the entry is not found, prints an error to stderr.
-#   6. **deduplicate** - Ensures no duplicate entries are present in the environment variable (default if no operation is specified).
-#
-# Flags:
-#   --verbose (-v)  : Prints the updated environment variable after modification.
-#   --quiet (-q)    : Suppresses output (no print).
-#   --delimiter (-d): Custom delimiter for separating entries (default is colon ":").
+#   - Updates the specified environment variable by modifying its value based on the specified operation.
 #
 # ============================================================
 update_env_var() {
-    # Initialize default values
-    var="$1"       # The environment variable name (e.g., PATH)
-    operation="deduplicate"  # Default operation is deduplication
-    verbose="no"
-    quiet="no"
-    delimiter=":"  # Default delimiter is colon
-    entry=""
-
-    # Check if the shell is interactive (based on the $- variable)
-    is_interactive_shell="${-#*i}"  # Remove the "i" character if it's interactive; check if it’s empty
-    if [ -n "$is_interactive_shell" ]; then
-        verbose="yes"  # Default to verbose (echo updated value) in interactive shells
+    # 1. **Determine if the shell is interactive or non-interactive**
+    # ============================================================
+    # The shell is interactive if:
+    # - The PS1 variable is set (indicating an interactive terminal).
+    # - The `-` flag contains "i" (indicating an interactive shell).
+    if [ -n "$PS1" ] || [[ "$-" == *i* ]]; then
+        verbose="yes"  # Interactive shell -> verbose mode
+    else
+        verbose="no"   # Non-interactive shell (e.g., sourcing a script) -> quiet mode by default
     fi
 
-    # Parse the arguments, process flags and operation
+    # 2. **Initialize default values**
+    # ============================================================
+    var="$1"           # The environment variable to modify (e.g., PATH)
+    operation="deduplicate"  # Default operation: deduplicate duplicates
+    delimiter=":"      # Default delimiter is colon ":"
+    entry=""           # The new entry to be modified/added to the environment variable
+    quiet="no"         # Quiet mode flag (suppress output when set)
+
+    # 3. **Parse the remaining arguments to configure the function's behavior**
+    # ============================================================
     shift  # Shift off the first argument (var)
 
-    # Loop through the remaining arguments to process flags and operation
     while [ $# -gt 0 ]; do
         case "$1" in
-            --verbose|-v) verbose="yes" ;;  # Verbose flag
-            --quiet|-q) quiet="yes" ;;     # Quiet flag
+            --verbose|-v) verbose="yes" ;;    # Verbose flag (prints output after operation)
+            --quiet|-q) quiet="yes" ;;       # Quiet flag (suppresses output)
             prepend|append|movefirst|movelast|remove) operation="$1" ;;  # Operation flags
-            --delimiter|-d) delimiter="$2"; shift ;;  # Delimiter flag, shift for delimiter value
-            *) entry="$1" ;;  # The entry to modify the variable with
+            --delimiter|-d) delimiter="$2"; shift ;;  # Custom delimiter flag, shift for the delimiter value
+            *) entry="$1" ;;  # Entry to add, prepend, remove, or move
         esac
         shift  # Move to the next argument
     done
 
-    # If no entry is provided, and the operation is "deduplicate", just perform deduplication
+    # 4. **Default operation is deduplication if no entry is provided**
+    # ============================================================
     if [ -z "$entry" ] && [ "$operation" != "remove" ]; then
-        operation="deduplicate"
+        operation="deduplicate"  # If no entry is specified, deduplication is performed by default
     fi
 
-    # If no entry is provided for non-deduplication operations, show an error and exit
+    # 5. **Check if entry is required for non-deduplication operations**
+    # ============================================================
     if [ -z "$entry" ] && [ "$operation" != "deduplicate" ]; then
         echo "Error: No entry specified to modify the variable." >&2
         return 1
     fi
 
-    # Retrieve the current value of the environment variable
-    val="${!var}"  # Indirect expansion to get the value of the environment variable.
+    # 6. **Retrieve the current value of the environment variable**
+    # ============================================================
+    val="${!var}"  # Indirect variable expansion to get the value of the environment variable
 
     # If the variable is empty, set it to an empty string
     if [ -z "$val" ]; then
         val=""
     fi
 
-    # Split the current value into an array of entries
+    # 7. **Split the current value into an array using the delimiter**
+    # ============================================================
     IFS="$delimiter" read -r -a entries <<< "$val"
 
-    # Perform deduplication using a list of seen entries (no associative arrays)
-    seen=""
-    result=()
+    # 8. **Perform deduplication**
+    # ============================================================
+    seen=""  # String to track seen entries
+    result=()  # Array to hold the deduplicated result
 
-    # Loop through entries and add unique ones to the result
     for e in "${entries[@]}"; do
-        # Check if the entry has been seen before by searching the "seen" list
+        # If the entry has already been seen, skip it.
         if echo "$seen" | grep -q "$delimiter$e$delimiter\|^$e$delimiter\|$delimiter$e$"; then
-            continue  # Skip the entry if it's already seen.
+            continue
         fi
-
-        # Add the entry to the result
         result+=("$e")
-        seen="$seen$delimiter$e"  # Track the seen entry
+        seen="$seen$delimiter$e"
     done
 
-    # Handle the remove operation (explicitly remove the entry)
+    # 9. **Handle remove operation**
+    # ============================================================
     if [ "$operation" = "remove" ]; then
-        # Check if the entry exists in the array before removing
         found="no"
         result=()
         for e in "${entries[@]}"; do
@@ -275,200 +314,99 @@ update_env_var() {
             fi
         done
 
-        # If the entry wasn't found, print an error to stderr
         if [ "$found" = "no" ]; then
             echo "Error: Entry '$entry' not found in $var." >&2
             return 1
         fi
     fi
 
-    # Handle adding or moving the new entry
+    # 10. **Handle adding or moving the new entry**
+    # ============================================================
     if [ -n "$entry" ]; then
-        # Check if the entry already exists in the result (for deduplication)
         if echo "$seen" | grep -q "$delimiter$entry$delimiter\|^$entry$delimiter\|$delimiter$entry$"; then
-            # If entry already exists, perform movefirst or movelast operation
+            # If entry already exists, move it to the specified position
             if [ "$operation" = "movefirst" ]; then
-                result=("$entry" "${result[@]/$entry}")  # Move to the first position
+                result=("$entry" "${result[@]/$entry}")
             elif [ "$operation" = "movelast" ]; then
-                result=("${result[@]/$entry}" "$entry")  # Move to the last position
+                result=("${result[@]/$entry}" "$entry")
             fi
         else
-            # Perform prepend, append, or move based on the operation
+            # If entry doesn't exist, perform prepend or append
             if [ "$operation" = "prepend" ]; then
-                result=("$entry" "${result[@]}")  # Prepend new entry.
+                result=("$entry" "${result[@]}")
             elif [ "$operation" = "append" ]; then
-                result+=("$entry")  # Append new entry.
+                result+=("$entry")
             fi
         fi
     fi
 
-    # Reassemble the variable and update it
+    # 11. **Reassemble the variable and update it**
+    # ============================================================
     new_value=$(IFS="$delimiter"; echo "${result[*]}")
+    export "$var=$new_value"  # Update the environment variable
 
-    # Remove any leading/trailing delimiter (colon) in the final value
-    new_value="${new_value##${delimiter}}"  # Remove leading colon
-    new_value="${new_value%%${delimiter}}"  # Remove trailing colon
-
-    export "$var=$new_value"
-
-    # Suppress output if quiet flag is set
+    # 12. **Handle quiet mode and verbose mode**
+    # ============================================================
     if [ "$quiet" = "yes" ]; then
-        return 0  # No output in quiet mode.
+        return 0  # Suppress any output if quiet mode is enabled
     fi
 
-    # Handle verbose mode (only output the updated value after the operation)
     if [ "$verbose" = "yes" ]; then
-        echo "$new_value"
+        echo "$new_value"  # Print the updated environment variable if verbose mode is enabled
     fi
 }
 
 # ============================================================
-# TEST CASES (Commented Out)
+# Example Use Cases (Commented out)
 # ============================================================
 
 # 1. **Prepending an Entry to a Non-Empty Variable**
 # Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 # Operation: Prepend "/new/path" to the front of the PATH variable.
 # Expected Output: /new/path:/usr/bin:/bin:/usr/sbin:/sbin
-# Explanation: "/new/path" is added at the beginning of the PATH, ensuring no duplicates.
 # update_env_var PATH "/new/path" prepend --verbose
 
 # 2. **Appending an Entry to a Non-Empty Variable**
 # Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 # Operation: Append "/opt/bin" to the end of the PATH variable.
 # Expected Output: /usr/bin:/bin:/usr/sbin:/sbin:/opt/bin
-# Explanation: "/opt/bin" is added to the end of the PATH variable.
 # update_env_var PATH "/opt/bin" append --verbose
 
 # 3. **Removing an Existing Entry**
 # Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 # Operation: Remove "/bin" from the PATH variable.
 # Expected Output: /usr/bin:/usr/sbin:/sbin
-# Explanation: "/bin" is successfully removed from the PATH.
 # update_env_var PATH "/bin" remove --verbose
 
 # 4. **Removing a Non-Existent Entry**
 # Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 # Operation: Try to remove "/opt/bin" (which does not exist).
 # Expected Output: Error: Entry '/opt/bin' not found in PATH.
-# Explanation: Since "/opt/bin" is not in the PATH, the function should print an error.
 # update_env_var PATH "/opt/bin" remove --verbose
 
 # 5. **Moving an Entry to the Front (movefirst)**
 # Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 # Operation: Move "/usr/sbin" to the front of the PATH variable.
 # Expected Output: /usr/sbin:/usr/bin:/bin:/sbin
-# Explanation: "/usr/sbin" is moved to the front of the PATH variable.
 # update_env_var PATH "/usr/sbin" movefirst --verbose
 
 # 6. **Moving an Entry to the End (movelast)**
 # Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 # Operation: Move "/bin" to the end of the PATH variable.
 # Expected Output: /usr/bin:/usr/sbin:/sbin:/bin
-# Explanation: "/bin" is moved to the end of the PATH variable.
 # update_env_var PATH "/bin" movelast --verbose
 
 # 7. **Test for Deduplication (Default Operation)**
 # Initial: PATH="/usr/bin:/bin:/usr/bin:/usr/sbin:/sbin"
 # Operation: The default operation is deduplication (no entry passed).
 # Expected Output: /usr/bin:/bin:/usr/sbin:/sbin
-# Explanation: The duplicate "/usr/bin" is removed, leaving only one occurrence.
 # update_env_var PATH "" --verbose
 
 # 8. **Test Quiet Mode**
 # Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 # Operation: Prepend "/new/path" to the front, with quiet mode enabled.
 # Expected Output: (No output, since quiet mode suppresses it)
-# Explanation: Quiet mode suppresses all output, so no result is printed.
 # update_env_var PATH "/new/path" prepend -q
-
-# 9. **Test Verbose Mode**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Prepend "/new/path" to the front, with verbose mode enabled.
-# Expected Output: /new/path:/usr/bin:/bin:/usr/sbin:/sbin
-# Explanation: Verbose mode prints the updated value of the PATH.
-# update_env_var PATH "/new/path" prepend -v
-
-# 10. **Multiple Operations - Prepend, Append, Remove**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Prepend "/new/path", then append "/opt/bin", then remove "/bin".
-# Expected Output: /new/path:/usr/bin:/usr/sbin:/sbin:/opt/bin
-# Explanation: The operations are executed sequentially. First "/new/path" is prepended, then "/opt/bin" is appended, and finally "/bin" is removed.
-# update_env_var PATH "/new/path" prepend --verbose
-# update_env_var PATH "/opt/bin" append --verbose
-# update_env_var PATH "/bin" remove --verbose
-
-# 11. **Moving an Existing Entry (movefirst) after Append**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin:/opt/bin"
-# Operation: Move "/bin" to the front.
-# Expected Output: /bin:/usr/bin:/usr/sbin:/sbin:/opt/bin
-# Explanation: After appending "/opt/bin", "/bin" is moved to the front.
-# update_env_var PATH "/bin" movefirst --verbose
-
-# 12. **Multiple Duplicates and Deduplication**
-# Initial: PATH="/usr/bin:/bin:/usr/bin:/usr/sbin:/bin:/sbin"
-# Operation: Perform deduplication.
-# Expected Output: /usr/bin:/bin:/usr/sbin:/sbin
-# Explanation: All duplicates of "/usr/bin" and "/bin" are removed.
-# update_env_var PATH "" --verbose
-
-# 13. **Prepending Already Present Entry**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Prepend "/usr/bin" to the PATH.
-# Expected Output: /usr/bin:/usr/bin:/bin:/usr/sbin:/sbin
-# Explanation: The entry "/usr/bin" is already present, so it is prepended again.
-# update_env_var PATH "/usr/bin" prepend --verbose
-
-# 14. **Appended Entry is Already Present**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Append "/bin" to the PATH.
-# Expected Output: /usr/bin:/bin:/usr/sbin:/sbin:/bin
-# Explanation: The entry "/bin" is appended again since it's not removed by deduplication in this case.
-# update_env_var PATH "/bin" append --verbose
-
-# 15. **Edge Case: Empty PATH Variable**
-# Initial: PATH=""
-# Operation: Prepend "/new/path" to the empty PATH variable.
-# Expected Output: /new/path
-# Explanation: Prepending to an empty variable should result in the new path.
-# update_env_var PATH "/new/path" prepend --verbose
-
-# 16. **Removing from an Empty PATH**
-# Initial: PATH=""
-# Operation: Remove "/bin" from the empty PATH.
-# Expected Output: Error: Entry '/bin' not found in PATH.
-# Explanation: There is no "/bin" in the empty PATH variable, so an error should be printed.
-# update_env_var PATH "/bin" remove --verbose
-
-# 17. **MoveFirst with Already First Entry**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Move "/usr/bin" to the front.
-# Expected Output: /usr/bin:/bin:/usr/sbin:/sbin
-# Explanation: Since "/usr/bin" is already at the front, the operation should have no effect.
-# update_env_var PATH "/usr/bin" movefirst --verbose
-
-# 18. **MoveLast with Already Last Entry**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Move "/sbin" to the end.
-# Expected Output: /usr/bin:/bin:/usr/sbin:/sbin
-# Explanation: Since "/sbin" is already the last element, the operation should have no effect.
-# update_env_var PATH "/sbin" movelast --verbose
-
-# 19. **Test for Quiet Mode with Removal Error**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin"
-# Operation: Try to remove "/opt/bin" with quiet mode enabled.
-# Expected Output: (No output, since quiet mode suppresses the error message)
-# Explanation: Quiet mode suppresses error output, so no error message is shown even though the entry does not exist.
-# update_env_var PATH "/opt/bin" remove -q
-
-# 20. **Edge Case: Trailing Colon in PATH**
-# Initial: PATH="/usr/bin:/bin:/usr/sbin:/sbin:"
-# Operation: Remove the trailing colon.
-# Expected Output: /usr/bin:/bin:/usr/sbin:/sbin
-# Explanation: A trailing colon should be removed.
-# update_env_var PATH "" --verbose
-
-
 
 # )))
 
@@ -477,222 +415,527 @@ update_env_var() {
 # test -r "$HOME/.config/envman/load.sh" && . "$HOME/.config/envman/load.sh" # TODO: Remove (webi brew)
 # # )))
 
-if [ -d "$HOME/.local/bin" ]; then  # Prepend "~/.local/bin" to the user's PATH
+# Prepend "~/.local/bin" to the user's PATH (((
+if [ -d "$HOME/.local/bin" ]; then
   update_env_var PATH prepend "$HOME/.local/bin" --quiet
 fi
+# )))
 
-# # Incorporate various third-party commands to PATH & set their related environment variables (((
-#
-# # Incorporate the `pixi` command to PATH (((
-# if [ -d "$HOME/.config/pixi" ]; then
-#   PIXI_HOME="$HOME/.config/pixi" && export PIXI_HOME
-# fi
+# Incorporate various third-party commands to PATH & set their related environment variables (((
+
+# Incorporate the `pixi` command to PATH (((
+if [ -d "$HOME/.config/pixi" ]; then
+  PIXI_HOME="$HOME/.config/pixi" && export PIXI_HOME
+fi
 # if [ ! -x "$(command -v pixi)" ]; then
-#   test -x "$(command -v "$PIXI_HOME/bin/pixi")" && path_add prepend "$PIXI_HOME/bin"
-# fi
-# # )))
-#
-# # Incorporate TexLive directories to PATH & INFOPATH (((
-# TLYEAR=2025 && TLDIR="$HOME/.local/texlive/$TLYEAR"
-# if [ -d "$TLDIR" ]; then
-#   path_add append "$TLDIR/bin/$(uname -m)-linux"
-# fi
-# # )))
-#
-# # )))
-#
-# # Set various environment variables provided by shell (but can use third-party tools where available) (((
-#
-# # Set EDITOR and SUDO_EDITOR (((
-# if [ -x "$(command -v nvim)" ]; then
-#   VISUAL="$(command -v nvim)"
-# elif [ -x "$(command -v vim)" ]; then
-#   VISUAL="$(command -v vim)"
-# elif [ -x "$(command -v vi)" ]; then
-#   VISUAL="$(command -v vi)"
-# elif [ -x "$(command -v nano)" ]; then
-#   VISUAL="$(command -v nano)"
-# fi
-# SUDO_EDITOR=$VISUAL
-# EDITOR="$SUDO_EDITOR" && export EDITOR && export SUDO_EDITOR && export VISUAL
-# # )))
-# # test -r "$HOME/.local/share/nvim/mason/bin" && path_add prepend "$HOME/.local/share/nvim/mason/bin" # Prepend Mason-tool-installer binaries to PATH
-#
-# # Set FIGNORE to suppress autocomplete for certain file extensions (((
-#
-# # https://stackoverflow.com/questions/32189015/can-i-make-tab-completion-filter-files-by-extension
-# # https://unix.stackexchange.com/questions/166857/modify-bash-autocomplete-rule-to-exclude-particular-file-names
-# # FIGNORE=".4ct:.4tc:.a:.acn:.acr:.alg:.aux:.auxlock:.backup:.bak:.bbl:.bcf:.blg:.brf:.cb:.cb2:.cpt:.cut:.dll:.dpth:.DS_Store:.dvi:.dx64fsl:.el:.end:.ent:.fasl:.fdb_latexmk:.fff:.fls:.fmt:.fot:.gaux:.gem:.glg:.glo:.gls:.glsdefs:.glstex:.gtex:.hst:.idea:.idv:.idx:.ilg:.ind:.ist:.la:.lb:.lg:.listing:.loa:.load:.loe:.lof:.lol:.lot:.lox:.ltjruby:.luac:.lx64fsl:.maf:.mf:.mlf:.mlt:.mo:.mod:.mp:.mw:.nav:.nlg:.nlo:.nls:.o:.obj:.pax:.pdfpc:.pdfsync:.pre:.pyc:.pyg:.pytxcode:.rbc:.rbo:.run.xml:.save:.snm:.so:.soc:.sout:.spl:.sta:.swp:.sympy:.synctex:.synctex.gz:.tdo:.texpadtmp:.tfm:.thm:.toc:.trc:.ttt:.upa:.upb:.ver:.vrb:.wrt:.xcp:.xdv:.xdy:.xmpi:.xref:.xyc:$FIGNORE" && export FIGNORE
-#
-# # )))
-#
-# # Set HISTCONTROL & HISTSIZE (shell-agnostic history-related environment variables) (((
-# # HISTCONTROL="erasedups:ignorespace:$HISTCONTROL" && export HISTCONTROL # prevent duplicate lines & lines starting with space
-# path_add prepend "erasedups:ignorespace" HISTCONTROL
-# HISTSIZE=10000 && export HISTSIZE                                      # Keep 10k lines of history
-# # )))
-#
-# # Set LESS_TERMCAP_xx, LESSPIPE, LESS, LESSKEY, LESSHISTFILE for colorising the output of the `less` pager (((
-#
-# # https://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables/108840#108840
-# # Add color in manpages for less https://unix.stackexchange.com/questions/149614/less-command-change-color-of-and-end
-#
-# # LESS_TERMCAP_so=$'\E[01;47;02m'
-# # LESS_TERMCAP_so=$'\E[01;39;33m'
-# # LESS_TERMCAP_so=$'\e[01;33m'
-# LESS_TERMCAP_mb=$'\E[01;31m' && export LESS_TERMCAP_mb # blinking?
-# LESS_TERMCAP_md=$'\E[01;31m' && export LESS_TERMCAP_md # bold?
-# LESS_TERMCAP_me=$'\E[0m' && export LESS_TERMCAP_me     # end mode?
-# LESS_TERMCAP_se=$'\E[0m' && export LESS_TERMCAP_se     # end standout-mode?
-# LESS_TERMCAP_so=$'\E[30;42m' && export LESS_TERMCAP_so # statusbar background colour for 'more/less'
-# LESS_TERMCAP_ue=$'\E[0m' && export LESS_TERMCAP_ue     # end underline?
-# LESS_TERMCAP_us=$'\E[01;32m' && export LESS_TERMCAP_us # underscore?
-#
-# test -x "$(command -v bat)" && BAT_PRESENT=1
-# if [ "$BAT_PRESENT" != "" ]; then
-#   batpipe_location=$(command -v batpipe)
-# fi
-#
-# if [ -x "$batpipe_location" ]; then
-#   LESSOPEN="|$batpipe_location %s"
-#   export LESSOPEN
-#   unset LESSCLOSE
-#   BATPIPE="color" && export BATPIPE # will enable colors when using batpipe with less:
-# elif [ -x "$(command -v lesspipe)" ] || [ -x "$(command -v lesspipe.sh)" ]; then
-#   LESSOPEN="|lesspipe.sh %s" && export LESSOPEN
-# fi
-#
-# # LESS="-eirMX"
-# LESS="--quit-if-one-screen --hilite-search --ignore-case --jump-target=4 --RAW-CONTROL-CHARS --use-color --no-init --prompt=[?f%f?m (%i/%m)?x Next> %x:
-# <Prev..:STDIN.]  ?L[Page %db of %D (?eEOF:?Pb%Pb:?pb%pb:\\?\\?..\\%.)].%t$"
-# export LESS
-#
-# LESSKEY="$HOME/.config/less/lesskey" && export LESSKEY
-# LESSHISTFILE="$HOME/.local/state/lesshistory.txt" && export LESSHISTFILE
-# # )))
-#
-# # Set locale-related environment variables for (the somewhat new?) UTF-8 terminal support (((
-# LANG="en_GB.UTF-8" && export LANG
-# LANGUAGE="en_GB.UTF-8" && export LANGUAGE
-# LC_COLLATE="C" && export LC_COLLATE
-# LC_CTYPE="en_GB.UTF-8" && export LC_CTYPE
-# LC_MESSAGES="en_GB.UTF-8" && export LC_MESSAGES
-# LC_MONETARY="C" && export LC_MONETARY
-# LC_NAME="C" && export LC_NAME
-# LC_NUMERIC="C" && export LC_NUMERIC
-# LC_PAPER="en_GB.UTF-8" && export LC_PAPER
-# LC_TIME="C" && export LC_TIME
-# LC_ALL="" && export LC_ALL
-# # )))
-#
-# MANPAGER='less -MRF --use-color' && export MANPAGER
-#
-# MANROFFOPT="-c" && export MANROFFOPT
-#
-# PAGER="less -MRF --use-color" && export PAGER
-#
-# # Set READER/PDFVIEWER etc (((
-# if [ -x "$(command -v zathura)" ]; then
-#   ASYMPTOTE_PDFVIEWER="zathura" && export ASYMPTOTE_PDFVIEWER
-#   PDFVIEWER="zathura" && export PDFVIEWER
-#   PDFVIEWER_texdoc="zathura" && export PDFVIEWER_texdoc
-#   TEXDOCVIEW_pdf="zathura" && export TEXDOCVIEW_pdf
-#   # https://tex.stackexchange.com/questions/451942/how-can-i-make-texdoc1-recognize-its-configuration-file-instead-of-the-environ
-#   # PDFVIEWER_texdoc='(nohup ${PDFVIEWER:-xpdf} %s) 2> /dev/null &'
-# fi
-# # )))
-#
-# # )))
-#
-# # Set environment variables related to third-party tools (((
-#
-# # Ansible environment variables (((
-# ANSIBLE_HOME="$HOME/.config/ansible" && export ANSIBLE_HOME
-# ANSIBLE_CONFIG="$HOME/.config/ansible/ansible.cfg" && export ANSIBLE_CONFIG
-# ANSIBLE_GALAXY_CACHE_DIR="$HOME/.local/state/ansible/galaxy_cache" && export ANSIBLE_GALAXY_CACHE_DIR
-# ANSIBLE_NAVIGATOR_CONFIG="$HOME/.config/ansible/ansible-navigator.yml" && export ANSIBLE_NAVIGATOR_CONFIG
-# # )))
-#
-# # https://stackoverflow.com/a/54373833
-# ASAN_OPTIONS=abort_on_error=1:detect_leaks=0:report_objects=1:sleep_before_dying=1 && export ASAN_OPTIONS
-#
-# # BASH_COMPLETION_USER_FILE="$HOME/.config/bash_completion/bash_completion" && export BASH_COMPLETION_USER_FILE
-#
-# CARGO_HOME="$HOME/.local/share/cargo" && export CARGO_HOME
-#
-# # DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock && export DOCKER_HOST
-# # /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
-# DOCKER_CONFIG=$HOME/.config/docker && export DOCKER_CONFIG
-#
-# # fzf environment variables (((
-# if [ -x "$(command -v fzf)" ]; then
-#   if [ "$BAT_PRESENT" != "" ]; then
-#     FZF_CTRL_T_OPTS="
-#     --preview 'bat -n --color=always {}'
-#     --bind 'ctrl-/:change-preview-window(down|hidden|)'"
-#     export FZF_CTRL_T_OPTS
-#   fi
-#   export FZF_CTRL_R_OPTS="
-#   --preview 'echo {}' --preview-window up:3:hidden:wrap
-#   --bind 'ctrl-/:toggle-preview'
-#   --color header:italic"
-# fi
-# # )))
-#
-# GCC_COLORS="error=01;31:warning=01;35:note=01;36:range1=32:range2=34:locus=01:\ quote=01:path=01;36:fixit-insert=32:fixit-delete=31:\ diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32:\ type-diff=01;32" && export GCC_COLORS
-#
-# GIT_EDITOR="$VISUAL -c 'startinsert'" && export GIT_EDITOR
-# test -x "$(command -v difft)" && GIT_EXTERNAL_DIFF=difft && export GIT_EXTERNAL_DIFF
-#
-# # Set GIT_PAGER (((
-# if [ "$BAT_PRESENT" != "" ]; then
-#   GIT_PAGER="bat --style=plain,header" && export GIT_PAGER  # https://github.com/sharkdp/bat/issues/72
-# else
-#   GIT_PAGER="less" && export GIT_PAGER
-# fi
-# # )))
-#
-# GOCACHE="$HOME/.local/state/go/go-build" && export GOCACHE
-# GOMODCACHE="$HOME/.local/state/go/mod" && export GOMODCACHE
-# GOPATH="$HOME/.local/share/go" && export GOPATH
-#
-# if [ -x "$(command -v brew)" ]; then
-#   if [ -d "$HOME/.local/opt/brew" ]; then
-#     HOMEBREW_PREFIX="$HOME/.local/opt/brew" && export HOMEBREW_PREFIX
-#   fi
-# fi
-#
-# JUPYTER_CONFIG_DIR="$HOME/.config/jupyter" && export JUPYTER_CONFIG_DIR
-#
-# NODE_REPL_HISTORY="$HOME/.local/state/node_repl_history.txt" && export NODE_REPL_HISTORY
-# test -r "$HOME/.config/npm/npmrc" && NPM_CONFIG_USERCONFIG="$HOME/.config/npm/npmrc" && export NPM_CONFIG_USERCONFIG
-#
-# test -r "$HOME/.config/readline/inputrc" && INPUTRC="$HOME/.config/readline/inputrc" && export INPUTRC
-#
-# test -r "$HOME/.config/python/pythonrc" && PYTHONSTARTUP="$HOME/.config/python/pythonrc" && export PYTHONSTARTUP
-#
-# test -x "$(command -v qt6ct)" && QT_QPA_PLATFORMTHEME=qt6ct && export QT_QPA_PLATFORMTHEME
-#
-# RUFF_CACHE_DIR="$HOME/.local/state/ruff" && export RUFF_CACHE_DIR
-#
-# RUSTUP_HOME="$HOME/.local/share/rustup" && export RUSTUP_HOME
-#
-# # Configure SCREENRC and SCREENDIR environment variables (((
-# if [ -x "$(command -v screen)" ] && [ -r "$HOME/.config/screen/screenrc" ]; then
-#     SCREENRC="$HOME/.config/screen/screenrc" && export SCREENRC
-#     SCREENDIR="$XDG_RUNTIME_DIR/screen" && export SCREENDIR
-# fi
-# # )))
-#
-# # test -x "$(command -v w3m)" && W3M_DIR="$HOME/.config/w3m" && export W3M_DIR
-#
-# test -r "$HOME/.config/wget/wgetrc" && test -r "$HOME/.cache/wget-hsts" && WGETRC="$HOME/.config/wget/wgetrc" && export WGETRC
-#
-# # )))
-#
-# # eval ssh-agent (((
-# if [ -x "$(command -v ssh-agent)" ] && [ "$SSH_AUTH_SOCK" = "" ]; then
-#   eval "$(ssh-agent)" >/dev/null
-#   ssh-add "$HOME/.ssh/id_ed25519_nov13_2025" 2>/dev/null
-# fi
-# # )))
+if command_type_does_not_exist "pixi" && command_type_exists "$PIXI_HOME/bin/pixi"; then
+  update_env_var PATH prepend "$PIXI_HOME/bin" --quiet
+fi
+# )))
+
+# Incorporate TexLive directories to PATH & INFOPATH (((
+TLYEAR=2025 && TLDIR="$HOME/.local/texlive/$TLYEAR"
+if [ -d "$TLDIR" ]; then
+  update_env_var PATH append "$TLDIR/bin/$(uname -m)-linux" --quiet
+fi
+# )))
+
+# Incorporate tools installed by `mason` to PATH (((
+MASON_BIN="$HOME/.local/share/nvim/mason/bin"
+[ -d "$MASON_BIN" ] && update_env_var PATH prepend "$MASON_BIN"
+# )))
+
+# )))
+
+# Set various environment variables provided by shell (can refer to external tools where available) (((
+
+# Set EDITOR and SUDO_EDITOR (((
+_editors="nvim vim vi nano" # List of preferred editors in order
+
+for e in $_editors; do
+    if command -v "$e" >/dev/null 2>&1; then
+        VISUAL="$(command -v "$e")"
+        break
+    fi
+done
+
+# Fallback to empty if none found
+: "${VISUAL:=}"
+
+# Set SUDO_EDITOR and EDITOR consistently
+SUDO_EDITOR="$VISUAL"
+EDITOR="$VISUAL"
+
+# Export all variables
+export VISUAL EDITOR SUDO_EDITOR
+# )))
+
+# Set FIGNORE to suppress autocomplete for certain file extensions (((
+
+# https://stackoverflow.com/questions/32189015/can-i-make-tab-completion-filter-files-by-extension
+# https://unix.stackexchange.com/questions/166857/modify-bash-autocomplete-rule-to-exclude-particular-file-names
+# Ignore common temporary, backup, build, editor, and TeX auxiliary files
+
+FIGNORE=".DS_Store:\
+.git:.hg:.svn:\
+.aux:.bbl:.blg:.log:.toc:.out:.lof:.lot:.fls:.fdb_latexmk:.synctex.gz:.synctex:\
+.xdv:.nav:.snm:.vrb:.run.xml:.dvi:.pdfsync:.brf:.auxlock:.ilg:.ind:.idx:.glg:.glo:.gls:.glsdefs:.gaux:.loa:.lol:.ltjruby:.luac:.lx64fsl:.maf:.mf:.mlf:.mlt:.mod:.mp:.mw:.nav:.nlg:.nlo:.nls:.pax:.pdfpc:.pre:.pyg:.pytxcode:.save:.sympy:.texpadtmp:.tdo:.ttt:.upa:.upb:.ver:.wrt:.xdy:.xyc:\
+.tmp:.swp:.swo:.bak:.backup:.old:.orig:.rej:\
+.o:.obj:.so:.dll:.pyc:.pyo:.rbc:.rbo:.class"
+export FIGNORE
+
+# )))
+
+# Set HISTCONTROL & HISTSIZE (shell-agnostic history-related environment variables) (((
+update_env_var HISTCONTROL prepend "erasedups:ignorespace" --quiet # prevent duplicate lines & lines starting with space
+HISTSIZE=10000 && export HISTSIZE                                  # Keep 10k lines of history
+# )))
+
+# Set LESS_TERMCAP_xx, LESSPIPE, LESS, LESSKEY, LESSHISTFILE for colorising the output of the `less` pager (((
+
+# https://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables/108840#108840
+# Add color in manpages for less https://unix.stackexchange.com/questions/149614/less-command-change-color-of-and-end
+# ------------------- LESS Color and Appearance -------------------
+# ANSI sequences for text formatting in less
+LESS_TERMCAP_mb=$'\E[01;31m'  # blinking text
+LESS_TERMCAP_md=$'\E[01;31m'  # bold text
+LESS_TERMCAP_me=$'\E[0m'      # reset mode
+LESS_TERMCAP_se=$'\E[0m'      # end standout mode
+LESS_TERMCAP_so=$'\E[30;42m'  # standout / status bar background
+LESS_TERMCAP_ue=$'\E[0m'      # end underline
+LESS_TERMCAP_us=$'\E[01;32m'  # underline text
+
+export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_me \
+       LESS_TERMCAP_se LESS_TERMCAP_so LESS_TERMCAP_ue LESS_TERMCAP_us
+
+# ------------------- LESS and Bat Integration -------------------
+
+BAT_PRESENT=
+batpipe_location=
+
+# Prefer bat + batpipe if available
+if command_type_exists bat; then
+    BAT_PRESENT=1
+    if command_type_exists batpipe; then
+        batpipe_location=$(command_type_path batpipe)
+    fi
+fi
+
+# Use batpipe for LESS if executable
+if [ -n "$batpipe_location" ] && [ -x "$batpipe_location" ]; then
+    LESSOPEN="|$batpipe_location %s"
+    export LESSOPEN
+    unset LESSCLOSE
+    BATPIPE="color"
+    export BATPIPE
+else
+    # Fallback to lesspipe / lesspipe.sh
+    if command_type_exists lesspipe; then
+        LESSOPEN="|$(command_type_path lesspipe) %s"
+        export LESSOPEN
+    elif command_type_exists lesspipe.sh; then
+        LESSOPEN="|$(command_type_path lesspipe.sh) %s"
+        export LESSOPEN
+    fi
+fi
+
+# ------------------- LESS Defaults -------------------
+# Enable colors, ignore case, quit if one screen, and show raw control chars
+LESS="--quit-if-one-screen --ignore-case --hilite-search --jump-target=4 --RAW-CONTROL-CHARS"
+export LESS
+
+# LESSKEY configuration file
+[ -r "$HOME/.config/less/lesskey" ] && LESSKEY="$HOME/.config/less/lesskey"
+export LESSKEY
+
+# LESS history file
+LESSHISTFILE="$HOME/.local/state/lesshistory.txt"
+export LESSHISTFILE
+# )))
+
+# Set locale-related environment variables for (the somewhat new?) UTF-8 terminal support (((
+# Set language and character encoding
+LANG="en_GB.UTF-8"
+export LANG
+
+LANGUAGE="en_GB.UTF-8"
+export LANGUAGE
+
+# Set consistent collation and character type behavior
+LC_COLLATE="C"
+export LC_COLLATE
+
+LC_CTYPE="en_GB.UTF-8"
+export LC_CTYPE
+
+# Messages and user interface text
+LC_MESSAGES="en_GB.UTF-8"
+export LC_MESSAGES
+
+# Numeric, monetary, and paper formats
+LC_MONETARY="C"
+export LC_MONETARY
+
+LC_NAME="C"
+export LC_NAME
+
+LC_NUMERIC="C"
+export LC_NUMERIC
+
+LC_PAPER="en_GB.UTF-8"
+export LC_PAPER
+
+LC_TIME="C"
+export LC_TIME
+
+# Reset LC_ALL to allow specific LC_* variables to take effect
+LC_ALL=""
+export LC_ALL
+# )))
+
+# Use less as the man page pager with color and proper behavior
+MANPAGER="less -MRF --use-color"
+export MANPAGER
+
+# Use -c option with man for continuous output (suppress page breaks)
+MANROFFOPT="-c"
+export MANROFFOPT
+
+# Use less as the default pager with color support and proper behavior
+PAGER="less -MRF --use-color"
+export PAGER
+
+# Set READER/PDFVIEWER etc (((
+if command_type_exists zathura; then
+    ASYMPTOTE_PDFVIEWER="zathura"
+    export ASYMPTOTE_PDFVIEWER
+
+    PDFVIEWER="zathura"
+    export PDFVIEWER
+
+    PDFVIEWER_texdoc="zathura"
+    export PDFVIEWER_texdoc
+
+    TEXDOCVIEW_pdf="zathura"
+    export TEXDOCVIEW_pdf
+
+    # Optional: texdoc can use a nohup wrapper if desired
+    # PDFVIEWER_texdoc='(nohup ${PDFVIEWER:-xpdf} %s) 2> /dev/null &'
+fi
+# )))
+
+# )))
+
+# Set environment variables related to third-party tools (((
+
+# Ansible environment variables (((
+ANSIBLE_HOME="$HOME/.config/ansible"
+export ANSIBLE_HOME
+
+ANSIBLE_CONFIG="$HOME/.config/ansible/ansible.cfg"
+export ANSIBLE_CONFIG
+
+ANSIBLE_GALAXY_CACHE_DIR="$HOME/.local/state/ansible/galaxy_cache"
+export ANSIBLE_GALAXY_CACHE_DIR
+
+ANSIBLE_NAVIGATOR_CONFIG="$HOME/.config/ansible/ansible-navigator.yml"
+export ANSIBLE_NAVIGATOR_CONFIG
+# )))
+
+# ------------------- AddressSanitizer (ASAN) Options (((
+# https://stackoverflow.com/a/54373833
+# Configure ASAN for safer debugging and controlled crash behavior
+ASAN_OPTIONS="abort_on_error=1:detect_leaks=0:report_objects=1:sleep_before_dying=1"
+export ASAN_OPTIONS
+# )))
+
+# BASH_COMPLETION_USER_FILE="$HOME/.config/bash_completion/bash_completion" && export BASH_COMPLETION_USER_FILE
+
+# ------------------- Rust Cargo Environment -------------------(((
+
+# Set Cargo home directory
+CARGO_HOME="$HOME/.local/share/cargo" && export CARGO_HOME
+
+# Optionally, you could also prepend Cargo bin to PATH if desired:
+# test -d "$CARGO_HOME/bin" && update_env_var PATH prepend "$CARGO_HOME/bin"
+# )))
+
+# ------------------- Docker Environment (with detection) ------------------- (((
+
+# Only set Docker environment if `docker` command exists
+if command_type_exists docker; then
+
+    # Set Docker configuration directory
+    DOCKER_CONFIG="$HOME/.config/docker"
+    export DOCKER_CONFIG
+
+    # Optional: Use user-specific Docker socket
+    # Uncomment to use a per-user Docker socket instead of the default system socket
+    # DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" && export DOCKER_HOST
+    # Notes:
+    #   • Default Docker daemon path: /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+    #   • Useful if running a rootless Docker daemon
+
+fi
+# )))
+
+# ------------------- FZF Advanced Configuration ------------------- (((
+# POSIX-compliant, modern fzf setup with BAT previews, git integration,
+# multi-pane support, truecolor-safe options, and advanced keybindings.
+
+# Only configure if fzf exists
+if command_type_exists fzf; then
+
+  # Ensure BAT is present for previews
+  if [ "$BAT_PRESENT" != "" ]; then
+
+    # CTRL-T (file finder) options
+    # - Show bat preview of the selected file with line numbers and syntax highlighting
+    # - ctrl-/ toggles preview window
+    # - preview window at the bottom, initially hidden
+    FZF_CTRL_T_OPTS="
+--preview 'bat --style=plain,grid,numbers --color=always {} || cat {}'
+--bind 'ctrl-/:change-preview-window(down|hidden|)'
+--height 40%
+--layout=reverse
+--ansi
+--color=fg+:yellow,bg+:black,preview-border:magenta
+--multi"
+    export FZF_CTRL_T_OPTS
+  fi
+
+  # CTRL-R (history search) options
+  # - Show previous commands with preview of command
+  # - preview window at top, initially hidden
+  FZF_CTRL_R_OPTS="
+--preview 'echo {}'
+--preview-window=up:3:hidden:wrap
+--bind 'ctrl-/:toggle-preview'
+--color header:italic
+--height 30%
+--layout=reverse
+--ansi
+--cycle"
+  export FZF_CTRL_R_OPTS
+
+  # File / Directory completion using fzf with BAT previews
+  FZF_DEFAULT_OPTS="
+--preview 'if [ -d {} ]; then ls -la --color=always {}; else bat --style=plain,grid,numbers --color=always {}; fi'
+--bind 'ctrl-d:toggle-preview,alt-l:accept,alt-h:abort'
+--color=fg+:cyan,bg+:black,info:yellow,pointer:red
+--ansi
+--height=50%
+--layout=reverse
+--multi"
+  export FZF_DEFAULT_OPTS
+
+  # Git integration (if inside a git repo)
+  # - CTRL-G opens git file search
+  # - Shows modified files with diff preview
+  if command_type_exists git; then
+    FZF_GIT_FILES_OPTS="
+--preview 'git diff --color=always -- {} | head -n 50'
+--bind 'ctrl-/:toggle-preview'
+--color fg+:green,bg+:black,preview-border:blue
+--height 50%
+--layout=reverse
+--ansi
+--multi"
+    export FZF_GIT_FILES_OPTS
+  fi
+
+  # Keybinding hints (helpful for multi-pane, preview toggle)
+  FZF_KEY_BINDINGS="
+ctrl-t: files | ctrl-r: history | alt-g: git-files
+ctrl-/: toggle preview window
+alt-l: accept | alt-h: abort"
+  export FZF_KEY_BINDINGS
+
+fi
+# ------------------- END FZF Advanced Configuration -------------------
+# )))
+
+# GCC_COLORS Setup (((
+# This configuration leverages 24-bit RGB colors for modern terminals while
+# falling back to classic 16-color ANSI codes for older terminals.
+# It covers all GCC diagnostic elements: errors, warnings, notes, code ranges,
+# file paths, diff highlights, and fixit hints.
+# -----------------------------------------------------------------------------
+
+# Detect if terminal supports truecolor
+# Some terminals set COLORTERM to "truecolor" or "24bit"
+if [ "${COLORTERM-}" = "truecolor" ] || [ "${COLORTERM-}" = "24bit" ]; then
+    # ------------------- Truecolor 24-bit GCC_COLORS -------------------
+    # Format: 38;2;<R>;<G>;<B> foreground, 48;2;<R>;<G>;<B> background
+    GCC_COLORS="\
+error=38;2;255;0;0:warning=38;2;255;165;0:note=38;2;0;255;255:\
+range1=38;2;0;255;0:range2=38;2;0;0;255:locus=38;2;255;255;0:\
+quote=38;2;255;0;255:path=38;2;0;255;255:fixit-insert=38;2;0;200;0:fixit-delete=38;2;200;0;0:\
+diff-filename=38;2;255;255;255:diff-hunk=38;2;0;255;0:diff-delete=38;2;255;0;0:diff-insert=38;2;0;255;0:\
+type-diff=38;2;0;255;255"
+else
+    # ------------------- Fallback to Classic 16-Color ANSI -------------------
+    GCC_COLORS="\
+error=01;31:warning=01;35:note=01;36:range1=32:range2=34:locus=01:\
+quote=01:path=01;36:fixit-insert=32:fixit-delete=31:\
+diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32:\
+type-diff=01;32"
+fi
+
+# Export GCC_COLORS for all GCC invocations
+export GCC_COLORS
+
+# -----------------------------------------------------------------------------
+# Explanation of Key Fields:
+# - error / warning / note: Highlight GCC diagnostics in red, orange, cyan
+# - range1 / range2: Highlight ranges in green / blue for code selection
+# - locus: Emphasize the locus (location) of diagnostic
+# - quote: Quoted strings in diagnostics
+# - path: File paths
+# - fixit-insert / fixit-delete: Proposed code modifications
+# - diff-filename / diff-hunk / diff-delete / diff-insert / type-diff: Highlight diffs in compiler output
+# -----------------------------------------------------------------------------
+# )))
+
+# ------------------- Git Editor and Diff Setup ------------------- (((
+
+# Use VISUAL as Git editor, optionally start in insert mode for vim/neovim (((
+if [ -n "$VISUAL" ]; then
+    GIT_EDITOR="$VISUAL -c 'startinsert'"
+    export GIT_EDITOR
+fi
+# )))
+
+# Use 'difft' as Git external diff tool if available (((
+if command_type_exists difft; then
+    GIT_EXTERNAL_DIFF=$(command_type_path difft)
+    export GIT_EXTERNAL_DIFF
+fi
+# )))
+
+# ------------------- Git Pager Setup -------------------(((
+# Prefer 'bat' as Git pager if available, fallback to 'less'
+if [ -n "$BAT_PRESENT" ]; then
+    # Use bat for Git output with plain style and header
+    GIT_PAGER="bat --style=plain,header"
+else
+    # Fallback to less
+    GIT_PAGER="less"
+fi
+export GIT_PAGER
+# )))
+
+# )))
+
+# ------------------- Go Environment ------------------ (((
+# Set Go cache, module cache, and GOPATH to user-specific directories
+GOCACHE="$HOME/.local/state/go/go-build" && export GOCACHE
+GOMODCACHE="$HOME/.local/state/go/mod" && export GOMODCACHE
+GOPATH="$HOME/.local/share/go" && export GOPATH
+# )))
+
+# ------------------- Homebrew Environment ------------------- (((
+# Set HOMEBREW_PREFIX if brew is installed and custom location exists
+if command_type_exists brew; then
+    if [ -d "$HOME/.local/opt/brew" ]; then
+        HOMEBREW_PREFIX="$HOME/.local/opt/brew"
+        export HOMEBREW_PREFIX
+    fi
+fi
+# )))
+
+# ------------------- Jupyter Configuration ------------------- (((
+# Set JUPYTER_CONFIG_DIR to a user-specific config directory
+JUPYTER_CONFIG_DIR="$HOME/.config/jupyter"
+export JUPYTER_CONFIG_DIR
+# )))
+
+# ------------------- Nodejs Configuration ------------------- (((
+# ------------------- Node.js REPL History -------------------
+# Set NODE_REPL_HISTORY to a custom location for persistent REPL history
+NODE_REPL_HISTORY="$HOME/.local/state/node_repl_history"
+export NODE_REPL_HISTORY
+
+# ------------------- NPM User Configuration -------------------
+# Set NPM_CONFIG_USERCONFIG if a custom npmrc exists
+if [ -r "$HOME/.config/npm/npmrc" ]; then
+    NPM_CONFIG_USERCONFIG="$HOME/.config/npm/npmrc"
+    export NPM_CONFIG_USERCONFIG
+fi
+# )))
+
+# ------------------- Readline Inputrc ------------------- (((
+# Set INPUTRC if a custom readline configuration exists
+if [ -r "$HOME/.config/readline/inputrc" ]; then
+    INPUTRC="$HOME/.config/readline/inputrc"
+    export INPUTRC
+fi
+# )))
+
+# ------------------- Python Startup File ------------------- (((
+# Set PYTHONSTARTUP if the user has a custom Python startup script
+if [ -r "$HOME/.config/python/pythonrc" ]; then
+    PYTHONSTARTUP="$HOME/.config/python/pythonrc"
+    export PYTHONSTARTUP
+fi
+# )))
+
+# ------------------- Qt6 Configuration Tool ------------------- (((
+# Set Qt platform theme if qt6ct is available
+if command_type_exists qt6ct; then
+    QT_QPA_PLATFORMTHEME="qt6ct"
+    export QT_QPA_PLATFORMTHEME
+fi
+# )))
+
+# ------------------- Ruff Cache Directory ------------------- (((
+# Set cache directory for the Ruff linter
+RUFF_CACHE_DIR="$HOME/.local/state/ruff"
+export RUFF_CACHE_DIR
+# )))
+
+# ------------------- Rustup Environment -------------------(((
+# Set Rustup home directory
+RUSTUP_HOME="$HOME/.local/share/rustup"
+export RUSTUP_HOME
+# )))
+
+# ------------------- GNU Screen Configuration -------------------(((
+# Set user-specific screen configuration and socket directory if screen exists
+if command_type_exists screen && [ -r "$HOME/.config/screen/screenrc" ]; then
+    SCREENRC="$HOME/.config/screen/screenrc"
+    export SCREENRC
+
+    SCREENDIR="${XDG_RUNTIME_DIR:-/tmp}/screen"
+    export SCREENDIR
+fi
+# )))
+
+# ------------------- w3m Configuration ------------------ (((
+# Set user-specific w3m config directory if w3m exists
+if command_type_exists w3m; then
+    W3M_DIR="$HOME/.config/w3m"
+    export W3M_DIR
+fi
+# )))
+
+# ------------------- Wget Configuration ------------------- (((
+# Use user-specific wgetrc if both the config and HSTS cache exist
+if [ -r "$HOME/.config/wget/wgetrc" ] && [ -r "$HOME/.cache/wget-hsts" ]; then
+    WGETRC="$HOME/.config/wget/wgetrc"
+    export WGETRC
+fi
+# )))
+
+# )))
+
+# ------------------- SSH Agent Setup -------------------(((
+# Start ssh-agent if not already running and add a specific key
+if command_type_exists ssh-agent && [ -z "$SSH_AUTH_SOCK" ]; then
+    # Start ssh-agent silently
+    eval "$(ssh-agent)" >/dev/null
+
+    # Add a default SSH key, suppressing errors if the file doesn't exist
+    ssh-add "$HOME/.ssh/id_ed25519_nov13_2025" 2>/dev/null
+fi
+# )))
