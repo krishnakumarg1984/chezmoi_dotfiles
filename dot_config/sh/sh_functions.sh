@@ -2,399 +2,392 @@
 # shellcheck shell=sh
 # shellcheck disable=SC1091
 
-# ============================================================
-# POSIX Environment Variable Manager
-# ------------------------------------------------------------
-# This script provides an ultra-fast and POSIX-compliant way to:
-#   - Deduplicate entries in colon-separated environment variables (like PATH).
-#   - Add new entries idempotently (only if it isn't already present).
-#   - Optionally move an existing entry to the beginning or end of the list.
-#
-# It avoids external tools like `grep`, `awk`, `sed`, and `tr`, ensuring maximum performance
-# and compatibility across all POSIX-compliant shells.
-#
-# Key Features:
-#   - **Speed Optimized**: Processes the environment variable in a single pass.
-#   - **POSIX Compliant**: Works in any POSIX shell, like `sh`, `bash`, `dash`, `zsh`.
-#   - **No External Tools**: Completely avoids reliance on tools like `grep`, `tr`, etc.
-#   - **Flexible**: Supports **prepending**, **appending**, **moving**, and **deduplication** of entries.
-#
-# Verbosity Control:
-#   - Default: Silent when sourced in shell scripts.
-#   - Verbose in interactive shell when explicitly set or on interactive terminal.
-# ============================================================
+# command_exists, command_path (strict POSIX) (((
+# Prevent reloading if functions are already defined
+if ! type "command_exists" > /dev/null 2>&1; then
 
-# Default separator for colon-separated environment variable entries.
-ENV_SEP=":"
+    # Cache delimiter
+    cmd_cache_delim="|"
 
-# Global verbosity flag (0 = silent, 1 = verbose)
-VERBOSE=0
-
-# ============================================================
-# FUNCTION: set_verbosity
-# ------------------------------------------------------------
-# Purpose:
-#   - Set verbosity level for the script (verbose or quiet).
-#
-# Arguments:
-#   $1 - "verbose" or "quiet" to set verbosity level.
-#
-# Returns:
-#   - Sets the global VERBOSE flag to control verbosity.
-# ============================================================
-set_verbosity() {
-    case "$1" in
-        verbose)
-            VERBOSE=1
-            ;;
-        quiet)
-            VERBOSE=0
-            ;;
-        *)
-            echo "Invalid argument: $1. Use 'verbose' or 'quiet'." >&2
-            return 1
-            ;;
-    esac
-}
-
-# ============================================================
-# FUNCTION: log_verbose
-# ------------------------------------------------------------
-# Purpose:
-#   - Print a message if verbosity is set to 1 (verbose).
-#
-# Arguments:
-#   $1 - Message to print.
-#
-# Returns:
-#   - Prints the message if VERBOSE is set to 1.
-# ============================================================
-log_verbose() {
-    if [ "$VERBOSE" -eq 1 ]; then
-        echo "$1"
-    fi
-}
-
-# ============================================================
-# FUNCTION: get_env_var
-# ------------------------------------------------------------
-# Purpose:
-#   - Retrieve the value of an environment variable.
-#
-# Arguments:
-#   $1 - Name of the environment variable (e.g., PATH).
-#
-# Returns:
-#   - Prints the current value of the environment variable.
-# ============================================================
-get_env_var() {
-    var="$1"
-    eval "printf '%s\n' \"\${$var}\""
-}
-
-# ============================================================
-# FUNCTION: set_env_var
-# ------------------------------------------------------------
-# Purpose:
-#   - Set and export an environment variable.
-#
-# Arguments:
-#   $1 - Name of the environment variable.
-#   $2 - Value to set.
-# ============================================================
-set_env_var() {
-    var="$1"
-    val="$2"
-    eval "$var=\$val"
-    export "$var"
-    log_verbose "Updated $var with value: $val"
-}
-
-# ============================================================
-# FUNCTION: update_env_var_generic
-# ------------------------------------------------------------
-# Purpose:
-#   - Deduplicate entries in a colon-separated environment variable.
-#   - Add a new entry idempotently (only if it isn't already present).
-#   - Optionally move an entry to the beginning or end.
-#
-# Arguments:
-#   $1 - Name of environment variable (e.g., PATH).
-#   $2 - (Optional) New entry to add.
-#   $3.. - (Optional) Options:
-#         "prepend" - Add new entry at the beginning.
-#         "append"  - Add new entry at the end (default).
-#         "move"    - Move the existing entry to the beginning or end.
-#
-# Returns:
-#   - Updates the specified environment variable.
-# ============================================================
-update_env_var_generic() {
-    var="$1"
-    new="$2"        # New entry to add.
-    mode="append"   # Default mode is "append".
-    move="no"       # Default: don't move entry.
-    shift 1         # Shift past the variable name.
-
-    # Parse optional arguments (prepend, append, move).
-    if [ -n "$new" ]; then
-        shift
-        for arg in "$@"; do
-            case "$arg" in
-                prepend|append) mode="$arg" ;;  # Set mode.
-                move) move="yes" ;;             # Enable move.
-                *) echo "Invalid argument '$arg'" >&2; return 1 ;;
-            esac
+    # Trim leading and trailing whitespace (simplified)
+    trim_spaces() {
+        s="$1"
+        # Remove leading spaces
+        while [ -n "$s" ] && { [ "${s%"${s#?}"}" = " " ] || [ "${s%"${s#?}"}" = $'\t' ]; }; do
+            s="${s#?}"
         done
-    fi
+        # Remove trailing spaces
+        while [ -n "$s" ] && { [ "${s%"${s%?}"}" = " " ] || [ "${s%"${s%?}"}" = $'\t' ]; }; do
+            s="${s%?}"
+        done
+        printf "%s" "$s"
+    }
 
-    # Retrieve the current value of the environment variable.
-    val=$(get_env_var "$var")
-
-    # -----------------------------------------------------------
-    # Efficient in-place processing: Deduplication + Addition + Move
-    # -----------------------------------------------------------
-    entries=""
-    seen=""
-    first=1   # Flag to manage the leading separator.
-
-    # Loop to handle deduplication and entry processing in one pass.
-    IFS="$ENV_SEP"
-    for entry in $val; do
-        # Skip entries that have already been added.
-        if [[ ":$seen:" != *":$entry:"* ]]; then
-            # Add to the entries string (handling the separator).
-            if [ "$first" -eq 1 ]; then
-                entries="$entry"
-                first=0
-            else
-                entries="$entries$ENV_SEP$entry"
-            fi
-            # Mark this entry as seen.
-            seen=":$seen:$entry"
-        fi
-    done
-
-    # Handle new entry addition and moving.
-    if [ -n "$new" ]; then
-        # If the new entry isn't already in the list.
-        if [[ ":$seen:" != *":$new:"* ]]; then
-            # Add new entry (prepend or append).
-            if [ "$mode" = "prepend" ]; then
-                entries="$new$ENV_SEP$entries"
-            else
-                entries="$entries$ENV_SEP$new"
-            fi
-            seen=":$seen:$new"   # Mark new entry as seen.
-        elif [ "$move" = "yes" ]; then
-            # Move the entry by removing and adding it back at the correct position.
-            entries=""
-            IFS="$ENV_SEP"
-            for entry in $val; do
-                if [ "$entry" != "$new" ]; then
-                    if [ -z "$entries" ]; then
-                        entries="$entry"
-                    else
-                        entries="$entries$ENV_SEP$entry"
-                    fi
-                fi
-            done
-            # Add the target entry at the correct position (prepend or append).
-            if [ "$mode" = "prepend" ]; then
-                entries="$new$ENV_SEP$entries"
-            else
-                entries="$entries$ENV_SEP$new"
-            fi
-        fi
-    fi
-
-    # Final step: Export the updated environment variable.
-    set_env_var "$var" "$entries"
-    log_verbose "Environment variable $var updated."
-}
-
-# ============================================================
-# FUNCTION: remove_from_env_var
-# ------------------------------------------------------------
-# Purpose:
-#   - Remove a specific entry from a colon-separated environment variable.
-#
-# Arguments:
-#   $1 - Name of the environment variable.
-#   $2 - Entry to remove.
-#
-# Returns:
-#   - Updates the specified environment variable.
-# ============================================================
-remove_from_env_var() {
-    var="$1"
-    target="$2"
-    val=$(get_env_var "$var")
-
-    # Efficiently build new entries without the target entry.
-    entries=""
-    IFS="$ENV_SEP"
-    for entry in $val; do
-        if [ "$entry" != "$target" ]; then
-            # Append entries that are not the target.
-            if [ -z "$entries" ]; then
-                entries="$entry"
-            else
-                entries="$entries$ENV_SEP$entry"
-            fi
-        fi
-    done
-
-    # Export the final result.
-    set_env_var "$var" "$entries"
-    log_verbose "Removed $target from $var."
-}
-
-# ============================================================
-# EXAMPLES (Commented Out)
-# ============================================================
-
-# 1. Deduplicate PATH only (no addition)
-# update_env_var_generic PATH
-
-# 2. Add a new entry to the beginning, move it if already exists
-# update_env_var_generic PATH "/usr/local/bin" prepend move
-
-# 3. Add a new entry to the end
-# update_env_var_generic PATH "/opt/tools" append
-
-# 4. Remove a specific entry
-# remove_from_env_var PATH "/old/path"
-
-# ============================================================
-# ASCII Flow Diagram (for update_env_var_generic)
-# -----------------------------------------------------------
-#
-#   +-----------------------------+
-#   |  Start                       |
-#   +-----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   | Retrieve environment var    |
-#   | (e.g., PATH)                 |
-#   +-----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   | Loop through entries and     |
-#   | deduplicate (if not seen)    |
-#   +-----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   | Is new entry provided?       |
-#   +-----------------------------+
-#       |         |
-#       v         v
-#   +---------------------+   +---------------------------+
-#   | Entry exists?       |   | Add new entry (prepend/    |
-#   | (move is "yes")     |   | append) and return final  |
-#   +---------------------+   | result                     |
-#       |                   +---------------------------+
-#       v
-#   +----------------------------+
-#   | Add new entry to position   |
-#   | (prepend or append)         |
-#   +----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   | Export final result         |
-#   +-----------------------------+
-#             |
-#             v
-#   +-----------------------------+
-#   |  End                        |
-#   +-----------------------------+
-
-
-
-# USAGE: path_add [include|prepend|append] "dir1" "dir2" ... (((
-# https://superuser.com/a/925318
-#   prepend: add/move to beginning
-#   append:  add/move to end
-#   include: add to end of PATH if not already included [default]
-#          that is, don't change position if already in PATH
-# RETURNS:
-# prepend:  dir2:dir1:OLD_PATH
-# append:   OLD_PATH:dir1:dir2
-# If called with no paramters, returns PATH with duplicate directories removed
-path_add() {
-    # use subshell to create "local" variables
-    PATH="$(path_unique)"
-    PATH="$(path_add_do "$@")" && export PATH
-}
-
-path_add_do() {
-    case "$1" in
-    'include' | 'prepend' | 'append')
-        action="$1"
-        shift
-        ;;
-    *) action='include' ;;
-    esac
-
-    path=":$PATH:" # pad to ensure full path is matched later
-
-    for dir in "$@"; do
-        #       [ -d "$dir" ] || continue # skip non-directory params
-
-        left="${path%:"$dir":*}" # remove last occurrence to end
-
-        if [ "$path" = "$left" ]; then
-            # PATH doesn't contain $dir
-            [ "$action" = 'include' ] && action='append'
-            right=''
-        else
-            right=":${path#"$left":"$dir":}" # remove start to last occurrence
-        fi
-
-        # construct path with $dir added
-        case "$action" in
-        'prepend') path=":$dir$left$right" ;;
-        'append') path="$left$right$dir:" ;;
+    # Validate command name (alphanumeric + ., _, +, -)
+    is_valid_command_name() {
+        case "$1" in
+            ""|*[!A-Za-z0-9._+-]*)
+                return 1
+                ;;
+            *)
+                return 0
+                ;;
         esac
-    done
+    }
 
-    # strip ':' pads
-    path="${path#:}"
-    path="${path%:}"
+    # Check if file exists and is executable
+    _is_executable() {
+        [ -f "$1" ] && [ -x "$1" ]
+    }
 
-    # return
-    printf '%s' "$path"
-}
+    # Search for command in PATH
+    command_path() {
+        name="$1"
+        cmd_path_value=""
+        [ -z "$PATH" ] && return 1
 
-# USAGE: path_unique [path]
-# path - a colon delimited list. Defaults to $PATH is not specified.
-# RETURNS: `path` with duplicated directories removed
-path_unique() {
-    in_path=${1:-$PATH}
-    path=':'
+        oldIFS="$IFS"
+        IFS=":"
+        for dir in $PATH; do
+            dir=$(trim_spaces "$dir")  # Trim spaces in directories
+            [ -z "$dir" ] && continue
+            if [ "$dir" = "." ]; then
+                continue  # Skip current directory
+            fi
+            if [ ! -d "$dir" ] || [ ! -x "$dir" ]; then
+                continue  # Skip invalid or inaccessible directories
+            fi
+            file="$dir/$name"
+            if _is_executable "$file"; then
+                cmd_path_value="$file"
+                IFS="$oldIFS"  # Restore IFS
+                return 0
+            fi
+        done
+        IFS="$oldIFS"  # Restore IFS
+        return 1
+    }
 
-    # Wrap the while loop in '{}' to be able to access the updated `path variable
-    # as the `while` loop is run in a subshell due to the piping to it.
-    # https://stackoverflow.com/questions/4667509/shell-variables-set-inside-while-loop-not-visible-outside-of-it
-    printf '%s\n' "$in_path" |
-        /bin/tr -s ':' '\n' |
-        {
-            while read -r dir; do
-                left="${path%:"$dir":*}" # remove last occurrence to end
-                if [ "$path" = "$left" ]; then
-                    # PATH doesn't contain $dir
-                    path="$path$dir:"
+    # Look up command in cache
+    cache_lookup() {
+        cache="$1"
+        name="$2"
+        cmd_cache_lookup_value=""
+        [ -z "$name" ] && return 1
+        [ -z "$cache" ] && return 1
+
+        name=$(trim_spaces "$name")  # Trim spaces in name
+        rest="$cache"
+        while [ -n "$rest" ]; do
+            entry="${rest%%$cmd_cache_delim*}"
+            rest="${rest#*$cmd_cache_delim}"
+            entry=$(trim_spaces "$entry")
+            [ -z "$entry" ] && continue
+            # Ensure entry contains '=' as key=value pair
+            if [ "${entry#*=}" = "$entry" ] || [ -z "${entry%%=*}" ] || [ -z "${entry#*=}" ]; then
+                continue  # Skip malformed entries
+            fi
+
+            key="${entry%%=*}"
+            value="${entry#*=}"
+            key=$(trim_spaces "$key")
+            value=$(trim_spaces "$value")
+
+            # Skip empty key or value
+            if [ -z "$key" ] || [ -z "$value" ]; then
+                continue
+            fi
+
+            if [ "$key" = "$name" ]; then
+                cmd_cache_lookup_value="$value"
+                return 0
+            fi
+        done
+        return 1
+    }
+
+    # Update cache with new name=value pair
+    cache_set() {
+        cache="$1"
+        name="$2"
+        value="$3"
+
+        # Default value if not provided
+        [ -z "$value" ] && value="not_found"
+
+        # Reject names/values containing the delimiter or equal sign
+        case "$name" in *$cmd_cache_delim*|*"="*) return 1; esac
+        case "$value" in *$cmd_cache_delim*|*"="*) return 1; esac
+
+        # Handle empty cache case
+        if [ -z "$cache" ]; then
+            cache="$name=$value"
+        else
+            new_cache=""
+            # Manually process cache entries to avoid any delimiter breaking
+            while [ -n "$cache" ]; do
+                # Extract key-value pair
+                entry="${cache%%$cmd_cache_delim*}"
+                cache="${cache#*$cmd_cache_delim}"
+
+                # Skip malformed entries
+                [ -z "$entry" ] && continue
+
+                key="${entry%%=*}"
+                value="${entry#*=}"
+
+                # Skip malformed key-value pairs
+                [ -z "$key" ] || [ -z "$value" ] && continue
+
+                if [ "$key" = "$name" ]; then
+                    new_cache="$new_cache${new_cache:+$cmd_cache_delim}$name=$value"
+                else
+                    new_cache="$new_cache${new_cache:+$cmd_cache_delim}$entry"
                 fi
             done
-            # strip ':' pads
-            path="${path#:}"
-            path="${path%:}"
-            # return
-            printf '%s\n' "$path"
-        }
-}
+            cache="$new_cache"
+        fi
+
+        printf "%s" "$cache"
+    }
+
+    # Check if command exists (cache or PATH)
+    command_exists() {
+        name="$1"
+        cache="$2"  # Pass the cache as an argument
+
+        [ -z "$name" ] && return 1
+
+        # If the input is a full path, check directly if it's executable
+        if [ "${name%/*}" != "$name" ]; then
+            _is_executable "$name" && return 0
+        fi
+
+        if ! is_valid_command_name "$name"; then
+            return 1
+        fi
+
+        # First, check the cache
+        cache_lookup "$cache" "$name"
+        if [ -n "$cmd_cache_lookup_value" ] && [ "$cmd_cache_lookup_value" != "not_found" ]; then
+            return 0  # Found in cache
+        fi
+
+        # If not found in cache, check if the command is executable
+        if _is_executable "$name"; then
+            cache=$(cache_set "$cache" "$name" "executable")
+            return 0
+        fi
+
+        # If not found in PATH
+        if command_path "$name"; then
+            cache=$(cache_set "$cache" "$name" "$cmd_path_value")
+            return 0
+        fi
+
+        # If still not found, cache the result and return failure
+        cache=$(cache_set "$cache" "$name" "not_found")
+        return 1
+    }
+
+    # Security check for "." in PATH
+    check_path_for_dots() {
+        if [ -z "$PATH" ] || [ "$(trim_spaces "$PATH")" = "" ]; then
+            echo "Warning: PATH is empty or unset. This may cause commands to fail."
+            return 1  # No PATH set, skip the check
+        fi
+
+        new_path=""
+        oldIFS="$IFS"
+        IFS=":"
+        for dir in $PATH; do
+            dir=$(trim_spaces "$dir")  # Trim spaces in directories
+            [ -z "$dir" ] && continue
+            [ "$dir" = "." ] && continue  # Skip current directory
+            new_path="$new_path$dir:"
+        done
+        IFS="$oldIFS"
+
+        # If PATH becomes empty after removing ".", warn and exit
+        if [ -z "$new_path" ] || [ "$new_path" = "." ]; then
+            echo "Error: No valid directories left in PATH!" >&2
+            return 1
+        fi
+        PATH="${new_path%:}"  # Remove trailing colon
+    }
+
+    # Run security check on PATH before using it
+    check_path_for_dots
+
+fi
+# )))
+
+# update_env_var (((
+if ! type "update_env_var" > /dev/null 2>&1; then
+  update_env_var() {
+    var="$1"
+    operation="deduplicate"
+    delimiter=":"  # Default delimiter
+    entry=""
+    verbose="no"
+    quiet="no"
+
+    shift
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --verbose|-v) verbose="yes" ;;
+        --quiet|-q) quiet="yes" ;;
+        prepend|append|movefirst|movelast|remove) operation="$1" ;;
+        --delimiter|-d) delimiter="$2"; shift ;;
+        *) entry="$1" ;;
+      esac
+      shift
+    done
+
+    # Get the value of the environment variable
+    val="${!var}"
+
+    # If the variable is empty or not set, initialize it to an empty string
+    [ -z "$val" ] && val=""
+
+    # If the variable is empty, just return early for remove operation
+    if [ -z "$val" ] && [ "$operation" = "remove" ]; then
+      echo "Error: Environment variable '$var' is empty or not set." >&2
+      return 1
+    fi
+
+    # Save the original IFS value
+    oldIFS="$IFS"
+    IFS="$delimiter"  # Set Internal Field Separator to delimiter
+
+    # Split the environment variable into a pseudo-array using the delimiter
+    result_list=""
+    remainder="$val"
+    while [ -n "$remainder" ]; do
+      # Extract the first entry before the delimiter
+      case "$remainder" in
+        *"$delimiter"*)
+          tmp="${remainder%%"$delimiter"*}"
+          # Skip empty entries
+          if [ -n "$tmp" ]; then
+            result_list="$result_list$delimiter$tmp"
+          fi
+          remainder="${remainder#*"$delimiter"}"
+          ;;
+        *)
+          result_list="$result_list$remainder"
+          remainder=""
+          ;;
+      esac
+    done
+
+    # Remove leading delimiter
+    result_list="${result_list#"$delimiter"}"
+
+    # Deduplicate the list
+    dedup_list=""
+    seen=""
+    for e in $result_list; do
+      [ -z "$e" ] && continue
+      # Check if we've seen this entry already
+      case "$seen" in
+        *"$delimiter$e$delimiter"*) continue ;;
+        *)
+          dedup_list="$dedup_list$e$delimiter"
+          seen="$seen$delimiter$e$delimiter"
+          ;;
+      esac
+    done
+
+    # Remove trailing delimiter after deduplication
+    dedup_list="${dedup_list%"$delimiter"}"
+
+    # Remove entry if the operation is "remove"
+    if [ "$operation" = "remove" ]; then
+      new_list=""
+      found="no"
+      for e in $dedup_list; do
+        if [ "$e" = "$entry" ]; then
+          found="yes"
+        else
+          new_list="$new_list$e$delimiter"
+        fi
+      done
+
+      if [ "$found" != "yes" ]; then
+        echo "Error: Entry '$entry' not found in $var." >&2
+        return 1
+      fi
+      # Remove trailing delimiter
+      dedup_list="${new_list%"$delimiter"}"
+    fi
+
+    # Prepend/Append/Move operations
+    if [ -n "$entry" ] && [ "$operation" != "remove" ]; then
+      # Prevent appending/Prepending empty entries
+      if [ -z "$entry" ]; then
+        echo "Error: Entry is empty." >&2
+        return 1
+      fi
+
+      new_list=""
+      for e in $dedup_list; do
+        if [ "$e" != "$entry" ]; then
+          new_list="$new_list$e$delimiter"
+        fi
+      done
+
+      case "$operation" in
+        prepend|movefirst) dedup_list="$entry$delimiter$new_list" ;;
+        append|movelast) dedup_list="$new_list$entry" ;;
+      esac
+    fi
+
+    # Final cleanup: Remove leading or trailing delimiters
+    dedup_list="${dedup_list#"$delimiter"}"
+    dedup_list="${dedup_list%"$delimiter"}"
+
+    # Avoid adding delimiter if the entry is the only element (for empty values)
+    if [ -z "$dedup_list" ]; then
+      dedup_list="$entry"
+    fi
+
+    # Set the environment variable directly without using eval
+    export "$var=$dedup_list"
+
+    # Verbose output only when appropriate
+    if [ "$quiet" != "yes" ] && [ "$verbose" = "yes" ]; then
+      printf "%s\n" "$dedup_list"
+    fi
+
+    # Restore IFS to original value
+    IFS="$oldIFS"
+  }
+fi
+
+# ============================================================
+# -------------------- USAGE EXAMPLES ------------------------
+# ============================================================
+
+# Update PATH by deduplicating
+# update_env_var PATH deduplicate --verbose
+
+# Prepend to PATH
+# update_env_var PATH prepend "/opt/bin" --verbose
+
+# Append to PATH
+# update_env_var PATH append "/home/user/bin" --verbose
+
+# Move directory to the start of PATH
+# update_env_var PATH movefirst "/usr/sbin" --verbose
+
+# Move directory to the end of PATH
+# update_env_var PATH movelast "/bin" --verbose
+
+# Remove a directory from PATH
+# update_env_var PATH remove "/sbin" --verbose
+
+# Prepend a directory with custom delimiter
+# update_env_var PATH prepend "/new/path" --delimiter "::" --verbose
+#
 # )))

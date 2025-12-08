@@ -9,20 +9,20 @@ fi
 # )))
 
 # Source ~/.profile (which contains common settings across shells such as environment variables)
-test -r "$HOME/.profile" && . "$HOME/.profile"
+[[ -r $HOME/.profile ]] && source "$HOME/.profile"
 
 # ((( Source ~/.bashrc (if present) to have aliases/functions etc defined for login shell sessions also
 # Helps to move most other bash settings into the ~/.bashrc file to consolidate everything in one place
 
 # https://superuser.com/questions/183870/difference-between-bashrc-and-bash-profile/183980
-case "$-" in *i*)
-  test -r "$HOME/.bashrc" && . "$HOME/.bashrc"
-  ;;
-esac
-if [ -x "$(command -v starship)" ] && [ "$TERM_PROGRAM" = "WezTerm" ]; then
-  case "$-" in *i*)
-    bash
-    ;;
-  esac
+# Source ~/.bashrc (if present) to have aliases, functions, and other settings for login shells
+# Consolidates interactive shell settings in ~/.bashrc
+if [[ "$-" == *i* && -r "$HOME/.bashrc" ]]; then
+  # If Starship is installed and running in WezTerm, start a new interactive Bash shell
+  if command -v starship &>/dev/null && [[ "$TERM_PROGRAM" == "WezTerm" ]]; then
+    bash --rcfile "$HOME/.bashrc"
+  else
+  . "$HOME/.bashrc"
+  fi
 fi
 # )))

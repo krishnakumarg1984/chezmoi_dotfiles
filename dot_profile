@@ -1,10 +1,11 @@
 # vim: ft=sh:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=145:syntax=sh:
 # shellcheck shell=sh
 # shellcheck disable=SC1091
+# ~/.profile
 
-# Command classifier (strict POSIX) (((
+# command_exists, command_path (strict POSIX) (((
 # Prevent reloading if functions are already defined
-if ! type "command_type_exists" > /dev/null 2>&1; then
+if ! type "command_exists" > /dev/null 2>&1; then
 
     # Cache delimiter
     cmd_cache_delim="|"
@@ -13,11 +14,11 @@ if ! type "command_type_exists" > /dev/null 2>&1; then
     trim_spaces() {
         s="$1"
         # Remove leading spaces
-        while [ -n "$s" ] && [ "${s%"${s#?}"}" = " " ] || [ "${s%"${s#?}"}" = "	" ]; do
+        while [ -n "$s" ] && { [ "${s%"${s#?}"}" = " " ] || [ "${s%"${s#?}"}" = $'\t' ]; }; do
             s="${s#?}"
         done
         # Remove trailing spaces
-        while [ -n "$s" ] && [ "${s%"${s%?}"}" = " " ] || [ "${s%"${s%?}"}" = "	" ]; do
+        while [ -n "$s" ] && { [ "${s%"${s%?}"}" = " " ] || [ "${s%"${s%?}"}" = $'\t' ]; }; do
             s="${s%?}"
         done
         printf "%s" "$s"
@@ -41,7 +42,7 @@ if ! type "command_type_exists" > /dev/null 2>&1; then
     }
 
     # Search for command in PATH
-    command_type_path() {
+    command_path() {
         name="$1"
         cmd_path_value=""
         [ -z "$PATH" ] && return 1
@@ -152,11 +153,17 @@ if ! type "command_type_exists" > /dev/null 2>&1; then
     }
 
     # Check if command exists (cache or PATH)
-    command_type_exists() {
+    command_exists() {
         name="$1"
         cache="$2"  # Pass the cache as an argument
 
         [ -z "$name" ] && return 1
+
+        # If the input is a full path, check directly if it's executable
+        if [ "${name%/*}" != "$name" ]; then
+            _is_executable "$name" && return 0
+        fi
+
         if ! is_valid_command_name "$name"; then
             return 1
         fi
@@ -174,7 +181,7 @@ if ! type "command_type_exists" > /dev/null 2>&1; then
         fi
 
         # If not found in PATH
-        if command_type_path "$name"; then
+        if command_path "$name"; then
             cache=$(cache_set "$cache" "$name" "$cmd_path_value")
             return 0
         fi
@@ -182,16 +189,6 @@ if ! type "command_type_exists" > /dev/null 2>&1; then
         # If still not found, cache the result and return failure
         cache=$(cache_set "$cache" "$name" "not_found")
         return 1
-    }
-
-    # Check if command does not exist (inverse of command_type_exists)
-    command_type_does_not_exist() {
-        name="$1"
-        cache="$2"  # Pass the cache as an argument
-
-        [ -z "$name" ] && return 1
-        command_type_exists "$name" "$cache"
-        return $?
     }
 
     # Security check for "." in PATH
@@ -224,12 +221,11 @@ if ! type "command_type_exists" > /dev/null 2>&1; then
     check_path_for_dots
 
 fi
-#
 # )))
 
-# -------------------- UPDATE_ENV_VAR ---------------------(((
-
-update_env_var() {
+# update_env_var (((
+if ! type "update_env_var" > /dev/null 2>&1; then
+  update_env_var() {
     var="$1"
     operation="deduplicate"
     delimiter=":"  # Default delimiter
@@ -239,14 +235,14 @@ update_env_var() {
 
     shift
     while [ $# -gt 0 ]; do
-        case "$1" in
-            --verbose|-v) verbose="yes" ;;
-            --quiet|-q) quiet="yes" ;;
-            prepend|append|movefirst|movelast|remove) operation="$1" ;;
-            --delimiter|-d) delimiter="$2"; shift ;;
-            *) entry="$1" ;;
-        esac
-        shift
+      case "$1" in
+        --verbose|-v) verbose="yes" ;;
+        --quiet|-q) quiet="yes" ;;
+        prepend|append|movefirst|movelast|remove) operation="$1" ;;
+        --delimiter|-d) delimiter="$2"; shift ;;
+        *) entry="$1" ;;
+      esac
+      shift
     done
 
     # Get the value of the environment variable
@@ -257,8 +253,8 @@ update_env_var() {
 
     # If the variable is empty, just return early for remove operation
     if [ -z "$val" ] && [ "$operation" = "remove" ]; then
-        echo "Error: Environment variable '$var' is empty or not set." >&2
-        return 1
+      echo "Error: Environment variable '$var' is empty or not set." >&2
+      return 1
     fi
 
     # Save the original IFS value
@@ -269,21 +265,21 @@ update_env_var() {
     result_list=""
     remainder="$val"
     while [ -n "$remainder" ]; do
-        # Extract the first entry before the delimiter
-        case "$remainder" in
-            *"$delimiter"*)
-                tmp="${remainder%%"$delimiter"*}"
-                # Skip empty entries
-                if [ -n "$tmp" ]; then
-                    result_list="$result_list$delimiter$tmp"
-                fi
-                remainder="${remainder#*"$delimiter"}"
-                ;;
-            *)
-                result_list="$result_list$remainder"
-                remainder=""
-                ;;
-        esac
+      # Extract the first entry before the delimiter
+      case "$remainder" in
+        *"$delimiter"*)
+          tmp="${remainder%%"$delimiter"*}"
+          # Skip empty entries
+          if [ -n "$tmp" ]; then
+            result_list="$result_list$delimiter$tmp"
+          fi
+          remainder="${remainder#*"$delimiter"}"
+          ;;
+        *)
+          result_list="$result_list$remainder"
+          remainder=""
+          ;;
+      esac
     done
 
     # Remove leading delimiter
@@ -293,15 +289,15 @@ update_env_var() {
     dedup_list=""
     seen=""
     for e in $result_list; do
-        [ -z "$e" ] && continue
-        # Check if we've seen this entry already
-        case "$seen" in
-            *"$delimiter$e$delimiter"*) continue ;;
-            *)
-                dedup_list="$dedup_list$e$delimiter"
-                seen="$seen$delimiter$e$delimiter"
-                ;;
-        esac
+      [ -z "$e" ] && continue
+      # Check if we've seen this entry already
+      case "$seen" in
+        *"$delimiter$e$delimiter"*) continue ;;
+        *)
+          dedup_list="$dedup_list$e$delimiter"
+          seen="$seen$delimiter$e$delimiter"
+          ;;
+      esac
     done
 
     # Remove trailing delimiter after deduplication
@@ -309,43 +305,43 @@ update_env_var() {
 
     # Remove entry if the operation is "remove"
     if [ "$operation" = "remove" ]; then
-        new_list=""
-        found="no"
-        for e in $dedup_list; do
-            if [ "$e" = "$entry" ]; then
-                found="yes"
-            else
-                new_list="$new_list$e$delimiter"
-            fi
-        done
-
-        if [ "$found" != "yes" ]; then
-            echo "Error: Entry '$entry' not found in $var." >&2
-            return 1
+      new_list=""
+      found="no"
+      for e in $dedup_list; do
+        if [ "$e" = "$entry" ]; then
+          found="yes"
+        else
+          new_list="$new_list$e$delimiter"
         fi
-        # Remove trailing delimiter
-        dedup_list="${new_list%"$delimiter"}"
+      done
+
+      if [ "$found" != "yes" ]; then
+        echo "Error: Entry '$entry' not found in $var." >&2
+        return 1
+      fi
+      # Remove trailing delimiter
+      dedup_list="${new_list%"$delimiter"}"
     fi
 
     # Prepend/Append/Move operations
     if [ -n "$entry" ] && [ "$operation" != "remove" ]; then
-        # Prevent appending/Prepending empty entries
-        if [ -z "$entry" ]; then
-            echo "Error: Entry is empty." >&2
-            return 1
+      # Prevent appending/Prepending empty entries
+      if [ -z "$entry" ]; then
+        echo "Error: Entry is empty." >&2
+        return 1
+      fi
+
+      new_list=""
+      for e in $dedup_list; do
+        if [ "$e" != "$entry" ]; then
+          new_list="$new_list$e$delimiter"
         fi
+      done
 
-        new_list=""
-        for e in $dedup_list; do
-            if [ "$e" != "$entry" ]; then
-                new_list="$new_list$e$delimiter"
-            fi
-        done
-
-        case "$operation" in
-            prepend|movefirst) dedup_list="$entry$delimiter$new_list" ;;
-            append|movelast) dedup_list="$new_list$entry" ;;
-        esac
+      case "$operation" in
+        prepend|movefirst) dedup_list="$entry$delimiter$new_list" ;;
+        append|movelast) dedup_list="$new_list$entry" ;;
+      esac
     fi
 
     # Final cleanup: Remove leading or trailing delimiters
@@ -354,7 +350,7 @@ update_env_var() {
 
     # Avoid adding delimiter if the entry is the only element (for empty values)
     if [ -z "$dedup_list" ]; then
-        dedup_list="$entry"
+      dedup_list="$entry"
     fi
 
     # Set the environment variable directly without using eval
@@ -362,12 +358,13 @@ update_env_var() {
 
     # Verbose output only when appropriate
     if [ "$quiet" != "yes" ] && [ "$verbose" = "yes" ]; then
-        printf "%s\n" "$dedup_list"
+      printf "%s\n" "$dedup_list"
     fi
 
     # Restore IFS to original value
     IFS="$oldIFS"
-}
+  }
+fi
 
 # ============================================================
 # -------------------- USAGE EXAMPLES ------------------------
@@ -406,18 +403,18 @@ fi
 
 # Incorporate the `pixi` command to PATH (((
 if [ -d "$HOME/.config/pixi" ]; then
-  PIXI_HOME="$HOME/.config/pixi" && export PIXI_HOME
+  PIXI_HOME="$HOME/.config/pixi"
+  export PIXI_HOME
 fi
-# if [ ! -x "$(command -v pixi)" ]; then
-if command_type_does_not_exist "pixi" && command_type_exists "$PIXI_HOME/bin/pixi"; then
+if ! command_exists "pixi" && command_exists "$PIXI_HOME/bin/pixi"; then
   update_env_var PATH prepend "$PIXI_HOME/bin" --quiet
 fi
 # )))
 
 # Incorporate TexLive directories to PATH & INFOPATH (((
-TLYEAR=2025 && TLDIR="$HOME/.local/texlive/$TLYEAR"
+TLYEAR=$(date '+%Y') && TLDIR="$HOME/.local/texlive/$TLYEAR"
 if [ -d "$TLDIR" ]; then
-  update_env_var PATH append "$TLDIR/bin/$(uname -m)-linux" --quiet
+  update_env_var PATH append "$TLDIR/bin/$(uname -m)-$(uname -s)" --quiet
 fi
 # )))
 
@@ -431,23 +428,27 @@ MASON_BIN="$HOME/.local/share/nvim/mason/bin"
 # Set various environment variables provided by shell (can refer to external tools where available) (((
 
 # Set EDITOR and SUDO_EDITOR (((
-_editors="nvim vim vi nano" # List of preferred editors in order
+# List of preferred editors in order of preference
+_editors="nvim vim vi nano"
 
+# Try to find the first available editor in the list
 for e in $_editors; do
-    if command -v "$e" >/dev/null 2>&1; then
-        VISUAL="$(command -v "$e")"
+    cmd_path=$(command_path "$e")
+    if [ -n "$cmd_path" ]; then
+        # Set VISUAL to the first available editor's path
+        VISUAL="$cmd_path"
         break
     fi
 done
 
-# Fallback to empty if none found
-: "${VISUAL:=}"
+# Fallback to empty if no editor was found
+: "${VISUAL:=""}"  # Explicit fallback to empty string if no editor is found
 
-# Set SUDO_EDITOR and EDITOR consistently
+# Set both SUDO_EDITOR and EDITOR to the same editor
 SUDO_EDITOR="$VISUAL"
 EDITOR="$VISUAL"
 
-# Export all variables
+# Export the variables to make them available in the environment
 export VISUAL EDITOR SUDO_EDITOR
 # )))
 
@@ -458,18 +459,56 @@ export VISUAL EDITOR SUDO_EDITOR
 # Ignore common temporary, backup, build, editor, and TeX auxiliary files
 
 FIGNORE=".DS_Store:\
-.git:.hg:.svn:\
+.git:.hg:.svn:.bzr:.fslckout:.cvs:\
 .aux:.bbl:.blg:.log:.toc:.out:.lof:.lot:.fls:.fdb_latexmk:.synctex.gz:.synctex:\
 .xdv:.nav:.snm:.vrb:.run.xml:.dvi:.pdfsync:.brf:.auxlock:.ilg:.ind:.idx:.glg:.glo:.gls:.glsdefs:.gaux:.loa:.lol:.ltjruby:.luac:.lx64fsl:.maf:.mf:.mlf:.mlt:.mod:.mp:.mw:.nav:.nlg:.nlo:.nls:.pax:.pdfpc:.pre:.pyg:.pytxcode:.save:.sympy:.texpadtmp:.tdo:.ttt:.upa:.upb:.ver:.wrt:.xdy:.xyc:\
 .tmp:.swp:.swo:.bak:.backup:.old:.orig:.rej:\
-.o:.obj:.so:.dll:.pyc:.pyo:.rbc:.rbo:.class"
+.o:.obj:.so:.dll:.pyc:.pyo:.rbc:.rbo:.class:\
+# Emacs lock files
+.#*:\
+# Vim and NeoVim swap files
+.viminfo:.exrc:.vimrc~:\
+# JetBrains IDE files
+.idea:*.iml:*.ipr:*.iws:\
+# Visual Studio files
+*.user:*.suo:*.userosscache:\
+# Eclipse files
+.project:.classpath:.settings/:
+# Xcode files
+.xcodeproj:.xcworkspace:*.xcuserstate:\
+# Node.js dependencies
+node_modules/:\
+# Python bytecode and cache
+*.pyd:*.pyo:*.pyc:\
+# Java class and bytecode files
+*.class:*.jar:*.war:*.ear:\
+# Ruby gem and bytecode files
+*.gem:.rbc:.rbo:\
+# PHP archive and temporary files
+*.phar:*.phtml:\
+# SQLite and database files
+*.sqlite:*.db:*.db-journal:*.sqlitedb:\
+# Cache directories
+.cache/:.thumb/:\
+# Configuration files
+*.cfg:*.conf:*.json:.env"
+
 export FIGNORE
 
 # )))
 
-# Set HISTCONTROL & HISTSIZE (shell-agnostic history-related environment variables) (((
-update_env_var HISTCONTROL prepend "erasedups:ignorespace" --quiet # prevent duplicate lines & lines starting with space
-HISTSIZE=10000 && export HISTSIZE                                  # Keep 10k lines of history
+# Set  HISTSIZE (((
+# update_env_var HISTCONTROL prepend "erasedups:ignorespace" --quiet # prevent duplicate lines & lines starting with space
+HISTSIZE=10000
+export HISTSIZE
+# )))
+
+# Inputrc for readline ------------------- (((
+# Set INPUTRC if a custom readline configuration exists
+if [ -r "$HOME/.config/readline/inputrc" ]; then
+    INPUTRC="$HOME/.config/readline/inputrc"
+    export INPUTRC
+fi
 # )))
 
 # Set LESS_TERMCAP_xx, LESSPIPE, LESS, LESSKEY, LESSHISTFILE for colorising the output of the `less` pager (((
@@ -491,19 +530,15 @@ export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_me \
 
 # ------------------- LESS and Bat Integration -------------------
 
-BAT_PRESENT=
-batpipe_location=
-
 # Prefer bat + batpipe if available
-if command_type_exists bat; then
-    BAT_PRESENT=1
-    if command_type_exists batpipe; then
-        batpipe_location=$(command_type_path batpipe)
+if command_exists bat; then
+    if command_exists batpipe; then
+        batpipe_location=$(command_path batpipe)
     fi
 fi
 
 # Use batpipe for LESS if executable
-if [ -n "$batpipe_location" ] && [ -x "$batpipe_location" ]; then
+if [ -n "$batpipe_location" ]; then
     LESSOPEN="|$batpipe_location %s"
     export LESSOPEN
     unset LESSCLOSE
@@ -511,11 +546,11 @@ if [ -n "$batpipe_location" ] && [ -x "$batpipe_location" ]; then
     export BATPIPE
 else
     # Fallback to lesspipe / lesspipe.sh
-    if command_type_exists lesspipe; then
-        LESSOPEN="|$(command_type_path lesspipe) %s"
+    if command_exists lesspipe; then
+        LESSOPEN="|$(command_path lesspipe) %s"
         export LESSOPEN
-    elif command_type_exists lesspipe.sh; then
-        LESSOPEN="|$(command_type_path lesspipe.sh) %s"
+    elif command_exists lesspipe.sh; then
+        LESSOPEN="|$(command_path lesspipe.sh) %s"
         export LESSOPEN
     fi
 fi
@@ -539,13 +574,14 @@ export LESSHISTFILE
 LANG="en_GB.UTF-8"
 export LANG
 
-LANGUAGE="en_GB.UTF-8"
-export LANGUAGE
+# Set fallback language (optional)
+# LANGUAGE="en_GB.UTF-8"   # Commented out if LANG is sufficient
 
-# Set consistent collation and character type behavior
-LC_COLLATE="C"
+# Collation (sort order) behavior
+LC_COLLATE="C"  # Use C locale for sorting (e.g., for programming or POSIX tools)
 export LC_COLLATE
 
+# Character classification and conversion (UTF-8 for character types)
 LC_CTYPE="en_GB.UTF-8"
 export LC_CTYPE
 
@@ -566,7 +602,7 @@ export LC_NUMERIC
 LC_PAPER="en_GB.UTF-8"
 export LC_PAPER
 
-LC_TIME="C"
+LC_TIME="C"  # Set time-related behavior to "C" locale (useful for POSIX systems)
 export LC_TIME
 
 # Reset LC_ALL to allow specific LC_* variables to take effect
@@ -587,7 +623,7 @@ PAGER="less -MRF --use-color"
 export PAGER
 
 # Set READER/PDFVIEWER etc (((
-if command_type_exists zathura; then
+if command_exists zathura; then
     ASYMPTOTE_PDFVIEWER="zathura"
     export ASYMPTOTE_PDFVIEWER
 
@@ -609,7 +645,14 @@ fi
 
 # Set environment variables related to third-party tools (((
 
-# Ansible environment variables (((
+# ------------------- AddressSanitizer (ASAN) Options (((
+# https://stackoverflow.com/a/54373833
+# Configure ASAN for safer debugging and controlled crash behavior
+ASAN_OPTIONS="abort_on_error=1:detect_leaks=0:report_objects=1:sleep_before_dying=1"
+export ASAN_OPTIONS
+# )))
+
+# ------------------- Ansible environment variables (((
 ANSIBLE_HOME="$HOME/.config/ansible"
 export ANSIBLE_HOME
 
@@ -623,36 +666,32 @@ ANSIBLE_NAVIGATOR_CONFIG="$HOME/.config/ansible/ansible-navigator.yml"
 export ANSIBLE_NAVIGATOR_CONFIG
 # )))
 
-# ------------------- AddressSanitizer (ASAN) Options (((
-# https://stackoverflow.com/a/54373833
-# Configure ASAN for safer debugging and controlled crash behavior
-ASAN_OPTIONS="abort_on_error=1:detect_leaks=0:report_objects=1:sleep_before_dying=1"
-export ASAN_OPTIONS
-# )))
-
 # BASH_COMPLETION_USER_FILE="$HOME/.config/bash_completion/bash_completion" && export BASH_COMPLETION_USER_FILE
 
-# ------------------- Rust Cargo Environment -------------------(((
-
+# ------------------- Cargo (Rust) Environment -------------------(((
 # Set Cargo home directory
-CARGO_HOME="$HOME/.local/share/cargo" && export CARGO_HOME
+if command_exists "cargo"; then
+  CARGO_HOME="$HOME/.local/share/cargo" && export CARGO_HOME
+fi
 
 # Optionally, you could also prepend Cargo bin to PATH if desired:
 # test -d "$CARGO_HOME/bin" && update_env_var PATH prepend "$CARGO_HOME/bin"
 # )))
 
 # ------------------- Docker Environment (with detection) ------------------- (((
-
 # Only set Docker environment if `docker` command exists
-if command_type_exists docker; then
-
+if command_exists docker; then
     # Set Docker configuration directory
     DOCKER_CONFIG="$HOME/.config/docker"
     export DOCKER_CONFIG
 
-    # Optional: Use user-specific Docker socket
-    # Uncomment to use a per-user Docker socket instead of the default system socket
-    # DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock" && export DOCKER_HOST
+    # Optional: Use user-specific Docker socket (uncomment if needed)
+    # Ensure that DOCKER_HOST is not already set (if using rootless Docker)
+    # if [ -z "$DOCKER_HOST" ]; then
+    #     DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock"
+    #     export DOCKER_HOST
+    #     echo "Docker host set to user-specific socket at $DOCKER_HOST"
+    # fi
     # Notes:
     #   • Default Docker daemon path: /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
     #   • Useful if running a rootless Docker daemon
@@ -665,16 +704,16 @@ fi
 # multi-pane support, truecolor-safe options, and advanced keybindings.
 
 # Only configure if fzf exists
-if command_type_exists fzf; then
+if command_exists fzf; then
 
   # Ensure BAT is present for previews
-  if [ "$BAT_PRESENT" != "" ]; then
+  if command_exists "bat"; then
 
     # CTRL-T (file finder) options
     # - Show bat preview of the selected file with line numbers and syntax highlighting
     # - ctrl-/ toggles preview window
     # - preview window at the bottom, initially hidden
-    FZF_CTRL_T_OPTS="
+    export FZF_CTRL_T_OPTS="
 --preview 'bat --style=plain,grid,numbers --color=always {} || cat {}'
 --bind 'ctrl-/:change-preview-window(down|hidden|)'
 --height 40%
@@ -682,13 +721,12 @@ if command_type_exists fzf; then
 --ansi
 --color=fg+:yellow,bg+:black,preview-border:magenta
 --multi"
-    export FZF_CTRL_T_OPTS
   fi
 
   # CTRL-R (history search) options
   # - Show previous commands with preview of command
   # - preview window at top, initially hidden
-  FZF_CTRL_R_OPTS="
+  export FZF_CTRL_R_OPTS="
 --preview 'echo {}'
 --preview-window=up:3:hidden:wrap
 --bind 'ctrl-/:toggle-preview'
@@ -697,10 +735,9 @@ if command_type_exists fzf; then
 --layout=reverse
 --ansi
 --cycle"
-  export FZF_CTRL_R_OPTS
 
   # File / Directory completion using fzf with BAT previews
-  FZF_DEFAULT_OPTS="
+  export FZF_DEFAULT_OPTS="
 --preview 'if [ -d {} ]; then ls -la --color=always {}; else bat --style=plain,grid,numbers --color=always {}; fi'
 --bind 'ctrl-d:toggle-preview,alt-l:accept,alt-h:abort'
 --color=fg+:cyan,bg+:black,info:yellow,pointer:red
@@ -708,13 +745,12 @@ if command_type_exists fzf; then
 --height=50%
 --layout=reverse
 --multi"
-  export FZF_DEFAULT_OPTS
 
   # Git integration (if inside a git repo)
   # - CTRL-G opens git file search
   # - Shows modified files with diff preview
-  if command_type_exists git; then
-    FZF_GIT_FILES_OPTS="
+  if command_exists git; then
+    export FZF_GIT_FILES_OPTS="
 --preview 'git diff --color=always -- {} | head -n 50'
 --bind 'ctrl-/:toggle-preview'
 --color fg+:green,bg+:black,preview-border:blue
@@ -722,33 +758,54 @@ if command_type_exists fzf; then
 --layout=reverse
 --ansi
 --multi"
-    export FZF_GIT_FILES_OPTS
+  fi
+
+  # Use ripgrep (rg) for file searches, if available
+  if command_exists rg; then
+
+    # File search with ripgrep and BAT previews
+    export FZF_DEFAULT_OPTS="
+--preview 'if [ -d {} ]; then ls -la --color=always {}; else rg --color=always --no-heading --line-number --column {} || cat {}; fi'
+--bind 'ctrl-d:toggle-preview,alt-l:accept,alt-h:abort'
+--color=fg+:cyan,bg+:black,info:yellow,pointer:red
+--ansi
+--height=50%
+--layout=reverse
+--multi"
+
+    # Git files search using ripgrep, if inside a git repo
+    export FZF_GIT_FILES_OPTS="
+--preview 'rg --color=always --no-heading --line-number --column {} | head -n 50'
+--bind 'ctrl-/:toggle-preview'
+--color fg+:green,bg+:black,preview-border:blue
+--height 50%
+--layout=reverse
+--ansi
+--multi"
   fi
 
   # Keybinding hints (helpful for multi-pane, preview toggle)
-  FZF_KEY_BINDINGS="
+  export FZF_KEY_BINDINGS="
 ctrl-t: files | ctrl-r: history | alt-g: git-files
 ctrl-/: toggle preview window
 alt-l: accept | alt-h: abort"
-  export FZF_KEY_BINDINGS
 
 fi
 # ------------------- END FZF Advanced Configuration -------------------
 # )))
 
-# GCC_COLORS Setup (((
+# ------------------- GCC_COLORS Setup (((
 # This configuration leverages 24-bit RGB colors for modern terminals while
 # falling back to classic 16-color ANSI codes for older terminals.
 # It covers all GCC diagnostic elements: errors, warnings, notes, code ranges,
 # file paths, diff highlights, and fixit hints.
 # -----------------------------------------------------------------------------
 
-# Detect if terminal supports truecolor
-# Some terminals set COLORTERM to "truecolor" or "24bit"
+# Detect if terminal supports truecolor (24-bit)
 if [ "${COLORTERM-}" = "truecolor" ] || [ "${COLORTERM-}" = "24bit" ]; then
     # ------------------- Truecolor 24-bit GCC_COLORS -------------------
     # Format: 38;2;<R>;<G>;<B> foreground, 48;2;<R>;<G>;<B> background
-    GCC_COLORS="\
+    export GCC_COLORS="\
 error=38;2;255;0;0:warning=38;2;255;165;0:note=38;2;0;255;255:\
 range1=38;2;0;255;0:range2=38;2;0;0;255:locus=38;2;255;255;0:\
 quote=38;2;255;0;255:path=38;2;0;255;255:fixit-insert=38;2;0;200;0:fixit-delete=38;2;200;0;0:\
@@ -756,17 +813,13 @@ diff-filename=38;2;255;255;255:diff-hunk=38;2;0;255;0:diff-delete=38;2;255;0;0:d
 type-diff=38;2;0;255;255"
 else
     # ------------------- Fallback to Classic 16-Color ANSI -------------------
-    GCC_COLORS="\
+    export GCC_COLORS="\
 error=01;31:warning=01;35:note=01;36:range1=32:range2=34:locus=01:\
 quote=01:path=01;36:fixit-insert=32:fixit-delete=31:\
 diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32:\
 type-diff=01;32"
 fi
 
-# Export GCC_COLORS for all GCC invocations
-export GCC_COLORS
-
-# -----------------------------------------------------------------------------
 # Explanation of Key Fields:
 # - error / warning / note: Highlight GCC diagnostics in red, orange, cyan
 # - range1 / range2: Highlight ranges in green / blue for code selection
@@ -775,6 +828,9 @@ export GCC_COLORS
 # - path: File paths
 # - fixit-insert / fixit-delete: Proposed code modifications
 # - diff-filename / diff-hunk / diff-delete / diff-insert / type-diff: Highlight diffs in compiler output
+
+# Export GCC_COLORS for all GCC invocations
+export GCC_COLORS
 # -----------------------------------------------------------------------------
 # )))
 
@@ -787,41 +843,59 @@ if [ -n "$VISUAL" ]; then
 fi
 # )))
 
+# ------------------- Use 'difft' as Git external diff tool if available (((
+if command_exists difft; then
+    GIT_EXTERNAL_DIFF=$(command_path difft)
+    export GIT_EXTERNAL_DIFF
+fi
+# )))
+
+# ------------------- Git Editor and Diff Setup ------------------- (((
+
+# Use VISUAL as Git editor, optionally start in insert mode for vim/neovim (((
+if [ -n "$VISUAL" ]; then
+    GIT_EDITOR="$VISUAL -c 'startinsert'"
+    export GIT_EDITOR
+fi
+# )))
+
 # Use 'difft' as Git external diff tool if available (((
-if command_type_exists difft; then
-    GIT_EXTERNAL_DIFF=$(command_type_path difft)
+if command_exists difft; then
+    GIT_EXTERNAL_DIFF=$(command_path difft)
     export GIT_EXTERNAL_DIFF
 fi
 # )))
 
 # ------------------- Git Pager Setup -------------------(((
 # Prefer 'bat' as Git pager if available, fallback to 'less'
-if [ -n "$BAT_PRESENT" ]; then
+if command_exists "bat"; then
     # Use bat for Git output with plain style and header
     GIT_PAGER="bat --style=plain,header"
 else
-    # Fallback to less
+    # Fallback to less if bat is not available
     GIT_PAGER="less"
 fi
 export GIT_PAGER
 # )))
-
+# )))
 # )))
 
 # ------------------- Go Environment ------------------ (((
 # Set Go cache, module cache, and GOPATH to user-specific directories
-GOCACHE="$HOME/.local/state/go/go-build" && export GOCACHE
-GOMODCACHE="$HOME/.local/state/go/mod" && export GOMODCACHE
-GOPATH="$HOME/.local/share/go" && export GOPATH
+if command_exists go; then
+  GOCACHE="$HOME/.local/state/go/go-build"
+  GOMODCACHE="$HOME/.local/state/go/mod"
+  GOPATH="$HOME/.local/share/go"
+  # Export all Go-related environment variables in one step
+  export GOCACHE GOMODCACHE GOPATH
+fi
 # )))
 
 # ------------------- Homebrew Environment ------------------- (((
 # Set HOMEBREW_PREFIX if brew is installed and custom location exists
-if command_type_exists brew; then
-    if [ -d "$HOME/.local/opt/brew" ]; then
-        HOMEBREW_PREFIX="$HOME/.local/opt/brew"
-        export HOMEBREW_PREFIX
-    fi
+if command_exists brew && [ -d "$HOME/.local/opt/brew" ] && [ -z "$HOMEBREW_PREFIX" ]; then
+  HOMEBREW_PREFIX="$HOME/.local/opt/brew"
+  export HOMEBREW_PREFIX
 fi
 # )))
 
@@ -845,14 +919,6 @@ if [ -r "$HOME/.config/npm/npmrc" ]; then
 fi
 # )))
 
-# ------------------- Readline Inputrc ------------------- (((
-# Set INPUTRC if a custom readline configuration exists
-if [ -r "$HOME/.config/readline/inputrc" ]; then
-    INPUTRC="$HOME/.config/readline/inputrc"
-    export INPUTRC
-fi
-# )))
-
 # ------------------- Python Startup File ------------------- (((
 # Set PYTHONSTARTUP if the user has a custom Python startup script
 if [ -r "$HOME/.config/python/pythonrc" ]; then
@@ -863,16 +929,18 @@ fi
 
 # ------------------- Qt6 Configuration Tool ------------------- (((
 # Set Qt platform theme if qt6ct is available
-if command_type_exists qt6ct; then
+if command_exists qt6ct; then
     QT_QPA_PLATFORMTHEME="qt6ct"
     export QT_QPA_PLATFORMTHEME
 fi
 # )))
 
 # ------------------- Ruff Cache Directory ------------------- (((
-# Set cache directory for the Ruff linter
-RUFF_CACHE_DIR="$HOME/.local/state/ruff"
-export RUFF_CACHE_DIR
+if command_exists "ruff"; then
+    # Set Ruff cache directory
+    RUFF_CACHE_DIR="$HOME/.local/state/ruff"
+    export RUFF_CACHE_DIR
+fi
 # )))
 
 # ------------------- Rustup Environment -------------------(((
@@ -883,7 +951,7 @@ export RUSTUP_HOME
 
 # ------------------- GNU Screen Configuration -------------------(((
 # Set user-specific screen configuration and socket directory if screen exists
-if command_type_exists screen && [ -r "$HOME/.config/screen/screenrc" ]; then
+if command_exists screen && [ -r "$HOME/.config/screen/screenrc" ]; then
     SCREENRC="$HOME/.config/screen/screenrc"
     export SCREENRC
 
@@ -894,15 +962,15 @@ fi
 
 # ------------------- w3m Configuration ------------------ (((
 # Set user-specific w3m config directory if w3m exists
-if command_type_exists w3m; then
+if command_exists w3m && [ -d "$HOME/.config/w3m" ]; then
     W3M_DIR="$HOME/.config/w3m"
     export W3M_DIR
 fi
 # )))
 
-# ------------------- Wget Configuration ------------------- (((
+# ------------------- wget Configuration ------------------- (((
 # Use user-specific wgetrc if both the config and HSTS cache exist
-if [ -r "$HOME/.config/wget/wgetrc" ] && [ -r "$HOME/.cache/wget-hsts" ]; then
+if command_exists wget && [ -r "$HOME/.config/wget/wgetrc" ] && [ -r "$HOME/.cache/wget-hsts" ]; then
     WGETRC="$HOME/.config/wget/wgetrc"
     export WGETRC
 fi
@@ -911,12 +979,27 @@ fi
 # )))
 
 # ------------------- SSH Agent Setup -------------------(((
-# Start ssh-agent if not already running and add a specific key
-if command_type_exists ssh-agent && [ -z "$SSH_AUTH_SOCK" ]; then
-    # Start ssh-agent silently
-    eval "$(ssh-agent)" >/dev/null
+# Check if ssh-agent is not already running
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    # Check if ssh-agent command exists
+    if command_exists ssh-agent; then
+        # Start the ssh-agent silently
+        eval "$(ssh-agent -s)" >/dev/null
+    else
+        echo "Error: ssh-agent is not available. Please install OpenSSH."
+    fi
+fi
 
-    # Add a default SSH key, suppressing errors if the file doesn't exist
-    ssh-add "$HOME/.ssh/id_ed25519_nov13_2025" 2>/dev/null
+# Define the SSH key path
+SSH_KEY="$HOME/.ssh/id_ed25519_nov13_2025"
+
+# Check if the SSH key exists
+if [ -f "$SSH_KEY" ]; then
+    # Add the SSH key to the agent
+    if ! ssh-add "$SSH_KEY" >/dev/null 2>&1; then
+        echo "Error: Failed to add SSH key '$SSH_KEY'."
+    fi
+else
+    echo "Error: SSH key '$SSH_KEY' not found."
 fi
 # )))
