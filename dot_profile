@@ -460,7 +460,7 @@ export VISUAL EDITOR SUDO_EDITOR
 
 FIGNORE=".DS_Store:\
 .git:.hg:.svn:.bzr:.fslckout:.cvs:\
-.aux:.bbl:.blg:.log:.toc:.out:.lof:.lot:.fls:.fdb_latexmk:.synctex.gz:.synctex:\
+.aux:.bbl:.blg:.toc:.out:.lof:.lot:.fls:.fdb_latexmk:.synctex.gz:.synctex:\
 .xdv:.nav:.snm:.vrb:.run.xml:.dvi:.pdfsync:.brf:.auxlock:.ilg:.ind:.idx:.glg:.glo:.gls:.glsdefs:.gaux:.loa:.lol:.ltjruby:.luac:.lx64fsl:.maf:.mf:.mlf:.mlt:.mod:.mp:.mw:.nav:.nlg:.nlo:.nls:.pax:.pdfpc:.pre:.pyg:.pytxcode:.save:.sympy:.texpadtmp:.tdo:.ttt:.upa:.upb:.ver:.wrt:.xdy:.xyc:\
 .tmp:.swp:.swo:.bak:.backup:.old:.orig:.rej:\
 .o:.obj:.so:.dll:.pyc:.pyo:.rbc:.rbo:.class:\
