@@ -2,424 +2,221 @@
 # shellcheck shell=sh
 # shellcheck disable=SC1091
 
-# -------------------- COMMAND TYPE DETECTION SUITE (((
-# Fully POSIX-compliant, zero external dependencies
-# Works on: ash, dash, busybox sh, bash, sh, ksh, ksh93, mksh, zsh
-# Detectable types:
-#   0 = notfound
-#   1 = builtin
-#   2 = function
-#   3 = keyword (reserved word)
-#   4 = external command in PATH or explicit/relative path
-#   5 = alias (only supported in shells: bash, zsh, mksh, ksh)
-# Features:
-#   • Safe caching
-#   • Handles absolute and relative paths
-#   • Alias detection where available
-#   • Returns absolute path if requested
-# -----------------------------------------------------------------------
+# Command classifier (pure posix) (((
+# Cache delimiter
+cache_delim='|'
 
-# -------------------- INTERNAL SAFE CACHE -----------------------------
-
-# Convert any string into a valid shell variable name (POSIX-only, no sed)
-_ct_cache_key() {
-    key="$1"
-    key=${key//[^a-zA-Z0-9_]/_}  # replace non-alnum/_ with _
-    printf '%s' "$key"
+# Function to check if a string contains the delimiter (| or =)
+contains_delim() {
+    input="$1"
+    delim="$2"
+    while [ -n "$input" ]; do
+        first_char="${input%"${input#?}"}"
+        if [ "$first_char" = "$delim" ]; then
+            return 0
+        fi
+        input="${input#?}"
+    done
+    return 1
 }
 
-# Set a cache entry
-_ct_cache_set() {
-    key=$(_ct_cache_key "$1")
-    eval "__ct_cache_$key=$2"
+# Trim spaces and tabs from both ends (POSIX version)
+trim_spaces() {
+    input="$1"
+    while [ -n "$input" ] && { [ "${input%"${input#?}"}" = " " ] || [ "${input%"${input#?}"}" = "	" ]; }; do
+        input="${input#?}"
+    done
+    while [ -n "$input" ] && { [ "${input%"${input#?}"}" = " " ] || [ "${input%"${input#?}"}" = "	" ]; }; do
+        input="${input%?}"
+    done
+    printf '%s' "$input"
 }
 
-# Get a cache entry
-_ct_cache_get() {
-    key=$(_ct_cache_key "$1")
-    eval "printf '%s' \"\${__ct_cache_$key:-}\""
-}
-
-# -------------------- COMMAND TYPE FUNCTION ---------------------------
-
-# Usage: command_type <name>
-# Returns type code:
-# 0=notfound, 1=builtin, 2=function, 3=keyword, 4=external, 5=alias
-command_type() {
-    name=$1
-
-    # 1. Check cached type
-    cached=$(_ct_cache_get "$name")
-    if [ -n "$cached" ]; then
-        printf '%s\n' "$cached"
-        return
-    fi
-
-    # 2. Explicit path detection
-    case $name in
-        */*)
-            if [ -x "$name" ] && [ ! -d "$name" ]; then
-                _ct_cache_set "$name" 4
-                printf '4\n'
-                return
-            else
-                _ct_cache_set "$name" 0
-                printf '0\n'
-                return
-            fi
-            ;;
+# Ensure valid command name (letters, numbers, underscores, periods, hyphens, plus signs allowed)
+is_valid_command_name() {
+    case $1 in
+        ""|*[!A-Za-z0-9._\-+]*)
+            return 1 ;;
     esac
+    return 0
+}
 
-    # 3. POSIX type detection via type builtin
-    out=$(type "$name" 2>/dev/null) || out=
-    case $out in
-        *"is a function"*)
-            _ct_cache_set "$name" 2
-            printf '2\n'
-            return
-            ;;
-        *"is a shell builtin"*)
-            _ct_cache_set "$name" 1
-            printf '1\n'
-            return
-            ;;
-        *"is a reserved word"*)
-            _ct_cache_set "$name" 3
-            printf '3\n'
-            return
-            ;;
-    esac
+# Cache lookup - handle malformed or empty entries
+cache_lookup() {
+    cache="$1"
+    name="$2"
+    [ -z "$cache" ] && { printf 'not_found'; return 1; }
 
-    # 4. Alias detection (bash/zsh/mksh/ksh)
-    if alias "$name" >/dev/null 2>&1; then
-        _ct_cache_set "$name" 5
-        printf '5\n'
-        return
-    fi
+    rest="$cache"
+    while [ -n "$rest" ]; do
+        entry="${rest%%"$cache_delim"*}"
+        rest="${rest#*"$cache_delim"}"
 
-    # 5. PATH scan for external commands
-    oldIFS=$IFS
-    IFS=:
-    for dir in $PATH; do
-        [ -d "$dir" ] || continue
-        if [ -x "$dir/$name" ]; then
-            IFS=$oldIFS
-            _ct_cache_set "$name" 4
-            printf '4\n'
-            return
+        # Skip empty or malformed entries
+        if [ -z "$entry" ] || [ "${entry#*=}" = "$entry" ]; then
+            continue
+        fi
+
+        key="${entry%%=*}"
+        value="${entry#*=}"
+
+        if [ -z "$key" ] || [ -z "$value" ]; then
+            continue
+        fi
+
+        if [ "$key" = "$name" ]; then
+            printf '%s' "$value"
+            return 0
         fi
     done
-    IFS=$oldIFS
 
-    # 6. Not found
-    _ct_cache_set "$name" 0
-    printf '0\n'
+    printf 'not_found'
+    return 1
 }
 
-# -------------------- CONVERT TYPE CODE TO NAME -----------------------
+# Cache update - handle malformed or empty entries
+cache_set() {
+    cache="$1"
+    name="$2"
+    value="$3"
+    [ -z "$value" ] && value="not_found"
 
-command_type_name() {
+    # Ensure no delimiter (| or =) in name or value
+    if contains_delim "$name" "$cache_delim" || contains_delim "$name" "=" || contains_delim "$value" "$cache_delim" || contains_delim "$value" "="; then
+        printf 'not_found'
+        return 1
+    fi
+
+    new=""
+    updated=0
+    rest="$cache"
+
+    if [ -z "$cache" ]; then
+        new="${name}=${value}"
+    else
+        while [ -n "$rest" ]; do
+            entry="${rest%%"$cache_delim"*}"
+            rest="${rest#*"$cache_delim"}"
+            if [ "${entry#*=}" != "$entry" ] && [ "${entry%%=*}" = "$name" ]; then
+                new="${new}${name}=${value}${cache_delim}"
+                updated=1
+            elif [ -n "$entry" ]; then
+                new="${new}${entry}${cache_delim}"
+            fi
+        done
+        if [ "$updated" -eq 0 ]; then
+            new="${new}${name}=${value}"
+        else
+            new="${new%"$cache_delim"}"  # Remove the trailing delimiter if updated
+        fi
+    fi
+
+    # Remove any trailing | (to prevent malformed cache)
+    printf '%s' "${new%"$cache_delim"}"
+}
+
+# Keyword detection (POSIX compliant, no external tools)
+_is_keyword() {
     case $1 in
-        0) printf 'notfound\n' ;;
-        1) printf 'builtin\n' ;;
-        2) printf 'function\n' ;;
-        3) printf 'keyword\n' ;;
-        4) printf 'external\n' ;;
-        5) printf 'alias\n' ;;
-        *) printf 'unknown\n' ;;
+        '!'|'{'|'}'|case|do|done|elif|else|esac|fi|for|if|in|then|until|while )
+            return 0 ;;
     esac
+    return 1
 }
 
-# -------------------- EXISTENCE CHECK FUNCTIONS -----------------------
-
-command_type_exists() {
-    t=$(command_type "$1")
-    [ "$t" -ne 0 ]
-}
-
-command_type_does_not_exist() {
-    t=$(command_type "$1")
-    [ "$t" -eq 0 ]
-}
-
-# -------------------- GET ABSOLUTE PATH OF COMMAND --------------------
-
-# Returns absolute path for external commands, explicit paths,
-# or command name for builtin/function/alias/keyword
-command_type_path() {
-    name=$1
-    t=$(command_type "$name")
-
-    case "$t" in
-        0)  # not found
-            printf ''
-            ;;
-        4)  # external
-            case $name in
-                */*)  # explicit path
-                    printf '%s' "$name"
-                    ;;
-                *)    # search PATH
-                    oldIFS=$IFS
-                    IFS=:
-                    for dir in $PATH; do
-                        [ -d "$dir" ] || continue
-                        if [ -x "$dir/$name" ]; then
-                            IFS=$oldIFS
-                            printf '%s' "$dir/$name"
-                            return
-                        fi
-                    done
-                    IFS=$oldIFS
-                    ;;
-            esac
-            ;;
-        1|2|3|5)  # builtin, function, keyword, alias
-            printf '%s' "$name"
-            ;;
-        *) printf '' ;;
+# Special builtin detection (POSIX compliant, no external tools)
+_is_special_builtin() {
+    case $1 in
+        :|.|break|continue|eval|exec|exit|export|readonly|return|set|shift|times|trap|umask|unset )
+            return 0 ;;
     esac
+    return 1
 }
 
-# -------------------- USAGE EXAMPLES ----------------------------------
-# Uncomment to test
-#
-# echo "echo:" $(command_type_name $(command_type echo))
-# echo "ls:" $(command_type_name $(command_type ls))
-# myfunc() { :; }
-# echo "myfunc:" $(command_type_name $(command_type myfunc))
-# echo "if:" $(command_type_name $(command_type if))
-# alias ll='ls -l'
-# echo "ll:" $(command_type_name $(command_type ll))
-#
-# # Absolute paths
-# echo "ls path:" $(command_type_path ls)
-# echo "echo path:" $(command_type_path echo)
-# echo "myfunc path:" $(command_type_path myfunc)
-# echo "ll path:" $(command_type_path ll)
-#
-# # Explicit file
-# touch ./tmp_test_exe && chmod +x ./tmp_test_exe
-# echo "./tmp_test_exe path:" $(command_type_path ./tmp_test_exe)
-# rm ./tmp_test_exe
-#
-# # Existence checks
-# command_type_exists ls && echo "ls exists"
-# command_type_does_not_exist bogus && echo "bogus does not exist"
-
-# )))
-
-# Modern POSIX Shell Environment Manager (((
-# ------------------------------------------------------------
-# Features:
-# 1. Fully POSIX `command_type` detection with caching.
-# 2. Pure POSIX `update_env_var` for manipulating environment variables.
-# 3. Supports deduplication, prepend/append, movefirst/movelast, remove.
-# 4. Handles multi-character delimiters.
-# 5. Verbose/quiet modes.
-# ============================================================
-
-# ============================================================
-# -------------------- COMMAND TYPE DETECTION -----------------
-# ============================================================
-
-# Convert any string into a valid shell variable name
-_ct_cache_key() {
-    key="$1"
-    key=${key//[^a-zA-Z0-9_]/_}
-    printf '%s' "$key"
+# Check if file is executable (POSIX)
+_is_executable() {
+    [ -f "$1" ] && [ -x "$1" ] && [ ! -d "$1" ]
 }
 
-# Cache set/get
-_ct_cache_set() {
-    key=$(_ct_cache_key "$1")
-    eval "__ct_cache_$key=$2"
+# PATH search (POSIX)
+_ct_find_in_path() {
+    name="$1"
+    oldIFS="$IFS"
+    IFS=':'
+
+    # Handle case where PATH might be empty or malformed
+    [ -z "$PATH" ] && { IFS="$oldIFS"; return 1; }
+
+    set -- $PATH
+    [ "$#" -eq 0 ] && set -- "."
+
+    for dir; do
+        [ -z "$dir" ] || [ "$dir" = "." ] && continue
+        f="$dir/$name"
+        if [ -f "$f" ] && [ -x "$f" ] && [ ! -d "$f" ]; then
+            printf '%s' "$f"
+            IFS="$oldIFS"
+            return 0
+        fi
+    done
+
+    IFS="$oldIFS"
+    return 1
 }
 
-_ct_cache_get() {
-    key=$(_ct_cache_key "$1")
-    eval "printf '%s' \"\${__ct_cache_$key:-}\""
-}
-
-# Return command type code:
-# 0=notfound, 1=builtin, 2=function, 3=keyword, 4=external, 5=alias
+# Main command type resolution
 command_type() {
-    name=$1
+    local_cache="$1"
+    name=$(trim_spaces "$2")
 
-    # Check cache first
-    cached=$(_ct_cache_get "$name")
-    [ -n "$cached" ] && { printf '%s\n' "$cached"; return; }
-
-    # Explicit path
-    case $name in */*) [ -x "$name" ] && [ ! -d "$name" ] && _ct_cache_set "$name" 4 && printf '4\n' && return || _ct_cache_set "$name" 0 && printf '0\n' && return ;; esac
-
-    # type builtin
-    out=$(type "$name" 2>/dev/null) || out=
-    case $out in
-        *"is a function"*) _ct_cache_set "$name" 2; printf '2\n'; return ;;
-        *"is a shell builtin"*) _ct_cache_set "$name" 1; printf '1\n'; return ;;
-        *"is a reserved word"*) _ct_cache_set "$name" 3; printf '3\n'; return ;;
-    esac
-
-    # alias detection
-    if alias "$name" >/dev/null 2>&1; then _ct_cache_set "$name" 5; printf '5\n'; return; fi
-
-    # PATH scan
-    oldIFS=$IFS
-    IFS=:
-    for dir in $PATH; do
-        [ -d "$dir" ] || continue
-        [ -x "$dir/$name" ] && IFS=$oldIFS && _ct_cache_set "$name" 4 && printf '4\n' && return
-    done
-    IFS=$oldIFS
-
-    _ct_cache_set "$name" 0
-    printf '0\n'
-}
-
-# Convert type code to name
-command_type_name() {
-    case $1 in
-        0) printf 'notfound\n' ;;
-        1) printf 'builtin\n' ;;
-        2) printf 'function\n' ;;
-        3) printf 'keyword\n' ;;
-        4) printf 'external\n' ;;
-        5) printf 'alias\n' ;;
-        *) printf 'unknown\n' ;;
-    esac
-}
-
-# Existence checks
-command_type_exists() { [ "$(command_type "$1")" -ne 0 ]; }
-command_type_does_not_exist() { [ "$(command_type "$1")" -eq 0 ]; }
-
-# Return absolute path (or command name for builtin/alias)
-command_type_path() {
-    name=$1
-    t=$(command_type "$name")
-    case "$t" in
-        0) printf '' ;;
-        4)
-            case $name in */*) printf '%s' "$name" ;;
-            *) oldIFS=$IFS; IFS=:; for dir in $PATH; do [ -x "$dir/$name" ] && IFS=$oldIFS && printf '%s' "$dir/$name" && return; done; IFS=$oldIFS ;;
-            esac ;;
-        1|2|3|5) printf '%s' "$name" ;;
-        *) printf '' ;;
-    esac
-}
-
-# ============================================================
-# -------------------- UPDATE_ENV_VAR ------------------------
-# ============================================================
-
-update_env_var() {
-    var="$1"
-    operation="deduplicate"
-    delimiter=":"
-    entry=""
-    verbose="no"
-    quiet="no"
-
-    shift
-    while [ $# -gt 0 ]; do
-        case "$1" in
-            --verbose|-v) verbose="yes" ;;
-            --quiet|-q) quiet="yes" ;;
-            prepend|append|movefirst|movelast|remove) operation="$1" ;;
-            --delimiter|-d) delimiter="$2"; shift ;;
-            *) entry="$1" ;;
-        esac
-        shift
-    done
-
-    eval "val=\$$var"
-    [ -z "$val" ] && val=""
-
-    # Split into pseudo-array
-    result_list=""
-    remainder="$val"
-    while [ -n "$remainder" ]; do
-        case "$remainder" in
-            *"$delimiter"*) tmp=${remainder%%"$delimiter"*}; result_list="$result_list
-$tmp"; remainder=${remainder#*"$delimiter"} ;;
-            *) result_list="$result_list
-$remainder"; remainder="" ;;
-        esac
-    done
-
-    # Deduplicate
-    dedup_list=""
-    seen=""
-    oldIFS=$IFS
-    IFS='
-'
-    for e in $result_list; do
-        [ -z "$e" ] && continue
-        case "$seen" in
-            *"$delimiter$e$delimiter"*) continue ;;
-            *) dedup_list="$dedup_list
-$e"; seen="$seen$delimiter$e$delimiter" ;;
-        esac
-    done
-    IFS=$oldIFS
-
-    # Remove
-    if [ "$operation" = "remove" ]; then
-        new_list=""
-        found="no"
-        IFS='
-'
-        for e in $dedup_list; do
-            [ "$e" = "$entry" ] && found="yes" || new_list="$new_list$delimiter$e"
-        done
-        IFS=$oldIFS
-        [ "$found" != "yes" ] && { echo "Error: Entry '$entry' not found in $var." >&2; return 1; }
-        dedup_list="$new_list"
+    # Validate command name
+    if [ -z "$name" ] || ! is_valid_command_name "$name"; then
+        printf 'not_found'
+        return 1
     fi
 
-    # Prepend/Append/Move
-    if [ -n "$entry" ] && [ "$operation" != "remove" ]; then
-        new_list=""
-        IFS='
-'
-        for e in $dedup_list; do
-            [ "$e" != "$entry" ] && new_list="$new_list$delimiter$e"
-        done
-        IFS=$oldIFS
-        case "$operation" in
-            prepend|movefirst) dedup_list="$entry$new_list" ;;
-            append|movelast) dedup_list="$new_list$delimiter$entry" ;;
-        esac
+    # Look up in cache
+    result=$(cache_lookup "$local_cache" "$name")
+    if [ "$result" != "not_found" ]; then
+        printf '%s' "$result"
+        return 0
     fi
 
-    # Cleanup leading delimiter
-    case "$dedup_list" in "$delimiter"*) dedup_list=${dedup_list#"$delimiter"} ;; esac
+    # Check if it's a shell keyword
+    if _is_keyword "$name"; then
+        local_cache=$(cache_set "$local_cache" "$name" "keyword")
+        printf 'keyword'
+        return 0
+    fi
 
-    # Export variable
-    eval "$var=\"\$dedup_list\""
+    # Check if it's a special builtin
+    if _is_special_builtin "$name"; then
+        local_cache=$(cache_set "$local_cache" "$name" "builtin")
+        printf 'builtin'
+        return 0
+    fi
 
-    # Verbose
-    [ "$quiet" != "yes" ] && [ "$verbose" = "yes" ] && printf '%s\n' "$dedup_list"
+    # Check if it's executable
+    if _is_executable "$name"; then
+        local_cache=$(cache_set "$local_cache" "$name" "executable")
+        printf 'executable'
+        return 0
+    fi
+
+    # Check if it's in PATH
+    if _ct_find_in_path "$name" >/dev/null; then
+        local_cache=$(cache_set "$local_cache" "$name" "executable")
+        printf 'executable'
+        return 0
+    fi
+
+    # Not found in cache or PATH
+    local_cache=$(cache_set "$local_cache" "$name" "not_found")
+    printf 'not_found'
 }
 
-# ============================================================
-# -------------------- USAGE EXAMPLES ------------------------
-# ============================================================
-# All examples are commented out for safe sourcing.
-#
-# PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/bin"
-# update_env_var PATH deduplicate --verbose
-# update_env_var PATH prepend "/opt/bin" --verbose
-# update_env_var PATH append "/home/user/bin" --verbose
-# update_env_var PATH movefirst "/usr/sbin" --verbose
-# update_env_var PATH movelast "/bin" --verbose
-# update_env_var PATH remove "/sbin" --verbose
-# update_env_var PATH prepend "/new/path" --delimiter "::" --verbose
-# ============================================================
-
-# End of modern POSIX environment manager
 # )))
+
 
 
 # # Source some useful external shell functions/values/options etc into the current shell (((
