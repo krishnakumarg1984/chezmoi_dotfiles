@@ -2,227 +2,399 @@
 # shellcheck shell=sh
 # shellcheck disable=SC1091
 
-# Command classifier (pure posix) (((
-# Cache delimiter
-cache_delim='|'
+# Command classifier (strict POSIX) (((
+# Prevent reloading if functions are already defined
+if ! type "command_type_exists" > /dev/null 2>&1; then
 
-# Function to check if a string contains the delimiter (| or =)
-contains_delim() {
-    input="$1"
-    delim="$2"
-    while [ -n "$input" ]; do
-        first_char="${input%"${input#?}"}"
-        if [ "$first_char" = "$delim" ]; then
-            return 0
-        fi
-        input="${input#?}"
-    done
-    return 1
-}
+    # Cache delimiter
+    cmd_cache_delim="|"
 
-# Trim spaces and tabs from both ends (POSIX version)
-trim_spaces() {
-    input="$1"
-    while [ -n "$input" ] && { [ "${input%"${input#?}"}" = " " ] || [ "${input%"${input#?}"}" = "	" ]; }; do
-        input="${input#?}"
-    done
-    while [ -n "$input" ] && { [ "${input%"${input#?}"}" = " " ] || [ "${input%"${input#?}"}" = "	" ]; }; do
-        input="${input%?}"
-    done
-    printf '%s' "$input"
-}
+    # Trim leading and trailing whitespace (simplified)
+    trim_spaces() {
+        s="$1"
+        # Remove leading spaces
+        while [ -n "$s" ] && [ "${s%"${s#?}"}" = " " ] || [ "${s%"${s#?}"}" = "	" ]; do
+            s="${s#?}"
+        done
+        # Remove trailing spaces
+        while [ -n "$s" ] && [ "${s%"${s%?}"}" = " " ] || [ "${s%"${s%?}"}" = "	" ]; do
+            s="${s%?}"
+        done
+        printf "%s" "$s"
+    }
 
-# Ensure valid command name (letters, numbers, underscores, periods, hyphens, plus signs allowed)
-is_valid_command_name() {
-    case $1 in
-        ""|*[!A-Za-z0-9._\-+]*)
-            return 1 ;;
-    esac
-    return 0
-}
+    # Validate command name (alphanumeric + ., _, +, -)
+    is_valid_command_name() {
+        case "$1" in
+            ""|*[!A-Za-z0-9._+-]*)
+                return 1
+                ;;
+            *)
+                return 0
+                ;;
+        esac
+    }
 
-# Cache lookup - handle malformed or empty entries
-cache_lookup() {
-    cache="$1"
-    name="$2"
-    [ -z "$cache" ] && { printf 'not_found'; return 1; }
+    # Check if file exists and is executable
+    _is_executable() {
+        [ -f "$1" ] && [ -x "$1" ]
+    }
 
-    rest="$cache"
-    while [ -n "$rest" ]; do
-        entry="${rest%%"$cache_delim"*}"
-        rest="${rest#*"$cache_delim"}"
+    # Search for command in PATH
+    command_type_path() {
+        name="$1"
+        cmd_path_value=""
+        [ -z "$PATH" ] && return 1
 
-        # Skip empty or malformed entries
-        if [ -z "$entry" ] || [ "${entry#*=}" = "$entry" ]; then
-            continue
-        fi
-
-        key="${entry%%=*}"
-        value="${entry#*=}"
-
-        if [ -z "$key" ] || [ -z "$value" ]; then
-            continue
-        fi
-
-        if [ "$key" = "$name" ]; then
-            printf '%s' "$value"
-            return 0
-        fi
-    done
-
-    printf 'not_found'
-    return 1
-}
-
-# Cache update - handle malformed or empty entries
-cache_set() {
-    cache="$1"
-    name="$2"
-    value="$3"
-    [ -z "$value" ] && value="not_found"
-
-    # Ensure no delimiter (| or =) in name or value
-    if contains_delim "$name" "$cache_delim" || contains_delim "$name" "=" || contains_delim "$value" "$cache_delim" || contains_delim "$value" "="; then
-        printf 'not_found'
-        return 1
-    fi
-
-    new=""
-    updated=0
-    rest="$cache"
-
-    if [ -z "$cache" ]; then
-        new="${name}=${value}"
-    else
-        while [ -n "$rest" ]; do
-            entry="${rest%%"$cache_delim"*}"
-            rest="${rest#*"$cache_delim"}"
-            if [ "${entry#*=}" != "$entry" ] && [ "${entry%%=*}" = "$name" ]; then
-                new="${new}${name}=${value}${cache_delim}"
-                updated=1
-            elif [ -n "$entry" ]; then
-                new="${new}${entry}${cache_delim}"
+        oldIFS="$IFS"
+        IFS=":"
+        for dir in $PATH; do
+            dir=$(trim_spaces "$dir")  # Trim spaces in directories
+            [ -z "$dir" ] && continue
+            if [ "$dir" = "." ]; then
+                continue  # Skip current directory
+            fi
+            if [ ! -d "$dir" ] || [ ! -x "$dir" ]; then
+                continue  # Skip invalid or inaccessible directories
+            fi
+            file="$dir/$name"
+            if _is_executable "$file"; then
+                cmd_path_value="$file"
+                IFS="$oldIFS"  # Restore IFS
+                return 0
             fi
         done
-        if [ "$updated" -eq 0 ]; then
-            new="${new}${name}=${value}"
+        IFS="$oldIFS"  # Restore IFS
+        return 1
+    }
+
+    # Look up command in cache
+    cache_lookup() {
+        cache="$1"
+        name="$2"
+        cmd_cache_lookup_value=""
+        [ -z "$name" ] && return 1
+        [ -z "$cache" ] && return 1
+
+        name=$(trim_spaces "$name")  # Trim spaces in name
+        rest="$cache"
+        while [ -n "$rest" ]; do
+            entry="${rest%%$cmd_cache_delim*}"
+            rest="${rest#*$cmd_cache_delim}"
+            entry=$(trim_spaces "$entry")
+            [ -z "$entry" ] && continue
+            # Ensure entry contains '=' as key=value pair
+            if [ "${entry#*=}" = "$entry" ] || [ -z "${entry%%=*}" ] || [ -z "${entry#*=}" ]; then
+                continue  # Skip malformed entries
+            fi
+
+            key="${entry%%=*}"
+            value="${entry#*=}"
+            key=$(trim_spaces "$key")
+            value=$(trim_spaces "$value")
+
+            # Skip empty key or value
+            if [ -z "$key" ] || [ -z "$value" ]; then
+                continue
+            fi
+
+            if [ "$key" = "$name" ]; then
+                cmd_cache_lookup_value="$value"
+                return 0
+            fi
+        done
+        return 1
+    }
+
+    # Update cache with new name=value pair
+    cache_set() {
+        cache="$1"
+        name="$2"
+        value="$3"
+
+        # Default value if not provided
+        [ -z "$value" ] && value="not_found"
+
+        # Reject names/values containing the delimiter or equal sign
+        case "$name" in *$cmd_cache_delim*|*"="*) return 1; esac
+        case "$value" in *$cmd_cache_delim*|*"="*) return 1; esac
+
+        # Handle empty cache case
+        if [ -z "$cache" ]; then
+            cache="$name=$value"
         else
-            new="${new%"$cache_delim"}"  # Remove the trailing delimiter if updated
+            new_cache=""
+            # Manually process cache entries to avoid any delimiter breaking
+            while [ -n "$cache" ]; do
+                # Extract key-value pair
+                entry="${cache%%$cmd_cache_delim*}"
+                cache="${cache#*$cmd_cache_delim}"
+
+                # Skip malformed entries
+                [ -z "$entry" ] && continue
+
+                key="${entry%%=*}"
+                value="${entry#*=}"
+
+                # Skip malformed key-value pairs
+                [ -z "$key" ] || [ -z "$value" ] && continue
+
+                if [ "$key" = "$name" ]; then
+                    new_cache="$new_cache${new_cache:+$cmd_cache_delim}$name=$value"
+                else
+                    new_cache="$new_cache${new_cache:+$cmd_cache_delim}$entry"
+                fi
+            done
+            cache="$new_cache"
         fi
-    fi
 
-    # Remove any trailing | (to prevent malformed cache)
-    printf '%s' "${new%"$cache_delim"}"
-}
+        printf "%s" "$cache"
+    }
 
-# Keyword detection (POSIX compliant, no external tools)
-_is_keyword() {
-    case $1 in
-        '!'|'{'|'}'|case|do|done|elif|else|esac|fi|for|if|in|then|until|while )
-            return 0 ;;
-    esac
-    return 1
-}
+    # Check if command exists (cache or PATH)
+    command_type_exists() {
+        name="$1"
+        cache="$2"  # Pass the cache as an argument
 
-# Special builtin detection (POSIX compliant, no external tools)
-_is_special_builtin() {
-    case $1 in
-        :|.|break|continue|eval|exec|exit|export|readonly|return|set|shift|times|trap|umask|unset )
-            return 0 ;;
-    esac
-    return 1
-}
+        [ -z "$name" ] && return 1
+        if ! is_valid_command_name "$name"; then
+            return 1
+        fi
 
-# Check if file is executable (POSIX)
-_is_executable() {
-    [ -f "$1" ] && [ -x "$1" ] && [ ! -d "$1" ]
-}
+        # First, check the cache
+        cache_lookup "$cache" "$name"
+        if [ -n "$cmd_cache_lookup_value" ] && [ "$cmd_cache_lookup_value" != "not_found" ]; then
+            return 0  # Found in cache
+        fi
 
-# PATH search (POSIX)
-_ct_find_in_path() {
-    name="$1"
-    oldIFS="$IFS"
-    IFS=':'
-
-    # Handle case where PATH might be empty or malformed
-    [ -z "$PATH" ] && { IFS="$oldIFS"; return 1; }
-
-    set -- $PATH
-    [ "$#" -eq 0 ] && set -- "."
-
-    for dir; do
-        [ -z "$dir" ] || [ "$dir" = "." ] && continue
-        f="$dir/$name"
-        if [ -f "$f" ] && [ -x "$f" ] && [ ! -d "$f" ]; then
-            printf '%s' "$f"
-            IFS="$oldIFS"
+        # If not found in cache, check if the command is executable
+        if _is_executable "$name"; then
+            cache=$(cache_set "$cache" "$name" "executable")
             return 0
         fi
+
+        # If not found in PATH
+        if command_type_path "$name"; then
+            cache=$(cache_set "$cache" "$name" "$cmd_path_value")
+            return 0
+        fi
+
+        # If still not found, cache the result and return failure
+        cache=$(cache_set "$cache" "$name" "not_found")
+        return 1
+    }
+
+    # Check if command does not exist (inverse of command_type_exists)
+    command_type_does_not_exist() {
+        name="$1"
+        cache="$2"  # Pass the cache as an argument
+
+        [ -z "$name" ] && return 1
+        command_type_exists "$name" "$cache"
+        return $?
+    }
+
+    # Security check for "." in PATH
+    check_path_for_dots() {
+        if [ -z "$PATH" ] || [ "$(trim_spaces "$PATH")" = "" ]; then
+            echo "Warning: PATH is empty or unset. This may cause commands to fail."
+            return 1  # No PATH set, skip the check
+        fi
+
+        new_path=""
+        oldIFS="$IFS"
+        IFS=":"
+        for dir in $PATH; do
+            dir=$(trim_spaces "$dir")  # Trim spaces in directories
+            [ -z "$dir" ] && continue
+            [ "$dir" = "." ] && continue  # Skip current directory
+            new_path="$new_path$dir:"
+        done
+        IFS="$oldIFS"
+
+        # If PATH becomes empty after removing ".", warn and exit
+        if [ -z "$new_path" ] || [ "$new_path" = "." ]; then
+            echo "Error: No valid directories left in PATH!" >&2
+            return 1
+        fi
+        PATH="${new_path%:}"  # Remove trailing colon
+    }
+
+    # Run security check on PATH before using it
+    check_path_for_dots
+
+fi
+#
+# )))
+
+# -------------------- UPDATE_ENV_VAR ---------------------(((
+
+update_env_var() {
+    var="$1"
+    operation="deduplicate"
+    delimiter=":"  # Default delimiter
+    entry=""
+    verbose="no"
+    quiet="no"
+
+    shift
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --verbose|-v) verbose="yes" ;;
+            --quiet|-q) quiet="yes" ;;
+            prepend|append|movefirst|movelast|remove) operation="$1" ;;
+            --delimiter|-d) delimiter="$2"; shift ;;
+            *) entry="$1" ;;
+        esac
+        shift
     done
 
-    IFS="$oldIFS"
-    return 1
-}
+    # Get the value of the environment variable
+    val="${!var}"
 
-# Main command type resolution
-command_type() {
-    local_cache="$1"
-    name=$(trim_spaces "$2")
+    # If the variable is empty or not set, initialize it to an empty string
+    [ -z "$val" ] && val=""
 
-    # Validate command name
-    if [ -z "$name" ] || ! is_valid_command_name "$name"; then
-        printf 'not_found'
+    # If the variable is empty, just return early for remove operation
+    if [ -z "$val" ] && [ "$operation" = "remove" ]; then
+        echo "Error: Environment variable '$var' is empty or not set." >&2
         return 1
     fi
 
-    # Look up in cache
-    result=$(cache_lookup "$local_cache" "$name")
-    if [ "$result" != "not_found" ]; then
-        printf '%s' "$result"
-        return 0
+    # Save the original IFS value
+    oldIFS="$IFS"
+    IFS="$delimiter"  # Set Internal Field Separator to delimiter
+
+    # Split the environment variable into a pseudo-array using the delimiter
+    result_list=""
+    remainder="$val"
+    while [ -n "$remainder" ]; do
+        # Extract the first entry before the delimiter
+        case "$remainder" in
+            *"$delimiter"*)
+                tmp="${remainder%%"$delimiter"*}"
+                # Skip empty entries
+                if [ -n "$tmp" ]; then
+                    result_list="$result_list$delimiter$tmp"
+                fi
+                remainder="${remainder#*"$delimiter"}"
+                ;;
+            *)
+                result_list="$result_list$remainder"
+                remainder=""
+                ;;
+        esac
+    done
+
+    # Remove leading delimiter
+    result_list="${result_list#"$delimiter"}"
+
+    # Deduplicate the list
+    dedup_list=""
+    seen=""
+    for e in $result_list; do
+        [ -z "$e" ] && continue
+        # Check if we've seen this entry already
+        case "$seen" in
+            *"$delimiter$e$delimiter"*) continue ;;
+            *)
+                dedup_list="$dedup_list$e$delimiter"
+                seen="$seen$delimiter$e$delimiter"
+                ;;
+        esac
+    done
+
+    # Remove trailing delimiter after deduplication
+    dedup_list="${dedup_list%"$delimiter"}"
+
+    # Remove entry if the operation is "remove"
+    if [ "$operation" = "remove" ]; then
+        new_list=""
+        found="no"
+        for e in $dedup_list; do
+            if [ "$e" = "$entry" ]; then
+                found="yes"
+            else
+                new_list="$new_list$e$delimiter"
+            fi
+        done
+
+        if [ "$found" != "yes" ]; then
+            echo "Error: Entry '$entry' not found in $var." >&2
+            return 1
+        fi
+        # Remove trailing delimiter
+        dedup_list="${new_list%"$delimiter"}"
     fi
 
-    # Check if it's a shell keyword
-    if _is_keyword "$name"; then
-        local_cache=$(cache_set "$local_cache" "$name" "keyword")
-        printf 'keyword'
-        return 0
+    # Prepend/Append/Move operations
+    if [ -n "$entry" ] && [ "$operation" != "remove" ]; then
+        # Prevent appending/Prepending empty entries
+        if [ -z "$entry" ]; then
+            echo "Error: Entry is empty." >&2
+            return 1
+        fi
+
+        new_list=""
+        for e in $dedup_list; do
+            if [ "$e" != "$entry" ]; then
+                new_list="$new_list$e$delimiter"
+            fi
+        done
+
+        case "$operation" in
+            prepend|movefirst) dedup_list="$entry$delimiter$new_list" ;;
+            append|movelast) dedup_list="$new_list$entry" ;;
+        esac
     fi
 
-    # Check if it's a special builtin
-    if _is_special_builtin "$name"; then
-        local_cache=$(cache_set "$local_cache" "$name" "builtin")
-        printf 'builtin'
-        return 0
+    # Final cleanup: Remove leading or trailing delimiters
+    dedup_list="${dedup_list#"$delimiter"}"
+    dedup_list="${dedup_list%"$delimiter"}"
+
+    # Avoid adding delimiter if the entry is the only element (for empty values)
+    if [ -z "$dedup_list" ]; then
+        dedup_list="$entry"
     fi
 
-    # Check if it's executable
-    if _is_executable "$name"; then
-        local_cache=$(cache_set "$local_cache" "$name" "executable")
-        printf 'executable'
-        return 0
+    # Set the environment variable directly without using eval
+    export "$var=$dedup_list"
+
+    # Verbose output only when appropriate
+    if [ "$quiet" != "yes" ] && [ "$verbose" = "yes" ]; then
+        printf "%s\n" "$dedup_list"
     fi
 
-    # Check if it's in PATH
-    if _ct_find_in_path "$name" >/dev/null; then
-        local_cache=$(cache_set "$local_cache" "$name" "executable")
-        printf 'executable'
-        return 0
-    fi
-
-    # Not found in cache or PATH
-    local_cache=$(cache_set "$local_cache" "$name" "not_found")
-    printf 'not_found'
+    # Restore IFS to original value
+    IFS="$oldIFS"
 }
 
+# ============================================================
+# -------------------- USAGE EXAMPLES ------------------------
+# ============================================================
+
+# Update PATH by deduplicating
+# update_env_var PATH deduplicate --verbose
+
+# Prepend to PATH
+# update_env_var PATH prepend "/opt/bin" --verbose
+
+# Append to PATH
+# update_env_var PATH append "/home/user/bin" --verbose
+
+# Move directory to the start of PATH
+# update_env_var PATH movefirst "/usr/sbin" --verbose
+
+# Move directory to the end of PATH
+# update_env_var PATH movelast "/bin" --verbose
+
+# Remove a directory from PATH
+# update_env_var PATH remove "/sbin" --verbose
+
+# Prepend a directory with custom delimiter
+# update_env_var PATH prepend "/new/path" --delimiter "::" --verbose
+#
 # )))
-
-
-
-# # Source some useful external shell functions/values/options etc into the current shell (((
-# . "$HOME/.config/sh/sh_functions.sh" 2>/dev/null || true
-# test -r "$HOME/.config/envman/load.sh" && . "$HOME/.config/envman/load.sh" # TODO: Remove (webi brew)
-# # )))
 
 # Prepend "~/.local/bin" to the user's PATH (((
 if [ -d "$HOME/.local/bin" ]; then
