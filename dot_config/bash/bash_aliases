@@ -2,330 +2,190 @@
 # shellcheck shell=bash
 
 # aliases for built-in & 3rd party tools (((
+# Function to check if alias exists
+alias_exists() {
+  alias "$1" &>/dev/null
+}
 
-# ansible aliases (((
-if [ -x "$(command -v ansible)" ]; then
-  alias ad='ansible-doc'
-  alias al='ansible-lint'
-  alias an='ansible-navigator'
-  alias ap='ansible-playbook'
-  if [ -x "$(command -v register-python-argcomplete)" ]; then
-    eval "$(register-python-argcomplete ansible)"
-    eval "$(register-python-argcomplete ansible-config)"
-    eval "$(register-python-argcomplete ansible-console)"
-    eval "$(register-python-argcomplete ansible-doc)"
-    eval "$(register-python-argcomplete ansible-galaxy)"
-    eval "$(register-python-argcomplete ansible-inventory)"
-    eval "$(register-python-argcomplete ansible-lint)"
-    eval "$(register-python-argcomplete ansible-navigator)"
-    eval "$(register-python-argcomplete ansible-playbook)"
-    eval "$(register-python-argcomplete ansible-pull)"
-    eval "$(register-python-argcomplete ansible-test)"
-    eval "$(register-python-argcomplete ansible-vault)"
-    complete -F _complete_alias ad 2>/dev/null
-    complete -F _complete_alias al 2>/dev/null
-    complete -F _complete_alias an 2>/dev/null
-    complete -F _complete_alias ap 2>/dev/null
+# Function to create an alias if the command exists
+create_alias() {
+  local command_name="$1"
+  local alias_name="$2"
+  local command_to_run="$3"
+
+  if command_exists "$command_name"; then
+    alias "$alias_name"="$command_to_run"
+  else
+    echo "Warning: '$command_name' not found. Skipping alias creation for '$alias_name'."
   fi
-fi
-# )))
+}
 
-# custom aliases and functions using bat (((
-test -x "$(command -v bat)" && BAT_PRESENT=1
-if [ "$BAT_PRESENT" != "" ]; then
+# Check for and create aliases for common tools
+
+# rm alias based on available tools
+if command_exists "gtrash"; then
+  alias rm='gtrash put -RIfv'
+elif command_exists "gomi"; then
+  alias rm='gomi -v'
+elif command_exists "trash-put"; then
+  alias rm='trash-put -v'
+elif command_exists "cnc" &>/dev/null && type "conceal"; then
+  alias rm='cnc'
+else
+  alias rm='rm -Iv --preserve-root --one-file-system'
+fi
+
+# Git and Kubernetes aliases
+if ! alias_exists "groot"; then
+  create_alias "git rev-parse --show-toplevel" "groot" 'cd "$(git rev-parse --show-toplevel)"'
+fi
+
+if ! alias_exists "k"; then
+  create_alias "kubectl" "k" "kubectl"
+fi
+
+# LS-related aliases
+if command_exists "eza"; then
+  alias ls='eza --icons=automatic -L 2'
+  alias la='eza --icons=automatic -labghHmF --all'
+  alias lg='eza --icons=automatic -labghHmF --group-directories-first'
+  alias ll='eza --icons=automatic -labghHmF'
+elif command_exists "lsd"; then
+  alias ls='lsd -F'
+  alias la='lsd -lAhF --group-dirs'
+fi
+
+# Other aliases for commands
+create_alias "ansible" "ad" "ansible-doc"
+create_alias "ansible" "al" "ansible-lint"
+create_alias "ansible" "an" "ansible-navigator"
+create_alias "ansible" "ap" "ansible-playbook"
+create_alias "git" "gmake" "gmake -j \"\$(nproc)\""
+
+# Compression aliases: `tarcbz2`, `tarcgz` with checks for `pv`
+if command_exists "pv"; then
+  create_alias "tarcbz2" 'tar --use-compress-program="lbzip2 | pv" -cf'
+  create_alias "tarcgz" 'tar --use-compress-program="pigz --best --recursive | pv" -cf'
+else
+  create_alias "tarcbz2" 'tar --use-compress-program="lbzip2" -cf'
+  create_alias "tarcgz" 'tar --use-compress-program="pigz --best --recursive" -cf'
+fi
+
+# Handle command-line tools like `ffmpeg` with standard flags
+if command_exists "ffmpeg"; then
+  alias ffmpeg='ffmpeg -hide_banner '
+  alias ffplay='ffplay -hide_banner -autoexit '
+  alias ffprobe='ffprobe -hide_banner '
+fi
+
+# Ping alias with prettier output if `prettyping` is installed
+if command_exists "prettyping"; then
+  alias ping='prettyping -c 5'
+else
+  alias ping='ping -c 5'
+fi
+
+# Alias for `top`/`htop` based on availability
+if command_exists "btop"; then
+  alias top='btop'
+  alias htop='btop'
+elif command_exists "btm"; then
+  alias top='btm'
+  alias htop='btm --basic'
+  alias btmb='btm --basic'
+fi
+
+# Tar/Compression-related aliases
+if command_exists "pixz"; then
+  alias xz='pixz'
+fi
+
+if command_exists "unzrip"; then
+  alias unzip='unzip'
+fi
+
+# Kubernetes (kubectl) alias with kubecolor if available
+if command_exists "kubectl"; then
+  if command_exists "kubecolor"; then
+    alias kubectl='kubecolor --paging'
+  fi
+  alias k='kubectl'
+fi
+
+# Setup `watch` alias with better visualizations if `viddy` is present
+if command_exists "viddy"; then
+  alias watch='viddy --interval 30 --differences --skip-empty-diffs --disable_auto_save'
+else
+  alias watch='watch --interval 15 --color '
+fi
+
+# Check if tools like `bat` are available and use them
+if command_exists "bat"; then
   helper() {
     "$@" --help 2>&1 | bat --plain --language=help
   }
   alias cat='bat'
-  alias path='echo -e ${PATH//:/\\n} | bat' # Print each PATH entry on a separate line
+  alias path='echo -e ${PATH//:/\\n} | bat'
 
   # man() function using `batman` (((
-  if [ -x "$(command -v batman)" ]; then
+  if command_exists batman; then
     man() {
       BAT_THEME="Monokai Extended" batman "$@"
       return $?
     }
   fi
-  # )))
 else
-  alias path='echo -e ${PATH//:/\\n} | less' # Print each PATH entry on a separate line
-fi
-# )))
-
-# bc alias (((
-if [ -x "$(command -v numbat)" ]; then
-  alias bc='numbat'
-elif [ -x "$(command -v fend)" ]; then
-  alias bc='fend'
-elif [ -x "$(command -v calc)" ]; then
-  alias bc='calc'
-elif [ -x "$(command -v kalc)" ]; then
-  alias bc='kalc'
-else
-  alias bc='bc -l'
-fi
-# )))
-
-# cal aliases (((
-if [ -x "$(command -v carl)" ]; then
-  alias cal='carl'
-elif [ -x "$(command -v ncal)" ]; then
-  alias ncal='ncal -b -3 -w' # oldstyle format for ncal output
-  alias cal='ncal'
-fi
-# )))
-
-# dirs/pushd aliases (((
-alias d='dirs -p -v'
-alias p='pushd'
-alias popd='popd >/dev/null'
-# )))
-
-# df alias (((
-if [ -x "$(command -v dysk)" ]; then
-  alias df="dysk -s free-d -c label+default+dev"
-else
-  alias df='df -x"squashfs" -x"cgroup" -x"tmpfs" -Th --total'
-fi
-# )))
-
-# diff aliases (((
-if [ -x "$(command -v difft)" ]; then
-  alias diff='difft'
-elif [ -x "$(command -v batdiff)" ]; then
-  alias diff='batdiff'
-elif [ -x "$(command -v delta)" ]; then
-  alias diff='delta'
-elif [ -x "$(command -v colordiff)" ]; then
-  alias diff='colordiff -u'
-else
-  alias diff='diff -u --minimal --color=auto'
-fi
-# )))
-
-# ffmpeg aliases (((
-if [ -x "$(command -v ffmpeg)" ]; then
-  alias ffmpeg='ffmpeg -hide_banner '
-  alias ffplay='ffplay -hide_banner -autoexit '
-  alias ffprobe='ffprobe -hide_banner '
-fi
-# )))
-
-test -x "$(command -v git)" && alias groot='cd $(git rev-parse --show-toplevel)'
-
-test -x "$(command -v gmake)" && alias gmake='gmake -j "$(nproc)"'
-
-test -x "$(command -v goawk)" && alias awk='goawk'
-
-# ipyc alias (((
-if [ -x "$(command -v euporie)" ]; then
-  alias ipyc='euporie console'
-  alias ipyn='euporie notebook'
-elif [ -x "$(command -v bpython)" ]; then
-  alias ipyc='bpython'
-elif [ -x "$(command -v ptipython)" ]; then
-  alias ipyc='ptipython'
-fi
-# )))
-
-# kubernetes alias (((
-if [ -x "$(command -v kubectl)" ]; then
-  if [ -x "$(command -v kubecolor)" ]; then
-    alias kubectl='kubecolor --paging'
-  fi
-  alias k='kubectl'
-  complete -o default -F __start_kubectl k # https://kubernetes.io/docs/reference/kubectl/quick-reference/#bash
-fi
-# )))
-
-# logoff alias (((
-if [ -x "$(command -v loginctl)" ]; then
-  alias logoff='(shopt -q login_shell && logout) || loginctl kill-user $(whoami)'
-elif [ -x "$(command -v killall)" ]; then
-  alias logoff='(shopt -q login_shell && logout) || killall -u $(whoami)'
-fi
-# )))
-
-# ls aliases in linux (((
-if [[ "$(command -v eza)" ]]; then
-  alias ls='eza --icons=automatic -L 2'
-  alias la='eza --icons=automatic -labghHmF --all'
-  alias lg='eza --icons=automatic -labghHmF --group-directories-first'
-  alias ll='eza --icons=automatic -labghHmF'
-  alias lt='eza --icons=automatic -labghHF --sort newest' # sort by date
-else
-  if [[ "$(command -v lsd)" ]]; then
-    alias ls='lsd -F'
-    alias lg='ls -lAhFv --group-dirs'
-  else
-    alias ls='ls -hF --color=auto'
-    alias lg='ls -lAhFv --group-directories-first'
-  fi
-
-  alias sl='ls -v'
-  alias ll='ls -lAhFv'
-  alias la='ls -lahv'
-  alias lt='ls -lAhFvrt' # sort by date
-  alias lx='ls -lAhFvBX' # sort by extension
-  alias lz='ls -lAhFvrS' # sort by size
-  alias l='ls -F'
-fi
-# )))
-
-# make alias (((
-if [ -x "$(command -v colormake)" ]; then
-  alias make='colormake -j "$(nproc)"'
-elif [ -x "$(command -v make)" ]; then
-  alias make='make -j "$(nproc)"'
-fi
-# )))
-
-# ping alias (((
-if [ -x "$(command -v prettyping)" ]; then
-  alias ping='prettyping -c 5'
-else
-  alias ping='ping -c 5'
-fi
-# )))
-
-alias ps='ps uxf -j --cols $COLUMNS | less' # linux alias for ps
-
-# rm alias (((
-if [ -x "$(command -v gtrash)" ]; then
-  alias rm='gtrash put -RIfv'
-  alias trash-empty='gtrash find --rm'
-elif [ -x "$(command -v gomi)" ]; then
-  alias rm='gomi -v'
-elif [ -x "$(command -v trash-put)" ]; then
-  alias rm='trash-put -v'
-elif [ -x "$(command -v cnc)" ] && [ -x "$(command -v conceal)" ]; then
-  alias rm='cnc'
-elif [ -x "$(command -v timeout)" ]; then
-  # safer alternative w/ timeout, not stored in history. 'rm -i' prompts for every file
-  alias rm=' timeout 3 rm -Iv --preserve-root --one-file-system'
-else
-  alias rm='rm -Iv --preserve-root --one-file-system'
-fi
-# )))
-
-test -x "$(command -v termimage)" && alias termimage='termimage -s 51x14'
-
-# top aliases (((
-if [ -x "$(command -v btop)" ]; then
-  alias top='btop'
-  alias htop='btop'
-elif [ -x "$(command -v btm)" ]; then
-  alias top='btm'
-  alias htop='btm --basic'
-  alias btmb='btm --basic'
-fi
-# )))
-
-if [ -x "$(command -v terraform)" ]; then
-  alias tf='terraform'
-  alias tfa='terraform apply'
-  alias tfaa='terraform apply -auto-approve'
-  alias tfdd='terraform destroy -auto-approve'
-  alias tff='terraform fmt'
-  alias tfi='terraform init'
-  alias tfiu='terraform init -upgrade'
-  alias tfo='terraform output'
-  alias tfv='terraform validate'
+  alias path='echo -e ${PATH//:/\\n} | less'
 fi
 
-if [ -x "$(command -v topgrade)" ]; then
-  alias pkgupdate='topgrade --yes --cleanup'
-fi
-
-test -x "$(command -v mtr)" && alias traceroute='mtr'
-
-# tree aliases (((
-if [ -x "$(command -v erd)" ]; then
-  alias tree='erd --hidden --no-git --level 2 --icons --suppress-size --layout inverted --sort name'
-  alias treestd='\tree -a -C -I .git -I .vendor -L 2'
-elif [ -x "$(command -v tree)" ]; then
-  alias tree='tree -a -C -I .git -I .vendor -L 2'
-fi
-# )))
-
-# watch alias (((
-if [ -x "$(command -v viddy)" ]; then
-  alias watch='viddy --interval 30 --differences --skip-empty-diffs --disable_auto_save '
-else
-  alias watch='watch --interval 15 --color ' # https://unix.stackexchange.com/questions/25327/watch-command-alias-expansion https://unix.stackexchange.com/questions/453858/watch-command-alias-expansion-and-need-to-use-quotes A trailing space in VALUE causes the next word to be checked for alias substitution when the alias is expanded.
-fi
-# )))
-
-# vim/neovim aliases (((
-if [ -x "$(command -v nvim)" ]; then
-  if [ "$EDITOR" != "" ]; then
-    alias vimdiff='nvim -d'
-    alias oldvim="\vim"
-    alias vim="nvim"
-    alias vi="nvim"
-    alias view="nvim -R"
-  fi
-elif [ -x "$(command -v vim)" ]; then
-  alias vi="vim"
-fi
-# )))
-
-# aliases for compression tools (((
-
-# aliases for bzip2 format (((
-if [ -x "$(command -v lbzip2)" ]; then # supports parallel decompression
+# Handle compressed files (.tar.bz2, .tar.gz, etc.)
+if command_exists "lbzip2"; then
   alias bzip2='lbzip2'
   alias bunzip2='lbzip2 -d'
-  if [ -x "$(command -v pv)" ]; then
-    alias tarcbz2='tar --use-compress-program="lbzip2 | pv" -cf'
-  else
-    alias tarcbz2='tar --use-compress-program="lbzip2" -cf'
-  fi
-elif [ -x "$(command -v pbzip2)" ]; then
+elif command_exists "pbzip2"; then
   alias bzip2='pbzip2'
   alias bunzip2='pbzip2 -d'
-  if [ -x "$(command -v pv)" ]; then
-    alias tarcbz2='tar --use-compress-program="pbzip2 | pv" -cf'
-  else
-    alias tarcbz2='tar --use-compress-program="pbzip2" -cf'
-  fi
 fi
-# )))
 
-# aliases for .gz format (((
-# Can use 'pigz' to compress in 'zip' format by using the -K (upper case) flag e.g.: pigz -k -K archlinux.iso
-if [ -x "$(command -v pigz)" ]; then
+if command_exists "pigz"; then
   alias gzip='pigz'
   alias gunzip='pigz -d'
-  if [ -x "$(command -v pv)" ]; then
-    alias tarcgz='tar --use-compress-program="pigz --best --recursive | pv" -cf'
-  else
-    alias tarcgz='tar --use-compress-program="pigz --best --recursive" -cf'
-  fi
-  # export TAR_OPTIONS="--use-compress-program=pbzip2" # https://askubuntu.com/questions/62607/whats-the-best-way-to-use-parallel-bzip2-and-gzip-by-default
   alias untar='tar --use-compress-program=pigz -xf'
 fi
-# )))
 
-test -x "$(command -v pixz)" && alias xz='pixz' # alias for .xz format
+# Additional default alias for `ls` for sorting and output control
+alias sl='ls -v'
+alias ll='ls -lAhFv'
+alias la='ls -lahv'
+alias lt='ls -lAhFvrt' # sort by date
+alias lx='ls -lAhFvBX' # sort by extension
+alias lz='ls -lAhFvrS' # sort by size
+alias l='ls -F'
 
-test -x "$(command -v unzrip)" && alias unzip='unzip' # alias for unzip
-# )))
-
-# aliases for batgrep/ripgrep (((
-if [ -x "$(command -v rg)" ]; then
-  if [ -x "$(command -v batgrep)" ]; then
-    alias rg='batgrep'
-    alias hisgrep='history|batgrep'
-  else
-    alias hisgrep='history|rg'
-  fi
-  alias rg='rg --engine=auto'
-  alias rgi='rg -p'
-else
-  alias hisgrep='history|grep'
+# Final check for available tools for user aliases and utilities
+if command_exists "termimage"; then
+  alias termimage='termimage -s 51x14'
 fi
-# )))
+
+# Make sure we don’t overwrite user's existing aliases
+if ! alias_exists "topgrade"; then
+  create_alias "topgrade" "pkgupdate" "topgrade --yes --cleanup"
+fi
+
+# Alias for `ps` with user-friendly output formatting
+alias ps='ps uxf -j --cols $COLUMNS | less'
+
+# Alias for easy directory navigation
+alias d='dirs -p -v'
+alias pd='pushd'
+alias po='popd >/dev/null'
+
+# Alias for `logoff` command
+if command_exists "loginctl"; then
+  alias logoff='(shopt -q login_shell && logout) || loginctl kill-user $(whoami)'
+else
+  alias logoff='(shopt -q login_shell && logout) || killall -u $(whoami)'
+fi
 
 # )))
 
@@ -382,5 +242,7 @@ alias delete="rm"
 alias dir="ls"
 alias tracert="traceroute"
 # )))
+
+
 
 # )))
