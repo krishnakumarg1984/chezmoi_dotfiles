@@ -15,6 +15,8 @@
 [[ -f /etc/bashrc ]] && source /etc/bashrc
 [[ -f /etc/bash.bashrc ]] && source /etc/bash.bashrc
 
+# BASH_COMPLETION_USER_FILE="$HOME/.config/bash_completion/bash_completion" && export BASH_COMPLETION_USER_FILE
+
 # Git-aware Bash prompt (((
 # --- Terminal color detection ---
 color_mode=
@@ -205,6 +207,12 @@ done
 # fi
 # # )))
 
+# tab completion for `keychain` (((
+if command_exists "keychain"; then
+    [[ -f "$HOME/.config/bash/bashrc_keychain_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_keychain_completion_functions.sh"
+fi
+# )))
+
 # # tab completion for `kind` (((
 # if command_exists "kind"; then
 #     [[ -f "$HOME/.config/bash/bashrc_kind_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_kind_completion_functions.sh"
@@ -242,10 +250,15 @@ if command_exists "podman"; then
 fi
 # )))
 
-
 # tab completion for `docker` based on `podman` script (((
 if [ -x "$(command -v docker)" ]; then
   test -r "$HOME/.config/bash/bashrc_docker_completion_functions.sh" && . "$HOME/.config/bash/bashrc_docker_completion_functions.sh"
+fi
+# )))
+
+# tab completion for `tmc` (((
+if [ -x "$(command -v tmc)" ]; then
+  [[ -f "$HOME/.config/bash/bashrc_tmc_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_tmc_completion_functions.sh"
 fi
 # )))
 
@@ -285,14 +298,8 @@ if [ "$TERM" = "linux" ]; then
 fi
 # )))
 
-. "$HOME/.tmc-autocomplete.sh" 2>/dev/null || true
-
 [ -f "$HOME/.config/bash/fzf.bash" ] && . "$HOME/.config/bash/fzf.bash"
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-
-if [ -x "$(command -v starship)" ]; then
-  eval "$(starship init bash)"
-fi
 
 MAMBA_EXE="$(command -v micromamba)"
 if [ -x "$MAMBA_EXE" ]; then
@@ -323,3 +330,11 @@ fi
 if [ -x "$(command -v direnv)" ]; then
   eval "$(direnv hook bash)"
 fi
+
+if [ -x "$(command -v starship)" ]; then
+  # echo "starship should be active"
+  # eval "$(starship init bash)"
+  source <(starship init bash)
+fi
+
+# echo "end of bashrc"

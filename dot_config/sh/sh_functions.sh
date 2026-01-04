@@ -2,7 +2,7 @@
 # shellcheck shell=sh
 # shellcheck disable=SC1091
 
-# command_exists, command_path (strict POSIX) (((
+# command_exists (strict POSIX) (((
 # Prevent reloading if functions are already defined
 if ! type "command_exists" > /dev/null 2>&1; then
 

@@ -52,7 +52,8 @@ lua-language-server = "latest"
 markdownlint-cli2 = "latest"
 marksman = "latest"
 meson = "latest"
-neovim = "latest"
+# neovim = "latest"
+neovim = "nightly"
 ninja = "latest"
 oxlint = "latest"
 pandoc = "latest"
@@ -84,6 +85,7 @@ zellij = "latest"
 "cargo:macchina" = "latest"
 "cargo:mcat" = "latest"
 "cargo:mdsf" = "latest"
+"cargo:metapac" = "latest"
 "cargo:neocmakelsp" = "latest"
 "cargo:procs" = "latest"
 # "cargo:rumdl" = "latest"
@@ -152,5 +154,8 @@ experimental = true
 idiomatic_version_file_enable_tools = ["ruby"]
 # quiet = true
 # npm.bun = true
+
+[plugins]
+neovim = "https://github.com/richin13/asdf-neovim"
 
 # vim: ft=toml:

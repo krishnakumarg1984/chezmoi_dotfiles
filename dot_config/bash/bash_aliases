@@ -128,6 +128,8 @@ elif [ -x "$(command -v ptipython)" ]; then
 fi
 # )))
 
+test -x "$(command -v keychain)" && [[ -d "$XDG_RUNTIME_DIR"/keychain ]] && alias keychain='keychain --absolute --dir "$XDG_RUNTIME_DIR"/keychain'
+
 # kubernetes alias (((
 if [ -x "$(command -v kubectl)" ]; then
   if [ -x "$(command -v kubecolor)" ]; then
@@ -188,7 +190,8 @@ else
 fi
 # )))
 
-alias ps='ps uxf -j --cols $COLUMNS | less' # linux alias for ps
+# alias ps='ps uxf -j --cols $COLUMNS' # linux alias for ps
+alias ps='ps uxf --cols $COLUMNS' # linux alias for ps
 
 # rm alias (((
 if [ -x "$(command -v gtrash)" ]; then

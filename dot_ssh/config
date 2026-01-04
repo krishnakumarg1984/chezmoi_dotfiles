@@ -5,6 +5,11 @@ Host *
     AddKeysToAgent yes
     # ForwardX11 yes
     # ForwardX11Trusted yes
+    Ciphers aes128-gcm@openssh.com,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+    ControlMaster auto
+    ControlPersist yes
+    ControlPath ~/.ssh/sockets/socket-%r@%h:%p
+    AddressFamily inet
 
 # ssh configs for access to remote accounts at various organisations
 Include ~/.ssh/modular_ssh_configs/laptop_ssh_config
