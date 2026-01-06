@@ -192,6 +192,16 @@ export FIGNORE
 
 # )))
 
+# Set POSIX sh HISTFILE (may be overridden in shell-specific startup files) (((
+_sh_histdir="$_xdg_state_home/sh"
+if ! [ -d "$_sh_histdir" ]; then
+  mkdir -p "$_sh_histdir"
+fi
+HISTFILE="$_sh_histdir/sh_history"
+export HISTFILE
+unset _sh_histdir
+# )))
+
 # Set HISTSIZE (((
 HISTSIZE=10000
 export HISTSIZE
@@ -428,7 +438,9 @@ if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "fzf"; } || { type "fzf" >
   FZF_OPTS="--ansi --height=50% --layout=reverse --multi"
 
   FZF_DEFAULT_OPTS="$FZF_PREVIEW --bind $FZF_BIND --color $FZF_COLOR $FZF_OPTS"
+# export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
   export FZF_DEFAULT_OPTS
+  unset FZF_PREVIEW FZF_BIND FZF_COLOR FZF_OPTS
 
 
   # Git integration (if inside a git repo)

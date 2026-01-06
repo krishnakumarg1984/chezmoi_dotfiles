@@ -2,62 +2,64 @@
 # shellcheck shell=bash
 # shellcheck disable=SC1091
 
-# echo "from bashrc"
+# echo "start bashrc"
 
-# Short-circuit the sourcing of ~/.bashrc for non-interactive shells (((
+# Short-circuit sourcing of ~/.bashrc for non-interactive shells
 [[ $- == *i* ]] || return
-# )))
 
 # Source some useful POSIX functions (like non-duplicate adding of directories to PATH)
 [[ -f $HOME/.config/sh/sh_functions.sh ]] && source "$HOME/.config/sh/sh_functions.sh"
 
-# Source global bashrc definitions from /etc/bashrc if it exists (typically in redhat-like distros)
+# Source global bashrcs (/etc/bashrc: redhat distros, /etc/bash.bashrc: deb distros) (((
 [[ -f /etc/bashrc ]] && source /etc/bashrc
 [[ -f /etc/bash.bashrc ]] && source /etc/bash.bashrc
+# )))
 
-# BASH_COMPLETION_USER_FILE="$HOME/.config/bash_completion/bash_completion" && export BASH_COMPLETION_USER_FILE
-
+# Setup bash prompt (((
+if command -v starship 2>&1 >/dev/null; then
+  source <(starship init bash)
+else
 # Git-aware Bash prompt (((
-# --- Terminal color detection ---
-color_mode=
-if [[ "$COLORTERM" == *truecolor* ]] || [[ "$TERM" == *-truecolor* ]]; then
+  # --- Terminal color detection ---
+  color_mode=
+  if [[ "$COLORTERM" == *truecolor* ]] || [[ "$TERM" == *-truecolor* ]]; then
     color_mode=24bit
-elif [[ "$TERM" == *-256color ]] || [[ "$TERM" == screen* ]] || [[ "$TERM" == tmux* ]]; then
+  elif [[ "$TERM" == *-256color ]] || [[ "$TERM" == screen* ]] || [[ "$TERM" == tmux* ]]; then
     color_mode=256
-elif [[ "$TERM" == xterm* || "$TERM" == rxvt* ]]; then
+  elif [[ "$TERM" == xterm* || "$TERM" == rxvt* ]]; then
     color_mode=16
-fi
-[[ -n $force_color_prompt ]] && color_mode=${color_mode:-16}
+  fi
+  [[ -n $force_color_prompt ]] && color_mode=${color_mode:-16}
 
 # --- Color definitions ---
 case $color_mode in
-    24bit)
-        RED="\[\033[38;2;255;50;50m\]"
-        GREEN="\[\033[38;2;50;255;50m\]"
-        ORANGE="\[\033[38;2;255;165;0m\]"
-        BLUE="\[\033[38;2;100;149;237m\]"
-        MAGENTA="\[\033[38;2;200;100;255m\]"
-        BOLD="\[\033[1m\]"
-        RESET="\[\033[0m\]"
-        ;;
-    256)
-        RED="\[\033[38;5;196m\]"
-        GREEN="\[\033[38;5;82m\]"
-        ORANGE="\[\033[38;5;208m\]"
-        BLUE="\[\033[38;5;75m\]"
-        MAGENTA="\[\033[38;5;141m\]"
-        BOLD="\[\033[1m\]"
-        RESET="\[\033[0m\]"
-        ;;
-    16)
-        RED="\[\033[31m\]"
-        GREEN="\[\033[32m\]"
-        ORANGE="\[\033[33m\]"
-        BLUE="\[\033[34m\]"
-        MAGENTA="\[\033[35m\]"
-        BOLD="\[\033[1m\]"
-        RESET="\[\033[0m\]"
-        ;;
+  24bit)
+    RED="\[\033[38;2;255;50;50m\]"
+    GREEN="\[\033[38;2;50;255;50m\]"
+    ORANGE="\[\033[38;2;255;165;0m\]"
+    BLUE="\[\033[38;2;100;149;237m\]"
+    MAGENTA="\[\033[38;2;200;100;255m\]"
+    BOLD="\[\033[1m\]"
+    RESET="\[\033[0m\]"
+    ;;
+  256)
+    RED="\[\033[38;5;196m\]"
+    GREEN="\[\033[38;5;82m\]"
+    ORANGE="\[\033[38;5;208m\]"
+    BLUE="\[\033[38;5;75m\]"
+    MAGENTA="\[\033[38;5;141m\]"
+    BOLD="\[\033[1m\]"
+    RESET="\[\033[0m\]"
+    ;;
+  16)
+    RED="\[\033[31m\]"
+    GREEN="\[\033[32m\]"
+    ORANGE="\[\033[33m\]"
+    BLUE="\[\033[34m\]"
+    MAGENTA="\[\033[35m\]"
+    BOLD="\[\033[1m\]"
+    RESET="\[\033[0m\]"
+    ;;
 esac
 
 # --- Git prompt cache ---
@@ -65,55 +67,55 @@ GIT_PROMPT_CACHE=""
 GIT_PROMPT_DIR=""
 
 precompute_git_prompt() {
-    local dir="$PWD"
-    if [[ "$dir" != "$GIT_PROMPT_DIR" ]]; then
-        if git rev-parse --is-inside-work-tree &>/dev/null; then
-            local gitdir branch icon dirty untracked stash ahead behind upstream
-            gitdir=$(git rev-parse --git-dir 2>/dev/null) || return
+  local dir="$PWD"
+  if [[ "$dir" != "$GIT_PROMPT_DIR" ]]; then
+    if git rev-parse --is-inside-work-tree &>/dev/null; then
+      local gitdir branch icon dirty untracked stash ahead behind upstream
+      gitdir=$(git rev-parse --git-dir 2>/dev/null) || return
 
-            # Branch
-            read -r ref < "$gitdir/HEAD"
-            branch="${ref#ref: refs/heads/}"
-            [[ -z $branch ]] && branch="DETACHED"
+      # Branch
+      read -r ref < "$gitdir/HEAD"
+      branch="${ref#ref: refs/heads/}"
+      [[ -z $branch ]] && branch="DETACHED"
 
-            # Status
-            local dirty_flag untracked_flag
-            while IFS= read -r line; do
-                case "$line" in
-                    "??"*) untracked_flag=1 ;;
-                    [ADMRC]??*) dirty_flag=1 ;;
-                esac
-            done < <(git status --porcelain -uno 2>/dev/null)
+      # Status
+      local dirty_flag untracked_flag
+      while IFS= read -r line; do
+        case "$line" in
+          "??"*) untracked_flag=1 ;;
+          [ADMRC]??*) dirty_flag=1 ;;
+        esac
+      done < <(git status --porcelain -uno 2>/dev/null)
 
-            [[ $dirty_flag ]] && { dirty="*"; icon="🔴"; } || icon="🟢"
-            [[ $untracked_flag ]] && untracked="❓"
+      [[ $dirty_flag ]] && { dirty="*"; icon="🔴"; } || icon="🟢"
+      [[ $untracked_flag ]] && untracked="❓"
 
-            # Upstream
-            local ahead_count behind_count
-            read -r ahead_count behind_count < <(git rev-list --left-right --count @{upstream}...HEAD 2>/dev/null || echo 0 0)
-            [[ $ahead_count -gt 0 ]] && upstream+="${GREEN}↑${ahead_count}${RESET}"
-            [[ $behind_count -gt 0 ]] && upstream+="${RED}↓${behind_count}${RESET}"
+      # Upstream
+      local ahead_count behind_count
+      read -r ahead_count behind_count < <(git rev-list --left-right --count @{upstream}...HEAD 2>/dev/null || echo 0 0)
+      [[ $ahead_count -gt 0 ]] && upstream+="${GREEN}↑${ahead_count}${RESET}"
+      [[ $behind_count -gt 0 ]] && upstream+="${RED}↓${behind_count}${RESET}"
 
-            # Stash
-            local stash_count
-            stash_count=$(git rev-parse --verify refs/stash 2>/dev/null && git stash list 2>/dev/null | wc -l)
-            [[ $stash_count -gt 0 ]] && stash="⚑${stash_count}"
+      # Stash
+      local stash_count
+      stash_count=$(git rev-parse --verify refs/stash 2>/dev/null && git stash list 2>/dev/null | wc -l)
+      [[ $stash_count -gt 0 ]] && stash="⚑${stash_count}"
 
-            GIT_PROMPT_CACHE="[${icon}${branch}${dirty}${untracked}${upstream}${stash}]"
-        else
-            GIT_PROMPT_CACHE=""
-        fi
-        GIT_PROMPT_DIR="$dir"
+      GIT_PROMPT_CACHE="[${icon}${branch}${dirty}${untracked}${upstream}${stash}]"
+    else
+      GIT_PROMPT_CACHE=""
     fi
+    GIT_PROMPT_DIR="$dir"
+  fi
 }
 
 # Shorten path helper
 shorten_path() {
-    local path="$PWD"
-    [[ "$path" == "$HOME"* ]] && path="~${path#$HOME}"
-    local base="${path##*/}"
-    [[ "$path" =~ "/" ]] && path="…/${base}"
-    echo -n "$path"
+  local path="$PWD"
+  [[ "$path" == "$HOME"* ]] && path="~${path#$HOME}"
+  local base="${path##*/}"
+  [[ "$path" =~ "/" ]] && path="…/${base}"
+  echo -n "$path"
 }
 
 # Construct PS1
@@ -121,9 +123,9 @@ PS1="${GREEN}\u${RESET}@${ORANGE}\h${RESET}: {${BLUE}\$(shorten_path)${RESET}\${
 
 # Terminal title
 case "$TERM" in
-    xterm*|rxvt*|screen*|tmux*)
-        PS1="\[\e]0;\u@\h: \w\a\]$PS1"
-        ;;
+  xterm*|rxvt*|screen*|tmux*)
+    PS1="\[\e]0;\u@\h: \w\a\]$PS1"
+    ;;
 esac
 
 # Update Git prompt before each display
@@ -131,7 +133,8 @@ PROMPT_COMMAND="precompute_git_prompt"
 
 # Optional LS_COLORS
 [[ -f "$HOME/.config/bash/lscolors.sh" ]] && source "$HOME/.config/bash/lscolors.sh"
-
+fi
+# )))
 # )))
 
 # Set bash-specific environment variables (((
@@ -140,6 +143,7 @@ if declare -f update_env_var > /dev/null; then
   [[ -f "/home/demo/.config/bash/update_env_variables_tab_completion.sh" ]] && source "/home/demo/.config/bash/update_env_variables_tab_completion.sh"
 fi
 # )))
+BASH_COMPLETION_USER_FILE="$HOME/.config/bash_completion/bash_completion" && export BASH_COMPLETION_USER_FILE
 
 # Set bash-specific history-related env vars HISTFILE, HISTFILESIZE, HISTIGNORE, HISTTIMEFORMAT (((
 [[ -d "$HOME/.local/state/bash" ]] && export HISTFILE="$HOME/.local/state/bash/bash_history"
@@ -147,7 +151,7 @@ export HISTFILESIZE=$HISTSIZE
 export HISTTIMEFORMAT='[%a, %b %d %Y %T] '
 # export HISTIGNORE="bc:bg:cd:clear:cls:df:dir:exit:fg:free:gd:gg:glog:gp:gpull:groot:h:history:l:la:lg:ll:ls:lt:lx:lz:mc:pwd:sl:su:top:topu:watch" # commands to ignore from bash history
 
-export PROMPT_COMMAND='history -a; history -n' # By default, bash only records a session to the .bash_history file on disk when the session terminates. This means that if you crash or your session terminates improperly, you lose the history up to that point. You can fix this by recording each line of history as you issue it, through the PROMPT_COMMAND variable.
+# export PROMPT_COMMAND='history -a; history -n' # By default, bash only records a session to the .bash_history file on disk when the session terminates. This means that if you crash or your session terminates improperly, you lose the history up to that point. You can fix this by recording each line of history as you issue it, through the PROMPT_COMMAND variable.
 
 # )))
 
@@ -262,8 +266,6 @@ if [ -x "$(command -v tmc)" ]; then
 fi
 # )))
 
-# )))
-
 # tab completion for the `ssh` command for hosts in the user's config file
 [[ -f "$HOME/.config/bash/bashrc_ssh_hosts_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_ssh_hosts_completion_functions.sh"
 
@@ -277,14 +279,14 @@ fi
 if command_exists "terraform"; then
   complete -C terraform tf
 fi
-
+# )))
 # )))
 
 # [[ -r "$HOME/.config/bash/complete_alias.sh" ]] && source "$HOME/.config/bash/complete_alias.sh"  # Source _complete_alias function
 test -r "$HOME/.config/bash/bash_aliases" && . "$HOME/.config/bash/bash_aliases"           # Source bash aliases
 test -r "$HOME/.config/bash/bash_functions.sh" && . "$HOME/.config/bash/bash_functions.sh" # Source bash functions
-[ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh ssh-copy-id
-[ -d "$HOME/.ssh/config/modular_ssh_configs" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config/modular_ssh_configs/* | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh ssh-copy-id
+# [ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh ssh-copy-id
+# [ -d "$HOME/.ssh/config/modular_ssh_configs" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config/modular_ssh_configs/* | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh ssh-copy-id
 
 # Use ~/.Xresources to set colors in linux virtual terminal console on the framebuffer (((
 # The colors in the Linux virtual console running on the framebuffer can be changed. This is done by writing the escape code \\e]PXRRGGBB, where X is the hexadecimal index of the color from 0-F, and RRGGBB is a traditional hexadecimal RGB code.
@@ -299,8 +301,8 @@ fi
 # )))
 
 [ -f "$HOME/.config/bash/fzf.bash" ] && . "$HOME/.config/bash/fzf.bash"
-export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
 
+# mamba config (((
 MAMBA_EXE="$(command -v micromamba)"
 if [ -x "$MAMBA_EXE" ]; then
   # >>> mamba initialize >>>
@@ -319,22 +321,13 @@ if [ -x "$MAMBA_EXE" ]; then
   # <<< mamba initialize <<<
   mamba activate mambaenv_base 2>/dev/null
 fi
+# )))
 
 # eval "$(aliae init zsh --config '/Users/aliae/configs/aliae.yaml')"
 # eval "$(aliae init bash)"
 
-if [ -x "$(command -v batpipe)" ]; then
-  eval "$(batpipe)"
-fi
-
-if [ -x "$(command -v direnv)" ]; then
-  eval "$(direnv hook bash)"
-fi
-
-if [ -x "$(command -v starship)" ]; then
-  # echo "starship should be active"
-  # eval "$(starship init bash)"
-  source <(starship init bash)
-fi
+# if [ -x "$(command -v direnv)" ]; then
+#   eval "$(direnv hook bash)"
+# fi
 
 # echo "end of bashrc"

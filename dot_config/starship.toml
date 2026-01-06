@@ -35,6 +35,9 @@ format = '\[[$symbol($version)]($style)\]'
 symbol = " "
 format = '\[[$symbol($version(-$name))]($style)\]'
 
+[cpp]
+symbol = " "
+
 [cmake]
 symbol = " "
 format = '\[[$symbol($version)]($style)\]'
@@ -91,6 +94,9 @@ format = '\[[$symbol($version)]($style)\]'
 symbol = " "
 format = '\[[$symbol($version)]($style)\]'
 
+[fortran]
+symbol = " "
+
 [fossil_branch]
 symbol = " "
 format = '\[[$symbol$branch]($style)\]'
@@ -102,6 +108,9 @@ format = '\[[$symbol$account(@$domain)(\($region\))]($style)\]'
 [git_branch]
 symbol = " "
 format = '\[[$symbol$branch]($style)\]'
+
+[git_commit]
+tag_symbol = '  '
 
 [git_status]
 format = '([\[$all_status$ahead_behind\]]($style))'
@@ -200,11 +209,13 @@ Alpine = " "
 AlmaLinux = " "
 Amazon = " "
 Android = " "
+AOSC = " "
 Arch = " "
 Artix = " "
 CentOS = " "
 Debian = " "
 DragonFly = " "
+Elementary = " "
 Emscripten = " "
 EndeavourOS = " "
 Fedora = " "
@@ -213,6 +224,7 @@ Garuda = "󰛓 "
 Gentoo = " "
 HardenedBSD = "󰞌 "
 Illumos = "󰈸 "
+Ios = "󰀷 "
 Kali = " "
 Linux = " "
 Mabox = " "
@@ -223,6 +235,7 @@ MidnightBSD = " "
 Mint = " "
 NetBSD = " "
 NixOS = " "
+Nobara = " "
 OpenBSD = "󰈺 "
 OpenCloudOS = "☁️ "
 openEuler = "🦉 "
@@ -241,6 +254,7 @@ Ultramarine = "🔷 "
 Unknown = " "
 Void = " "
 Windows = "󰍲 "
+Zorin = " "
 
 [package]
 symbol = "󰏗 "
@@ -257,6 +271,9 @@ format = '\[[$symbol($version)]($style)\]'
 [pijul_channel]
 symbol = " "
 format = '\[[$symbol$channel]($style)\]'
+
+[pixi]
+symbol = "󰏗 "
 
 [pulumi]
 symbol = "🧊 "
@@ -336,6 +353,9 @@ format = '\[[$symbol($version)]($style)\]'
 [vlang]
 symbol = " "
 format = '\[[$symbol($version)]($style)\]'
+
+[xmake]
+symbol = " "
 
 [zig]
 symbol = " "
