@@ -2,8 +2,8 @@ version = 1
 
 [envs.pixi_global_env_general]
 channels = ["conda-forge"]
-dependencies = { biome = "*", cppcheck = "*", croc = "*", fx = "*", goawk = "*", jinja-lsp = "*", jnv = "*", jq = "*", jupyter = "*", lua = "*", make = "*", markdown-oxide = "*", mdslw = "*", nasm = "*", nodejs = "*", selene = "*", terraform-ls = "*", treefmt = "*", typos-lsp = "*", yj = "*", zk = "*" }
-exposed = { biome = "biome", cppcheck = "cppcheck", cppcheck-htmlreport = "cppcheck-htmlreport", croc = "croc", fx = "fx", goawk = "goawk", jinja-lsp = "jinja-lsp", jnv = "jnv", jq = "jq", jupyter = "jupyter", lua = "lua", luac = "luac", make = "make", markdown-oxide = "markdown-oxide", mdslw = "mdslw", nasm = "nasm", ndisasm = "ndisasm", node = "node", npm = "npm", selene = "selene", terraform-ls = "terraform-ls", treefmt = "treefmt", typos-lsp = "typos-lsp", yj = "yj", zk = "zk" }
+dependencies = { biome = "*", cppcheck = "*", croc = "*", fx = "*", goawk = "*", jinja-lsp = "*", jnv = "*", jq = "*", jupyter = "*", lua = "*", luarocks = "*", make = "*", markdown-oxide = "*", mdslw = "*", nasm = "*", nodejs = "*", selene = "*", terraform-ls = "*", treefmt = "*", typos-lsp = "*", yj = "*", zk = "*" }
+exposed = { biome = "biome", cppcheck = "cppcheck", cppcheck-htmlreport = "cppcheck-htmlreport", croc = "croc", fx = "fx", goawk = "goawk", jinja-lsp = "jinja-lsp", jnv = "jnv", jq = "jq", jupyter = "jupyter", lua = "lua", luac = "luac", luarocks = "luarocks", luarocks-admin = "luarocks-admin", make = "make", markdown-oxide = "markdown-oxide", mdslw = "mdslw", nasm = "nasm", ndisasm = "ndisasm", node = "node", npm = "npm", selene = "selene", terraform-ls = "terraform-ls", treefmt = "treefmt", typos-lsp = "typos-lsp", yj = "yj", zk = "zk" }
 
 [envs.pixi_global_env_cmake]
 channels = ["conda-forge"]
@@ -25,7 +25,7 @@ channels = ["conda-forge"]
 dependencies = { gdb = "*" }
 exposed = { ".gdb-post-link" = ".gdb-post-link", gcore = "gcore", gdb = "gdb", gdb-add-index = "gdb-add-index", gdbserver = "gdbserver", gstack = "gstack" }
 
-[envs.git]
+[envs.pixi_global_env_git]
 channels = ["conda-forge"]
 dependencies = { git = "*" }
 exposed = { git = "git", git-cvsserver = "git-cvsserver", git-receive-pack = "git-receive-pack", git-shell = "git-shell", git-upload-archive = "git-upload-archive", git-upload-pack = "git-upload-pack", gitk = "gitk", scalar = "scalar" }
