@@ -1,28 +1,17 @@
 # vim: ft=sh:foldmarker=(((,))):fdm=marker:tw=130:syntax=sh:
 # shellcheck disable=1091,2148
+# ~/.bash_profile is invoked only for login shells
+# per-user, after /etc/profile
 
 # echo "Start of ~/.bash_profile"
 
 # Activate mise
 command -v mise &>/dev/null && source <(mise activate bash --shims)
 
-if [ -x "$(command -v starship)" ]; then
-  source <(starship init bash)
-fi
-
 # Source ~/.profile (which contains common settings across shells e.g. environment variables)
 [[ -f "$HOME/.profile" ]] && source "$HOME/.profile"
 
-# # Set bash HISTFILE (overrides the setting in ~/.profile for bash shells) (((
-_xdg_state_home="$HOME/.local/state"
-_bash_histdir="$_xdg_state_home/bash"
-if ! [ -d "$_bash_histdir" ]; then
-  mkdir -p "$_bash_histdir"
-fi
-HISTFILE="$_bash_histdir/bash_history"
-export HISTFILE
-unset _bash_histdir
-# # )))
+# echo "In ~/.bash_profile, before calling ~/.bashrc: $HISTCONTROL"
 
 # ((( Source ~/.bashrc (if present) to have aliases/functions etc defined for login shell sessions also
 # Most bash settings are in ~/.bashrc file to consolidate settings in one place ~/.bashrc
@@ -32,8 +21,7 @@ if [[ "$-" == *i* && -f "$HOME/.bashrc" ]]; then
 fi
 # )))
 
-# Unset variables local to this file (((
-# unset _xdg_state_home _xdg_data_home _xdg_cache_home _xdg_config_home
-unset _xdg_state_home
-# )))
+# echo "In ~/.bash_profile, after calling ~/.bashrc: $HISTCONTROL"
+export HISTCONTROL="erasedups:ignoreboth"
 
+# echo "End of ~/.bash_profile"

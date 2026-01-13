@@ -1,6 +1,8 @@
 # vim: ft=sh:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=130:syntax=sh:ft=sh
 # shellcheck shell=bash
 # shellcheck disable=SC1091
+# Usually runs for every interactive _non-login_ bash shell
+# While interactive, non-login bash shells do not explicitly source ~/.bash_profile, they still inherit the environment from their parent process (which may be a login shell).
 
 # echo "start bashrc"
 
@@ -10,10 +12,21 @@
 # Source some useful POSIX functions (like non-duplicate adding of directories to PATH)
 [[ -f $HOME/.config/sh/sh_functions.sh ]] && source "$HOME/.config/sh/sh_functions.sh"
 
-# Source global bashrcs (/etc/bashrc: redhat distros, /etc/bash.bashrc: deb distros) (((
-[[ -f /etc/bashrc ]] && source /etc/bashrc
-[[ -f /etc/bash.bashrc ]] && source /etc/bash.bashrc
-# )))
+# # Source global bashrcs (/etc/bashrc: redhat distros, /etc/bash.bashrc: deb distros) (((
+# [[ -f /etc/bashrc ]] && source /etc/bashrc
+# [[ -f /etc/bash.bashrc ]] && source /etc/bash.bashrc
+# # )))
+
+# # Set bash HISTFILE (overrides the setting in ~/.profile for bash shells) (((
+_xdg_state_home="$HOME/.local/state"
+_bash_histdir="$_xdg_state_home/bash"
+if ! [ -d "$_bash_histdir" ]; then
+  mkdir -p "$_bash_histdir"
+fi
+HISTFILE="$_bash_histdir/bash_history"
+export HISTFILE
+unset _bash_histdir
+# # )))
 
 # Setup bash prompt (((
 if command -v starship 2>&1 >/dev/null; then
@@ -139,8 +152,12 @@ fi
 
 # Set bash-specific environment variables (((
 if declare -f update_env_var > /dev/null; then
-  update_env_var HISTCONTROL prepend "erasedups:ignorespace" --quiet # prevent duplicate lines & lines starting with space
+  update_env_var HISTCONTROL prepend "erasedups"  # To remove all but the last identical command
+  update_env_var HISTCONTROL append "ignorespace" # To avoid saving commands that start with a space
+  # echo "just after setting: $HISTCONTROL"
   [[ -f "/home/demo/.config/bash/update_env_variables_tab_completion.sh" ]] && source "/home/demo/.config/bash/update_env_variables_tab_completion.sh"
+else
+  export HISTCONTROL="erasedups:ignorespace"
 fi
 # )))
 BASH_COMPLETION_USER_FILE="$HOME/.config/bash_completion/bash_completion" && export BASH_COMPLETION_USER_FILE
@@ -329,5 +346,12 @@ fi
 # if [ -x "$(command -v direnv)" ]; then
 #   eval "$(direnv hook bash)"
 # fi
+
+# Unset variables local to this file (((
+# unset _xdg_state_home _xdg_data_home _xdg_cache_home _xdg_config_home
+unset _xdg_state_home
+# )))
+
+# echo "at the end: $HISTCONTROL"
 
 # echo "end of bashrc"
