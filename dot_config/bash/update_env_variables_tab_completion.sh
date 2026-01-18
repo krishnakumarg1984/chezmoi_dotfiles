@@ -1,68 +1,143 @@
-# Optimized update_env_var tab completion function using only Bash built-ins (no subshells, no external tools)
-_update_env_var_completions() {
-    local cur prev opts var entry val entries IFS
+# -----------------------------------------
+# Bash completion for update_env_var
+# Fully built-in, recursive directory completion
+# No subshells, no external commands
+# -----------------------------------------
 
-    # Set the possible operations
-    opts="prepend append movefirst movelast remove deduplicate"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
-    cur="${COMP_WORDS[COMP_CWORD]}"
+# Recursive helper function for directory completion
+# Arguments:
+#   $1 = prefix directory to scan
+#   $2 = current word being completed
+#   $3 = recursion depth (used internally)
+_update_env_var_recursive_dirs() {
+    local prefix="$1" cur="$2" depth="$3" max_depth=5
+    # Stop recursion if max depth reached
+    [[ $depth -ge $max_depth ]] && return
 
-    # Completion for the operation argument
-    if [[ $COMP_CWORD -eq 2 ]]; then
-        COMPREPLY=(${opts[@]// /$'\n'})  # Fast completion for operations
-        return 0
-    fi
+    local IFS_SAVE=$IFS
+    IFS=$'\n'  # iterate entries line by line
 
-    # Completion for the environment variable (like PATH, LD_LIBRARY_PATH)
+    local f
+    shopt -s nullglob dotglob  # include hidden dirs, prevent literal '*'
+    for f in "$prefix"/*; do
+        [[ -d "$f" ]] || continue   # skip non-directories
+        local name="${f%/}"          # remove trailing slash
+        # skip special entries '.' and '..'
+        [[ ${name##*/} == . || ${name##*/} == .. ]] && continue
+        # add to completion if it matches the current input
+        [[ $name == "$cur"* ]] && COMPREPLY+=("$name/")
+        # recurse into subdirectories
+        _update_env_var_recursive_dirs "$f" "$cur" $((depth + 1))
+    done
+    shopt -u nullglob dotglob
+    IFS=$IFS_SAVE
+}
+
+# Main completion function for update_env_var
+_update_env_var_completion() {
+    local cur prev var opts IFS_SAVE
+    COMPREPLY=()  # clear previous completions
+
+    cur="${COMP_WORDS[COMP_CWORD]}"           # current word being completed
+    prev="${COMP_WORDS[COMP_CWORD-1]}"        # previous word
+    var="${COMP_WORDS[1]}"                     # first argument = variable name
+
+    # allowed operations and options
+    opts=("deduplicate" "append" "prepend" "--delim" "--verbose")
+
+    # -----------------------------
+    # First argument: variable name
+    # -----------------------------
     if [[ $COMP_CWORD -eq 1 ]]; then
-        COMPREPLY=()
-
-        # Loop over environment variables directly from the shell's internal variable list
-        for var in $(compgen -v); do
-            if [[ "$var" == "$cur"* ]]; then
-                COMPREPLY+=("$var")
-            fi
+        # pure Bash cannot enumerate all variables, so use a common set
+        local common_vars=("PATH" "MANPATH" "LD_LIBRARY_PATH" "PYTHONPATH" "EDITOR" "HOME")
+        local v
+        for v in "${common_vars[@]}"; do
+            [[ $v == "$cur"* ]] && COMPREPLY+=("$v")
         done
-        return 0
+        return
     fi
 
-    # If the operation requires an entry (prepend, append, movefirst, movelast, remove)
-    if [[ "$prev" =~ ^(prepend|append|movefirst|movelast|remove)$ ]]; then
-        COMPREPLY=()
-
-        # Use globbing to match directories within the current directory
-        for dir in $cur*/; do
-            if [[ -d "$dir" && "$dir" == "$cur"* ]]; then
-                COMPREPLY+=("$dir")
+    # -----------------------------
+    # Second argument: value
+    # -----------------------------
+    if [[ $COMP_CWORD -eq 2 ]]; then
+        if [[ $var == "PATH" ]]; then
+            # Determine starting prefix for directory scanning
+            local prefix
+            if [[ $cur == /* ]]; then
+                prefix="/"                  # absolute path
+            elif [[ $cur == */* ]]; then
+                prefix="${cur%/*}"          # directory part of path
+            else
+                prefix="."                  # relative path
             fi
-        done
-        return 0
+            # recursive directory completion
+            _update_env_var_recursive_dirs "$prefix" "$cur" 0
+        else
+            # Complete existing colon-separated entries for other variables
+            local val entries entry
+            IFS_SAVE=$IFS
+            IFS=':'  # split on colon
+            val="${!var}"  # indirect expansion to get variable value
+            read -ra entries <<< "$val"
+            for entry in "${entries[@]}"; do
+                # skip empty entries
+                [[ -n $entry && $entry == "$cur"* ]] && COMPREPLY+=("$entry")
+            done
+            IFS=$IFS_SAVE
+        fi
+        return
     fi
 
-    # If the operation is remove, we may want to complete entries in the environment variable
-    if [[ "$prev" == "remove" && $COMP_CWORD -eq 3 ]]; then
-        var="${COMP_WORDS[1]}"
-        val="${!var}"
-
-        # Split the value into a list of entries using the delimiter ":"
-        IFS=':' read -ra entries <<< "$val"
-
-        COMPREPLY=()
-        for entry in "${entries[@]}"; do
-            if [[ "$entry" == "$cur"* ]]; then
-                COMPREPLY+=("$entry")
-            fi
+    # -----------------------------
+    # Third or later argument: operation/options
+    # -----------------------------
+    if [[ $COMP_CWORD -ge 3 ]]; then
+        local opt
+        for opt in "${opts[@]}"; do
+            [[ $opt == "$cur"* ]] && COMPREPLY+=("$opt")
         done
-        return 0
-    fi
-
-    # Completion for the --delimiter option (optional)
-    if [[ "$prev" == "--delimiter" || "$prev" == "-d" ]]; then
-        COMPREPLY=(":" ";" "," "|")  # Common delimiter characters for completion
-        return 0
+        return
     fi
 }
 
-# Bind the tab completion function for the update_env_var command
-complete -F _update_env_var_completions update_env_var
+# Enable the completion function for update_env_var
+complete -F _update_env_var_completion update_env_var
+
+# -----------------------------------------
+# Example usage of completion (for reference)
+# Copy-paste as comments in your ~/.bashrc
+# -----------------------------------------
+
+# # Complete variable name
+# update_env_var [TAB]
+# # => PATH
+# # => MANPATH
+# # => LD_LIBRARY_PATH
+# # => PYTHONPATH
+# # => EDITOR
+# # => HOME
+
+# # Complete PATH directories recursively
+# update_env_var PATH /u[TAB]
+# # => /usr/
+# update_env_var PATH /usr/l[TAB]
+# # => /usr/local/
+# update_env_var PATH /usr/local/b[TAB]
+# # => /usr/local/bin/
+
+# # Complete colon-separated values for other variables
+# update_env_var MANPATH /usr/s[TAB]
+# # => /usr/share/man/
+
+# # Complete operations/options
+# update_env_var PATH /usr/local/bin d[TAB]
+# # => deduplicate
+# update_env_var PATH /usr/local/bin a[TAB]
+# # => append
+# update_env_var PATH /usr/local/bin p[TAB]
+# # => prepend
+# update_env_var PATH /usr/local/bin --v[TAB]
+# # => --verbose
 

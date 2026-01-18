@@ -222,315 +222,325 @@ if ! type "command_exists" > /dev/null 2>&1; then
 fi
 # )))
 
-# # update_env_var (((
-# if ! type "update_env_var" > /dev/null 2>&1; then
-#   update_env_var() {
-#     var="$1"
-#     operation="deduplicate"
-#     delimiter=":"  # Default delimiter
-#     entry=""
-#     verbose="no"
-#     quiet="no"
-#
-#     shift
-#     while [ $# -gt 0 ]; do
-#       case "$1" in
-#         --verbose|-v) verbose="yes" ;;
-#         --quiet|-q) quiet="yes" ;;
-#         prepend|append|movefirst|movelast|remove) operation="$1" ;;
-#         --delimiter|-d) delimiter="$2"; shift ;;
-#         *) entry="$1" ;;
-#       esac
-#       shift
-#     done
-#
-#     # Get the value of the environment variable
-#     val="${!var}"
-#
-#     # If the variable is empty or not set, initialize it to an empty string
-#     [ -z "$val" ] && val=""
-#
-#     # If the variable is empty, just return early for remove operation
-#     if [ -z "$val" ] && [ "$operation" = "remove" ]; then
-#       echo "Error: Environment variable '$var' is empty or not set." >&2
-#       return 1
-#     fi
-#
-#     # Save the original IFS value
-#     oldIFS="$IFS"
-#     IFS="$delimiter"  # Set Internal Field Separator to delimiter
-#
-#     # Split the environment variable into a pseudo-array using the delimiter
-#     result_list=""
-#     remainder="$val"
-#     while [ -n "$remainder" ]; do
-#       # Extract the first entry before the delimiter
-#       case "$remainder" in
-#         *"$delimiter"*)
-#           tmp="${remainder%%"$delimiter"*}"
-#           # Skip empty entries
-#           if [ -n "$tmp" ]; then
-#             result_list="$result_list$delimiter$tmp"
-#           fi
-#           remainder="${remainder#*"$delimiter"}"
-#           ;;
-#         *)
-#           result_list="$result_list$remainder"
-#           remainder=""
-#           ;;
-#       esac
-#     done
-#
-#     # Remove leading delimiter
-#     result_list="${result_list#"$delimiter"}"
-#
-#     # Deduplicate the list
-#     dedup_list=""
-#     seen=""
-#     for e in $result_list; do
-#       [ -z "$e" ] && continue
-#       # Check if we've seen this entry already
-#       case "$seen" in
-#         *"$delimiter$e$delimiter"*) continue ;;
-#         *)
-#           dedup_list="$dedup_list$e$delimiter"
-#           seen="$seen$delimiter$e$delimiter"
-#           ;;
-#       esac
-#     done
-#
-#     # Remove trailing delimiter after deduplication
-#     dedup_list="${dedup_list%"$delimiter"}"
-#
-#     # Remove entry if the operation is "remove"
-#     if [ "$operation" = "remove" ]; then
-#       new_list=""
-#       found="no"
-#       for e in $dedup_list; do
-#         if [ "$e" = "$entry" ]; then
-#           found="yes"
-#         else
-#           new_list="$new_list$e$delimiter"
-#         fi
-#       done
-#
-#       if [ "$found" != "yes" ]; then
-#         echo "Error: Entry '$entry' not found in $var." >&2
-#         return 1
-#       fi
-#       # Remove trailing delimiter
-#       dedup_list="${new_list%"$delimiter"}"
-#     fi
-#
-#     # Prepend/Append/Move operations
-#     if [ -n "$entry" ] && [ "$operation" != "remove" ]; then
-#       # Prevent appending/Prepending empty entries
-#       if [ -z "$entry" ]; then
-#         echo "Error: Entry is empty." >&2
-#         return 1
-#       fi
-#
-#       new_list=""
-#       for e in $dedup_list; do
-#         if [ "$e" != "$entry" ]; then
-#           new_list="$new_list$e$delimiter"
-#         fi
-#       done
-#
-#       case "$operation" in
-#         prepend|movefirst) dedup_list="$entry$delimiter$new_list" ;;
-#         append|movelast) dedup_list="$new_list$entry" ;;
-#       esac
-#     fi
-#
-#     # Final cleanup: Remove leading or trailing delimiters
-#     dedup_list="${dedup_list#"$delimiter"}"
-#     dedup_list="${dedup_list%"$delimiter"}"
-#
-#     # Avoid adding delimiter if the entry is the only element (for empty values)
-#     if [ -z "$dedup_list" ]; then
-#       dedup_list="$entry"
-#     fi
-#
-#     # Set the environment variable directly without using eval
-#     export "$var=$dedup_list"
-#
-#     # Verbose output only when appropriate
-#     if [ "$quiet" != "yes" ] && [ "$verbose" = "yes" ]; then
-#       printf "%s\n" "$dedup_list"
-#     fi
-#
-#     # Restore IFS to original value
-#     IFS="$oldIFS"
-#   }
-# fi
-#
-# # ============================================================
-# # -------------------- USAGE EXAMPLES ------------------------
-# # ============================================================
-#
-# # Update PATH by deduplicating
-# # update_env_var PATH deduplicate --verbose
-#
-# # Prepend to PATH
-# # update_env_var PATH prepend "/opt/bin" --verbose
-#
-# # Append to PATH
-# # update_env_var PATH append "/home/user/bin" --verbose
-#
-# # Move directory to the start of PATH
-# # update_env_var PATH movefirst "/usr/sbin" --verbose
-#
-# # Move directory to the end of PATH
-# # update_env_var PATH movelast "/bin" --verbose
-#
-# # Remove a directory from PATH
-# # update_env_var PATH remove "/sbin" --verbose
-#
-# # Prepend a directory with custom delimiter
-# # update_env_var PATH prepend "/new/path" --delimiter "::" --verbose
-# #
-# # )))
-
 # update_env_var (((
-if ! type "update_env_var" > /dev/null 2>&1; then
-  update_env_var() {
-    var="$1"
-    operation="deduplicate"
-    delimiter=":"  # Default delimiter
-    entry=""
-    verbose="no"
-    quiet="no"
+#
+# Pure POSIX shell function to manipulate environment variables (PATH-style).
+# Supports deduplicate, prepend, append operations with custom delimiter.
+# Fully safe for ~/.profile, login scripts, or minimal shells (dash, ash, ksh).
+#
+# Usage:
+#   update_env_var VAR VALUE [deduplicate|append|prepend] [--delim D] [--verbose]
+#
+# Arguments:
+#   VAR       : The environment variable name to update (must be valid POSIX identifier)
+#   VALUE     : The value to add/move in the variable
+#   deduplicate (default) : Ensure VALUE appears exactly once (preserves first occurrence)
+#   prepend   : Move VALUE to the beginning (first entry)
+#   append    : Move VALUE to the end (last entry)
+#   --delim D : Optional single-character delimiter (defaults to ':')
+#   --verbose : Prints the variable after modification
+#
+# Examples:
+#   # Add /opt/bin to PATH if not present (deduplicate by default)
+#   update_env_var PATH /opt/bin
+#
+#   # Move /opt/bin to the front of PATH
+#   update_env_var PATH /opt/bin prepend
+#
+#   # Move /opt/bin to the end of PATH
+#   update_env_var PATH /opt/bin append
+#
+#   # Use a different delimiter (semicolon) and print result
+#   update_env_var MANPATH /custom/man --delim ';' --verbose
+#
+#   # Deduplicate MANPATH and print result
+#   update_env_var MANPATH /usr/local/man --verbose
+#
+#   # Multiple operations in ~/.profile safely
+#   update_env_var PATH /usr/local/bin prepend
+#   update_env_var PATH /opt/bin append
+#
+#
+# Notes / POSIX constraints:
+#   - Single-character delimiter only
+#   - Values cannot contain the delimiter
+#   - Empty fields in PATH-style variables are removed
+#   - Fully subshell-free, external-command-free
+#   - Subshell-free – no ( ), $(), or pipelines.
+#   - External-command-free – uses only POSIX built-ins: eval, export, printf, for, case, [ ].
+#   - Deduplicate preserves first occurrence – repeated entries later are removed.
+#   - Prepend/Append moves existing entries – ensures uniqueness.
+#   - Safe for ~/.profile – can modify PATH, MANPATH, etc., without breaking login shell.
+#   - Verbose mode – print updated variable if --verbose is passed.#
+# -----------------------------------------------------------------------------
+update_env_var() {
+    # -----------------------------
+    # Defaults
+    # -----------------------------
+    _op=deduplicate    # Default operation
+    _delim=:           # Default delimiter
+    _verbose=0         # Silent by default
 
-    shift
+    # -----------------------------
+    # Require VAR and VALUE
+    # -----------------------------
+    [ $# -ge 2 ] || return 1
+    _var=$1
+    _val=$2
+    shift 2
+
+    # -----------------------------
+    # Validate variable name (POSIX identifier)
+    # Only letters, digits, underscore, cannot start with digit
+    # -----------------------------
+    case $_var in
+        [A-Za-z_]*[!A-Za-z0-9_]*|'')
+            return 2
+            ;;
+    esac
+
+    # -----------------------------
+    # Parse optional arguments
+    # -----------------------------
     while [ $# -gt 0 ]; do
-      case "$1" in
-        --verbose|-v) verbose="yes" ;;
-        --quiet|-q) quiet="yes" ;;
-        prepend|append|movefirst|movelast|remove) operation="$1" ;;
-        --delimiter|-d) delimiter="$2"; shift ;;
-        *) entry="$1" ;;
-      esac
-      shift
+        case $1 in
+            deduplicate|append|prepend)
+                _op=$1
+                ;;
+            --delim)
+                shift || return 1
+                _delim=$1
+                ;;
+            --verbose)
+                _verbose=1
+                ;;
+            *)
+                # Unrecognized argument
+                return 1
+                ;;
+        esac
+        shift
     done
 
-    # Get the value of the environment variable
-    val="${!var}"
+    # -----------------------------
+    # Fetch current variable value safely
+    # -----------------------------
+    eval _cur=\${$_var}
 
-    # If the variable is empty or not set, initialize it to an empty string
-    [ -z "$val" ] && val=""
+    _new=
+    _found=0
 
-    # If the variable is empty, just return early for remove operation
-    if [ -z "$val" ] && [ "$operation" = "remove" ]; then
-      echo "Error: Environment variable '$var' is empty or not set." >&2
-      return 1
+    _old_ifs=$IFS
+    IFS=$_delim  # Split on delimiter
+
+    # -----------------------------
+    # Operation logic
+    # -----------------------------
+    case $_op in
+        # -------------------------
+        # Deduplicate: preserve first occurrence
+        # -------------------------
+        deduplicate)
+            for _item in $_cur; do
+                [ -z "$_item" ] && continue   # Skip empty fields
+                if [ "$_item" = "$_val" ]; then
+                    [ $_found -eq 1 ] && continue  # Skip duplicates
+                    _found=1
+                fi
+                if [ -n "$_new" ]; then
+                    _new=$_new$_delim$_item
+                else
+                    _new=$_item
+                fi
+            done
+
+            # Append VALUE if not already found
+            if [ $_found -eq 0 ]; then
+                if [ -n "$_new" ]; then
+                    _new=$_new$_delim$_val
+                else
+                    _new=$_val
+                fi
+            fi
+            ;;
+
+        # -------------------------
+        # Prepend / Append: move VALUE to front or end
+        # -------------------------
+        prepend|append)
+            # Remove all existing occurrences first
+            for _item in $_cur; do
+                [ -z "$_item" ] && continue
+                [ "$_item" = "$_val" ] && continue
+                if [ -n "$_new" ]; then
+                    _new=$_new$_delim$_item
+                else
+                    _new=$_item
+                fi
+            done
+
+            # Insert VALUE
+            if [ "$_op" = prepend ]; then
+                if [ -n "$_new" ]; then
+                    _new=$_val$_delim$_new
+                else
+                    _new=$_val
+                fi
+            else
+                if [ -n "$_new" ]; then
+                    _new=$_new$_delim$_val
+                else
+                    _new=$_val
+                fi
+            fi
+            ;;
+    esac
+
+    IFS=$_old_ifs  # Restore IFS
+
+    # -----------------------------
+    # Assign back and export
+    # -----------------------------
+    eval $_var=\$_new
+    export $_var
+
+    # -----------------------------
+    # Optional verbose output
+    # -----------------------------
+    if [ $_verbose -eq 1 ]; then
+        printf '%s=%s\n' "$_var" "$_new"
     fi
+}
 
-    # Save the original IFS value
-    oldIFS="$IFS"
-    IFS="$delimiter"  # Set Internal Field Separator to delimiter
+# ----------------------------
+# Test cases for update_env_var
+# ----------------------------
 
-    # Split the environment variable into a pseudo-array using the delimiter
-    result_list=""
-    remainder="$val"
-    while [ -n "$remainder" ]; do
-      # Extract the first entry before the delimiter
-      case "$remainder" in
-        *"$delimiter"*)
-          tmp="${remainder%%"$delimiter"*}"
-          # Skip empty entries
-          if [ -n "$tmp" ]; then
-            result_list="$result_list$delimiter$tmp"
-          fi
-          remainder="${remainder#*"$delimiter"}"
-          ;;
-        *)
-          result_list="$result_list$remainder"
-          remainder=""
-          ;;
-      esac
-    done
+# 1. Basic deduplicate (default)
+# PATH="/bin:/usr/bin:/bin:/sbin"
+# update_env_var PATH /bin
+# Expected: /bin:/usr/bin:/sbin
 
-    # Ensure no leading delimiter after splitting the value
-    result_list="${result_list#"$delimiter"}"
+# PATH=""
+# update_env_var PATH /usr/local/bin
+# Expected: /usr/local/bin
 
-    # Deduplicate the list
-    dedup_list=""
-    seen=""
-    for e in $result_list; do
-      [ -z "$e" ] && continue
-      # Check if we've seen this entry already
-      case "$seen" in
-        *"$delimiter$e$delimiter"*) continue ;;
-        *)
-          dedup_list="$dedup_list$e$delimiter"
-          seen="$seen$delimiter$e$delimiter"
-      esac
-    done
+# PATH="/bin"
+# update_env_var PATH /usr/bin
+# Expected: /bin:/usr/bin
 
-    # Remove trailing delimiter after deduplication to prevent growing last entry
-    dedup_list="${dedup_list%"$delimiter"}"
+# ----------------------------
+# 2. Prepend
+# ----------------------------
+# PATH="/usr/bin:/bin"
+# update_env_var PATH /bin prepend
+# Expected: /bin:/usr/bin
 
-    # Remove entry if the operation is "remove"
-    if [ "$operation" = "remove" ]; then
-      new_list=""
-      found="no"
-      for e in $dedup_list; do
-        if [ "$e" = "$entry" ]; then
-          found="yes"
-        else
-          new_list="$new_list$e$delimiter"
-        fi
-      done
+# PATH="/usr/bin"
+# update_env_var PATH /usr/local/bin prepend
+# Expected: /usr/local/bin:/usr/bin
 
-      if [ "$found" != "yes" ]; then
-        echo "Error: Entry '$entry' not found in $var." >&2
-        return 1
-      fi
-      # Remove trailing delimiter
-      dedup_list="${new_list%"$delimiter"}"
-    fi
+# PATH=""
+# update_env_var PATH /bin prepend
+# Expected: /bin
 
-    # Prepend/Append/Move operations
-    if [ -n "$entry" ] && [ "$operation" != "remove" ]; then
-      # Prevent appending/Prepending empty entries
-      if [ -z "$entry" ]; then
-        echo "Error: Entry is empty." >&2
-        return 1
-      fi
+# ----------------------------
+# 3. Append
+# ----------------------------
+# PATH="/bin:/usr/bin"
+# update_env_var PATH /bin append
+# Expected: /usr/bin:/bin
 
-      new_list=""
-      for e in $dedup_list; do
-        if [ "$e" != "$entry" ]; then
-          new_list="$new_list$e$delimiter"
-        fi
-      done
+# PATH="/usr/bin"
+# update_env_var PATH /usr/local/bin append
+# Expected: /usr/bin:/usr/local/bin
 
-      case "$operation" in
-        prepend|movefirst) dedup_list="$entry$delimiter$new_list" ;;
-        append|movelast) dedup_list="$new_list$entry" ;;
-      esac
-    fi
+# PATH=""
+# update_env_var PATH /bin append
+# Expected: /bin
 
-    # Final cleanup: Remove leading or trailing delimiters after all operations
-    dedup_list="${dedup_list#"$delimiter"}"
-    dedup_list="${dedup_list%"$delimiter"}"
+# ----------------------------
+# 4. Deduplicate preserves first occurrence
+# ----------------------------
+# PATH="/bin:/usr/bin:/bin:/sbin:/bin"
+# update_env_var PATH /bin
+# Expected: /bin:/usr/bin:/sbin
 
-    # Avoid adding delimiter if the entry is the only element (for empty values)
-    if [ -z "$dedup_list" ]; then
-      dedup_list="$entry"
-    fi
+# PATH="/usr/bin:/bin:/usr/bin:/sbin"
+# update_env_var PATH /usr/bin
+# Expected: /usr/bin:/bin:/sbin
 
-    # Set the environment variable directly without using eval
-    export "$var=$dedup_list"
+# ----------------------------
+# 5. Custom delimiter
+# ----------------------------
+# MANPATH="/usr/share/man;/usr/local/share/man;/usr/share/man"
+# update_env_var MANPATH /usr/local/share/man deduplicate --delim ';' --verbose
+# Expected: /usr/share/man;/usr/local/share/man
 
-    # Verbose output only when appropriate
-    if [ "$quiet" != "yes" ] && [ "$verbose" = "yes" ]; then
-      printf "%s\n" "$dedup_list"
-    fi
+# MANPATH="/usr/share/man;/usr/local/share/man"
+# update_env_var MANPATH /opt/man prepend --delim ';' --verbose
+# Expected: /opt/man;/usr/share/man;/usr/local/share/man
 
-    # Restore IFS to original value
-    IFS="$oldIFS"
-  }
-fi
+# MANPATH="/usr/share/man;/usr/local/share/man"
+# update_env_var MANPATH /opt/man append --delim ';' --verbose
+# Expected: /usr/share/man;/usr/local/share/man;/opt/man
+
+# ----------------------------
+# 6. Empty fields handling
+# ----------------------------
+# PATH=":/bin::/usr/bin:"
+# update_env_var PATH /bin
+# Expected: /bin:/usr/bin
+
+# PATH="::"
+# update_env_var PATH /bin
+# Expected: /bin
+
+# PATH=""
+# update_env_var PATH /bin
+# Expected: /bin
+
+# ----------------------------
+# 7. Already at correct position
+# ----------------------------
+# PATH="/bin:/usr/bin:/sbin"
+# update_env_var PATH /bin prepend
+# Expected: /bin:/usr/bin:/sbin
+
+# PATH="/bin:/usr/bin:/sbin"
+# update_env_var PATH /sbin append
+# Expected: /bin:/usr/bin:/sbin
+
+# ----------------------------
+# 8. Multiple duplicates removed
+# ----------------------------
+# PATH="/bin:/usr/bin:/bin:/sbin:/usr/bin:/bin"
+# update_env_var PATH /usr/bin
+# Expected: /bin:/usr/bin:/sbin
+
+# PATH="/bin:/bin:/bin"
+# update_env_var PATH /bin
+# Expected: /bin
+
+# ----------------------------
+# 9. Verbose mode
+# ----------------------------
+# PATH="/bin:/usr/bin"
+# update_env_var PATH /opt/bin prepend --verbose
+# Expected printed: PATH=/opt/bin:/bin:/usr/bin
+
+# PATH="/bin:/usr/bin"
+# update_env_var PATH /opt/bin append --verbose
+# Expected printed: PATH=/bin:/usr/bin:/opt/bin
+
+# ----------------------------
+# 10. Invalid variable name (should fail)
+# ----------------------------
+# update_env_var "1INVALID" /bin
+# Returns 2, no change
+
+# update_env_var "VAR!" /bin
+# Returns 2, no change
+
+
 # )))
