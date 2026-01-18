@@ -2,13 +2,18 @@ version = 1
 
 [envs.pixi_global_env_general]
 channels = ["conda-forge"]
-dependencies = { biome = "*", cppcheck = "*", croc = "*", fx = "*", goawk = "*", jinja-lsp = "*", jnv = "*", jq = "*", jupyter = "*", lua = "*", luarocks = "*", make = "*", markdown-oxide = "*", mdslw = "*", nasm = "*", nodejs = "*", selene = "*", terraform-ls = "*", treefmt = "*", typos-lsp = "*", yj = "*", zk = "*" }
-exposed = { biome = "biome", cppcheck = "cppcheck", cppcheck-htmlreport = "cppcheck-htmlreport", croc = "croc", fx = "fx", goawk = "goawk", jinja-lsp = "jinja-lsp", jnv = "jnv", jq = "jq", jupyter = "jupyter", lua = "lua", luac = "luac", luarocks = "luarocks", luarocks-admin = "luarocks-admin", make = "make", markdown-oxide = "markdown-oxide", mdslw = "mdslw", nasm = "nasm", ndisasm = "ndisasm", node = "node", npm = "npm", selene = "selene", terraform-ls = "terraform-ls", treefmt = "treefmt", typos-lsp = "typos-lsp", yj = "yj", zk = "zk" }
+dependencies = { biome = "*", croc = "*", fx = "*", goawk = "*", jinja-lsp = "*", jnv = "*", jq = "*", jupyter = "*", make = "*", markdown-oxide = "*", mdslw = "*", selene = "*", terraform-ls = "*", treefmt = "*", typos-lsp = "*", yj = "*", zk = "*" }
+exposed = { biome = "biome", croc = "croc", fx = "fx", goawk = "goawk", jinja-lsp = "jinja-lsp", jnv = "jnv", jq = "jq", jupyter = "jupyter", make = "make", markdown-oxide = "markdown-oxide", mdslw = "mdslw", selene = "selene", terraform-ls = "terraform-ls", treefmt = "treefmt", typos-lsp = "typos-lsp", yj = "yj", zk = "zk" }
 
 [envs.pixi_global_env_cmake]
 channels = ["conda-forge"]
 dependencies = { cmake = "*" }
 exposed = { ccmake = "ccmake", cmake = "cmake", cpack = "cpack", ctest = "ctest" }
+
+[envs.pixi_global_env_cppcheck]
+channels = ["conda-forge"]
+dependencies = { cppcheck = "*" }
+exposed = { cppcheck = "cppcheck", cppcheck-htmlreport = "cppcheck-htmlreport" }
 
 [envs.pixi_global_env_fontconfig]
 channels = ["conda-forge"]
@@ -40,19 +45,37 @@ channels = ["conda-forge"]
 dependencies = { clang = "*", clang-tools = "*" }
 exposed = { amdgpu-arch = "amdgpu-arch", analyze-build = "analyze-build", c-index-test = "c-index-test", clang = "clang", clang-apply-replacements = "clang-apply-replacements", clang-apply-replacements-21 = "clang-apply-replacements-21", clang-change-namespace = "clang-change-namespace", clang-change-namespace-21 = "clang-change-namespace-21", clang-check = "clang-check", clang-check-21 = "clang-check-21", clang-cl = "clang-cl", clang-cpp = "clang-cpp", clang-doc = "clang-doc", clang-doc-21 = "clang-doc-21", clang-extdef-mapping = "clang-extdef-mapping", clang-extdef-mapping-21 = "clang-extdef-mapping-21", clang-include-cleaner = "clang-include-cleaner", clang-include-cleaner-21 = "clang-include-cleaner-21", clang-include-fixer = "clang-include-fixer", clang-include-fixer-21 = "clang-include-fixer-21", clang-installapi = "clang-installapi", clang-installapi-21 = "clang-installapi-21", clang-linker-wrapper = "clang-linker-wrapper", clang-linker-wrapper-21 = "clang-linker-wrapper-21", clang-move = "clang-move", clang-move-21 = "clang-move-21", clang-nvlink-wrapper = "clang-nvlink-wrapper", clang-nvlink-wrapper-21 = "clang-nvlink-wrapper-21", clang-offload-bundler = "clang-offload-bundler", clang-offload-bundler-21 = "clang-offload-bundler-21", clang-offload-packager = "clang-offload-packager", clang-offload-packager-21 = "clang-offload-packager-21", clang-query = "clang-query", clang-query-21 = "clang-query-21", clang-refactor = "clang-refactor", clang-refactor-21 = "clang-refactor-21", clang-reorder-fields = "clang-reorder-fields", clang-reorder-fields-21 = "clang-reorder-fields-21", clang-repl = "clang-repl", clang-repl-21 = "clang-repl-21", clang-scan-deps = "clang-scan-deps", clang-scan-deps-21 = "clang-scan-deps-21", clang-sycl-linker = "clang-sycl-linker", clang-sycl-linker-21 = "clang-sycl-linker-21", clang-tidy = "clang-tidy", clang-tidy-21 = "clang-tidy-21", clangd = "clangd", diagtool = "diagtool", find-all-symbols = "find-all-symbols", git-clang-format = "git-clang-format", hmaptool = "hmaptool", intercept-build = "intercept-build", modularize = "modularize", nvptx-arch = "nvptx-arch", offload-arch = "offload-arch", pp-trace = "pp-trace", run-clang-tidy = "run-clang-tidy", scan-build = "scan-build", scan-build-py = "scan-build-py", scan-view = "scan-view" }
 
-{{- if not (and (eq .chezmoi.arch "arm64") (eq .chezmoi.os "linux")) }}
-
-[envs.pixi_global_env_extras]
+[envs.pixi_global_env_lua]
 channels = ["conda-forge"]
-dependencies = { less = "*" }
-exposed = { less = "less", lesskey = "lesskey" }
+dependencies = { lua = "*", luarocks = "*" }
+exposed = {lua = "lua", luac = "luac", luarocks = "luarocks", luarocks-admin = "luarocks-admin" }
+
+[envs.pixi_global_env_nasm]
+channels = ["conda-forge"]
+dependencies = { nasm = "*" }
+exposed = { nasm = "nasm", ndisasm = "ndisasm" }
+
+[envs.pixi_global_env_nodejs]
+channels = ["conda-forge"]
+dependencies = { nodejs = "*" }
+exposed = { node = "node", npm = "npm" }
 
 [envs.pixi_global_env_openjdk]
 channels = ["conda-forge"]
 dependencies = { openjdk = "*" }
 exposed = { jar = "jar", jarsigner = "jarsigner", java = "java", javac = "javac", javadoc = "javadoc", javap = "javap", jcmd = "jcmd", jconsole = "jconsole", jdb = "jdb", jdeprscan = "jdeprscan", jdeps = "jdeps", jfr = "jfr", jhsdb = "jhsdb", jimage = "jimage", jinfo = "jinfo", jlink = "jlink", jmap = "jmap", jmod = "jmod", jnativescan = "jnativescan", jpackage = "jpackage", jps = "jps", jrunscript = "jrunscript", jshell = "jshell", jstack = "jstack", jstat = "jstat", jstatd = "jstatd", jwebserver = "jwebserver", keytool = "keytool", rmiregistry = "rmiregistry", serialver = "serialver" }
 
+[envs.pixi_global_env_trash_cli]
+channels = ["conda-forge"]
+dependencies = { trash-cli = "*" }
+exposed = { trash = "trash", trash-empty = "trash-empty", trash-list = "trash-list", trash-put = "trash-put", trash-restore = "trash-restore", trash-rm = "trash-rm" }
 
+{{- if not (and (eq .chezmoi.arch "arm64") (eq .chezmoi.os "linux")) }}
+
+[envs.pixi_global_env_less]
+channels = ["conda-forge"]
+dependencies = { less = "*" }
+exposed = { less = "less", lesskey = "lesskey" }
 
 # [envs.vale-ls]
 # channels = ["conda-forge"]

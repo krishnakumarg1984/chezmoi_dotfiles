@@ -34,6 +34,26 @@ _xdg_data_home="$HOME/.local/share"
 _xdg_state_home="$HOME/.local/state"
 # )))
 
+# Append "luarocks binaries" to PATH (((
+_luarocks_config_file="$_xdg_config_home/luarocks/config.lua"
+if [ -f "$_luarocks_config_file" ]; then
+  LUAROCKS_CONFIG="$_luarocks_config_file"
+  export LUAROCKS_CONFIG
+fi
+unset _luarocks_config_file
+
+_luarocks_bindir="$_xdg_data_home/luarocks/bin"
+if [ -d "$_luarocks_bindir" ]; then
+  # if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
+  #   echo "$_luarocks_bindir"
+  #   update_env_var PATH append "$_luarocks_bindir" --quiet  # append seems to be buggy
+  # else
+    pupdate "$_luarocks_bindir"
+  # fi
+fi
+unset _luarocks_bindir
+# )))
+
 # Pixi Configuration (((
 # PIXI_HOME should be set prior to the installation of pixi (((
 PIXI_HOME="$_xdg_config_home/pixi"
@@ -213,8 +233,8 @@ _inputrc="$_xdg_config_home/readline/inputrc"
 if [ -f "$_inputrc" ]; then
   INPUTRC="$_inputrc"
   export INPUTRC
-  unset _inputrc
 fi
+unset _inputrc
 # )))
 
 # Set LESS_TERMCAP_xx, LESSPIPE, LESS, LESSKEY, LESSHISTFILE for colorising the output of the `less` pager (((

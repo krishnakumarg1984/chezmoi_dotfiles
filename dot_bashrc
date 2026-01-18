@@ -221,6 +221,12 @@ done
 
 # type -P aws_completer &>/dev/null && complete -C aws_completer aws
 
+# tab completion for `helm` (((
+if command_exists "exercism"; then
+  source <(exercism completion bash)
+fi
+# )))
+
 # # tab completion for `helm` (((
 # if command_exists "helm"; then
 #   # If the helm completion functions file exists and is readable, source it
