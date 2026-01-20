@@ -152,8 +152,8 @@ fi
 
 # Set bash-specific environment variables (((
 if declare -f update_env_var > /dev/null; then
-  update_env_var HISTCONTROL prepend "erasedups"  # To remove all but the last identical command
-  update_env_var HISTCONTROL append "ignorespace" # To avoid saving commands that start with a space
+  update_env_var HISTCONTROL "erasedups" prepend  # To remove all but the last identical command
+  update_env_var HISTCONTROL "ignorespace" append # To avoid saving commands that start with a space
   # echo "just after setting: $HISTCONTROL"
   [[ -f "/home/demo/.config/bash/update_env_variables_tab_completion.sh" ]] && source "/home/demo/.config/bash/update_env_variables_tab_completion.sh"
 else

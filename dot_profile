@@ -10,14 +10,21 @@ if [ -f "$HOME/.config/sh/sh_functions.sh" ]; then
 fi
 # )))
 
-# https://unix.stackexchange.com/a/124447
-pupdate() { case ":${PATH:=$1}:" in *:"$1":*) ;; *) PATH="$1:$PATH" ;; esac; }
+# pupdate() function (((
+pupdate() {
+  [ "$1" ] || return 0     # ignore empty arg
+  case ":$PATH:" in
+    *:"$1":*) ;;
+    *) PATH="$1${PATH:+:$PATH}" ;;
+  esac
+}
+# )))
 
 # Prepend "~/.local/bin" to PATH (((
 _local_bindir="$HOME/.local/bin"
 if [ -d "$_local_bindir" ]; then
   if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
-    update_env_var PATH prepend "$_local_bindir" --quiet
+    update_env_var PATH "$_local_bindir" prepend
   else
     pupdate "$_local_bindir"
   fi
@@ -46,7 +53,7 @@ _luarocks_bindir="$_xdg_data_home/luarocks/bin"
 if [ -d "$_luarocks_bindir" ]; then
   # if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
   #   echo "$_luarocks_bindir"
-  #   update_env_var PATH append "$_luarocks_bindir" --quiet  # append seems to be buggy
+  #   update_env_var PATH "$_luarocks_bindir" append
   # else
     pupdate "$_luarocks_bindir"
   # fi
@@ -63,7 +70,7 @@ export PIXI_HOME
 # Prepend $PIXI_HOME/bin to PATH if the pixi command does not already exist (((
 _pixi_bindir="$PIXI_HOME/bin"
 if [ -n "$SH_FUNCTIONS_SOURCED" ] && ! command_exists "pixi" && command_exists "$_pixi_bindir/pixi"; then
-  update_env_var PATH prepend "$_pixi_bindir" --quiet
+  update_env_var PATH "$_pixi_bindir" prepend
 elif ! { type "pixi" > /dev/null 2>&1; } && [ -x "$_pixi_bindir/pixi" ]; then
   PATH="$_pixi_bindir:$PATH"
 fi
@@ -88,7 +95,7 @@ if [ -d "$_tl_dir" ]; then
 
   # Now incorporate the TL bin directory to PATH
   if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
-    update_env_var PATH prepend "$_tl_bin_path" --quiet
+    update_env_var PATH "$_tl_bin_path" prepend
   else
     pupdate "$_tl_bin_path"
   fi
@@ -103,7 +110,7 @@ _mason_bindir="$_xdg_data_home/nvim/mason/bin"
 
 # mason_bindir may not exist yet if custom neovim config that uses mason is not yet activated
 if [ -n "$SH_FUNCTIONS_SOURCED" ] && ! command_exists "mason"; then
-  update_env_var PATH prepend "$_mason_bindir" --quiet
+  update_env_var PATH "$_mason_bindir" prepend
 elif ! type "mason" > /dev/null 2>&1; then
   pupdate "$_mason_bindir"
 fi
@@ -118,7 +125,7 @@ if [ -d "$_brew_prefix_dir" ] && [ -z "$HOMEBREW_PREFIX" ]; then
   HOMEBREW_PREFIX="$_brew_prefix_dir"
   export HOMEBREW_PREFIX
   if [ -n "$SH_FUNCTIONS_SOURCED" ] && ! command_exists "brew"; then
-    update_env_var PATH append "$HOMEBREW_PREFIX/bin" --quiet
+    update_env_var PATH "$HOMEBREW_PREFIX/bin" append
   elif ! type "brew" > /dev/null 2>&1; then
     pupdate "$HOMEBREW_PREFIX/bin"
   fi
@@ -384,7 +391,7 @@ CARGO_HOME="$_xdg_data_home/cargo" && export CARGO_HOME
 # Optionally, you could also prepend cargo bin to PATH if desired:
 # if [ -d "$CARGO_HOME/bin" ]; then
 #   if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
-#     update_env_var PATH prepend "$CARGO_HOME/bin" --quiet
+#     update_env_var PATH "$CARGO_HOME/bin" prepend
 #   else
 #     pupdate "$CARGO_HOME/bin"
 #   fi
