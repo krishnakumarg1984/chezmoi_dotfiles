@@ -11,12 +11,52 @@ fi
 # )))
 
 # pupdate() function (((
+# ============================================================
+# pupdate: POSIX-safe PATH updater with flags and batch entries
+# - canonicalizes entries (removes trailing slash)
+# - deduplicates existing PATH entries
+# - supports --prepend (default) or --append
+# - supports multiple entries in one call
+# ============================================================
+
 pupdate() {
-  [ "$1" ] || return 0     # ignore empty arg
-  case ":$PATH:" in
-    *:"$1":*) ;;
-    *) PATH="$1${PATH:+:$PATH}" ;;
-  esac
+    [ $# -gt 0 ] || return 0        # nothing to do if no arguments
+
+    # default mode
+    mode="prepend"
+
+    # parse optional flags
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --prepend) mode="prepend"; shift ;;
+            --append)  mode="append"; shift ;;
+            --) shift; break ;;       # end of flags
+            --*) echo "Unknown flag: $1" >&2; return 1 ;;
+            *) break ;;                # first non-flag argument
+        esac
+    done
+
+    [ $# -gt 0 ] || return 0        # no PATH entries left after flags
+
+    new_entries=""
+    for val in "$@"; do
+        entry=${val%/}               # strip trailing slash
+        [ -n "$entry" ] || continue  # skip empty
+        # skip if already in PATH
+        case ":$PATH:" in
+            *:"$entry":*) continue ;;
+        esac
+        # build new_entries list
+        new_entries="${new_entries:+$new_entries:}$entry"
+    done
+
+    [ -z "$new_entries" ] && return 0  # nothing new to add
+
+    # prepend or append
+    case "$mode" in
+        append) PATH="${PATH:+$PATH:}$new_entries" ;;
+        prepend|*) PATH="$new_entries${PATH:+:$PATH}" ;;
+    esac
 }
 # )))
 
@@ -24,7 +64,7 @@ pupdate() {
 _local_bindir="$HOME/.local/bin"
 if [ -d "$_local_bindir" ]; then
   if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
-    update_env_var PATH "$_local_bindir" prepend
+    update_env_var PATH --prepend "$_local_bindir"
   else
     pupdate "$_local_bindir"
   fi
@@ -53,7 +93,7 @@ _luarocks_bindir="$_xdg_data_home/luarocks/bin"
 if [ -d "$_luarocks_bindir" ]; then
   # if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
   #   echo "$_luarocks_bindir"
-  #   update_env_var PATH "$_luarocks_bindir" append
+  #   update_env_var PATH --append "$_luarocks_bindir"
   # else
     pupdate "$_luarocks_bindir"
   # fi
@@ -70,7 +110,7 @@ export PIXI_HOME
 # Prepend $PIXI_HOME/bin to PATH if the pixi command does not already exist (((
 _pixi_bindir="$PIXI_HOME/bin"
 if [ -n "$SH_FUNCTIONS_SOURCED" ] && ! command_exists "pixi" && command_exists "$_pixi_bindir/pixi"; then
-  update_env_var PATH "$_pixi_bindir" prepend
+  update_env_var PATH --prepend "$_pixi_bindir"
 elif ! { type "pixi" > /dev/null 2>&1; } && [ -x "$_pixi_bindir/pixi" ]; then
   PATH="$_pixi_bindir:$PATH"
 fi
@@ -95,7 +135,7 @@ if [ -d "$_tl_dir" ]; then
 
   # Now incorporate the TL bin directory to PATH
   if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
-    update_env_var PATH "$_tl_bin_path" prepend
+    update_env_var PATH --prepend "$_tl_bin_path"
   else
     pupdate "$_tl_bin_path"
   fi
@@ -110,7 +150,7 @@ _mason_bindir="$_xdg_data_home/nvim/mason/bin"
 
 # mason_bindir may not exist yet if custom neovim config that uses mason is not yet activated
 if [ -n "$SH_FUNCTIONS_SOURCED" ] && ! command_exists "mason"; then
-  update_env_var PATH "$_mason_bindir" prepend
+  update_env_var PATH --prepend "$_mason_bindir"
 elif ! type "mason" > /dev/null 2>&1; then
   pupdate "$_mason_bindir"
 fi
@@ -125,7 +165,7 @@ if [ -d "$_brew_prefix_dir" ] && [ -z "$HOMEBREW_PREFIX" ]; then
   HOMEBREW_PREFIX="$_brew_prefix_dir"
   export HOMEBREW_PREFIX
   if [ -n "$SH_FUNCTIONS_SOURCED" ] && ! command_exists "brew"; then
-    update_env_var PATH "$HOMEBREW_PREFIX/bin" append
+    update_env_var PATH --append "$HOMEBREW_PREFIX/bin"
   elif ! type "brew" > /dev/null 2>&1; then
     pupdate "$HOMEBREW_PREFIX/bin"
   fi
@@ -391,7 +431,7 @@ CARGO_HOME="$_xdg_data_home/cargo" && export CARGO_HOME
 # Optionally, you could also prepend cargo bin to PATH if desired:
 # if [ -d "$CARGO_HOME/bin" ]; then
 #   if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
-#     update_env_var PATH "$CARGO_HOME/bin" prepend
+#     update_env_var PATH --prepend "$CARGO_HOME/bin"
 #   else
 #     pupdate "$CARGO_HOME/bin"
 #   fi
