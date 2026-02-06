@@ -17,6 +17,78 @@
 # [[ -f /etc/bash.bashrc ]] && source /etc/bash.bashrc
 # # )))
 
+# Set FIGNORE to suppress autocomplete for certain file extensions (((
+# https://stackoverflow.com/questions/32189015/can-i-make-tab-completion-filter-files-by-extension
+# https://unix.stackexchange.com/questions/166857/modify-bash-autocomplete-rule-to-exclude-particular-file-names
+
+###############################################################################
+# FIGNORE — Bash-only filename completion filter
+#
+# Notes:
+# - Matches suffixes only (no globs, no directories)
+# - Affects TAB completion, not globbing
+# - Safe to source in .bashrc / .bash_profile
+###############################################################################
+
+# Editor backups and autosaves
+#   ~            generic editor backups
+#   #, #~         Emacs autosave files
+#   .sw*          Vim / Neovim swap files
+#   .viminfo      Vim state
+#
+# OS junk
+#   .DS_Store     macOS Finder metadata
+#
+# Generic temporary, cache, and state files
+#   .bak/.old     patch & backup leftovers
+#   .tmp/.cache   temporary & cache files
+#   .log/.pid     logs and process IDs
+#
+# Native compiled artifacts
+#   .o/.obj       object files
+#   .a/.so/.dll   libraries
+#   .exe/.out     executables
+#   .core         crash dumps
+#
+# Language ecosystems
+#   JVM           .class .jar .war .ear
+#   Python        .pyc .pyo .pyd
+#   Ruby          .rbc .rbo .gem
+#   Erlang        .beam .ez
+#   Go            .go.build .test
+#
+# TeX / LaTeX auxiliary files
+#   .aux/.toc     references & contents
+#   .synctex*     SyncTeX
+#   .nav/.snm     Beamer
+#   .idx/.gls     indexes & glossaries
+#
+# Databases & binary data
+#   SQLite        .sqlite .db
+#   Columnar      .parquet .avro
+#
+# Archives & compressed files
+#   .zip/.tar     archives
+#   .gz/.xz       compression
+#
+# Disk images
+#   .iso/.img     images
+#   .qcow2/.vmdk  VM disks
+
+export FIGNORE="\
+~:#:#~:.swp:.swo:.swn:.swm:.swl:.vimrc~:.exrc:.viminfo:\
+.DS_Store:\
+.bak:.backup:.old:.orig:.rej:.tmp:.temp:.cache:.log:.trace:.pid:\
+.o:.obj:.lo:.la:.a:.so:.dylib:.dll:.exe:.out:.core:\
+.class:.jar:.war:.ear:.pyc:.pyo:.pyd:.rbc:.rbo:.gem:.beam:.ez:.go.build:.test:\
+.toc:.aux:.bbl:.blg:.lof:.lot:.fls:.fdb_latexmk:.synctex:.synctex.gz:\
+.nav:.snm:.vrb:.run.xml:.xdv:.dvi:.pdfsync:.idx:.ilg:.ind:.glg:.glo:.glsdefs:.mp:.mf:.mlf:.mlt:.mod:\
+.sqlitedb:.sqlite:.db:.db-journal:.parquet:.avro:\
+.zip:.tar:.tgz:.tbz:.txz:.gz:.bz2:.xz:.lz:.zst:\
+.iso:.img:.qcow2:.vmdk"
+
+# )))
+
 # # Set bash HISTFILE (overrides the setting in ~/.profile for bash shells) (((
 _xdg_state_home="$HOME/.local/state"
 _bash_histdir="$_xdg_state_home/bash"

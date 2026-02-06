@@ -1,7 +1,7 @@
 # vim: ft=sh:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=145:syntax=sh:
 # shellcheck shell=sh
 # shellcheck disable=SC1091
-# ~/.profile checked Dec 15, 2025
+# ~/.profile checked Feb 06, 2026
 
 # Source common posix-compliant helper functions if possible (((
 if [ -f "$HOME/.config/sh/sh_functions.sh" ]; then
@@ -10,65 +10,25 @@ if [ -f "$HOME/.config/sh/sh_functions.sh" ]; then
 fi
 # )))
 
-# pupdate() function (((
-# ============================================================
-# pupdate: POSIX-safe PATH updater with flags and batch entries
-# - canonicalizes entries (removes trailing slash)
-# - deduplicates existing PATH entries
-# - supports --prepend (default) or --append
-# - supports multiple entries in one call
-# ============================================================
-
-pupdate() {
-    [ $# -gt 0 ] || return 0        # nothing to do if no arguments
-
-    # default mode
-    mode="prepend"
-
-    # parse optional flags
-    while [ $# -gt 0 ]; do
-        case "$1" in
-            --prepend) mode="prepend"; shift ;;
-            --append)  mode="append"; shift ;;
-            --) shift; break ;;       # end of flags
-            --*) echo "Unknown flag: $1" >&2; return 1 ;;
-            *) break ;;                # first non-flag argument
-        esac
-    done
-
-    [ $# -gt 0 ] || return 0        # no PATH entries left after flags
-
-    new_entries=""
-    for val in "$@"; do
-        entry=${val%/}               # strip trailing slash
-        [ -n "$entry" ] || continue  # skip empty
-        # skip if already in PATH
-        case ":$PATH:" in
-            *:"$entry":*) continue ;;
-        esac
-        # build new_entries list
-        new_entries="${new_entries:+$new_entries:}$entry"
-    done
-
-    [ -z "$new_entries" ] && return 0  # nothing new to add
-
-    # prepend or append
-    case "$mode" in
-        append) PATH="${PATH:+$PATH:}$new_entries" ;;
-        prepend|*) PATH="$new_entries${PATH:+:$PATH}" ;;
-    esac
-}
-# )))
-
-# Prepend "~/.local/bin" to PATH (((
+# Prepend "~/.local/bin" to PATH (irrespective of whether it exists to be ready to go) (((
 _local_bindir="$HOME/.local/bin"
-if [ -d "$_local_bindir" ]; then
-  if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
-    update_env_var PATH --prepend "$_local_bindir"
-  else
-    pupdate "$_local_bindir"
-  fi
+# if [ -d "$_local_bindir" ]; then
+if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
+  update_env_var PATH --prepend "$_local_bindir"
+else
+  case ":${PATH-}:" in
+    *:"$_local_bindir":*)
+      ;; # already present
+    *)
+      if [ -z "${PATH-}" ]; then
+        PATH="$_local_bindir"
+      else
+        PATH="$_local_bindir:$PATH"
+      fi
+      ;;
+  esac
 fi
+# fi
 unset _local_bindir
 # )))
 
@@ -91,53 +51,78 @@ unset _luarocks_config_file
 
 _luarocks_bindir="$_xdg_data_home/luarocks/bin"
 if [ -d "$_luarocks_bindir" ]; then
-  # if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
-  #   echo "$_luarocks_bindir"
-  #   update_env_var PATH --append "$_luarocks_bindir"
-  # else
-    pupdate "$_luarocks_bindir"
-  # fi
+  if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
+    update_env_var PATH --append "$_luarocks_bindir"
+  else
+    case ":${PATH-}:" in
+      *:"$_luarocks_bindir":*) ;;
+      *)
+        if [ -z "${PATH-}" ]; then
+          PATH="$_luarocks_bindir"
+        else
+          PATH="${PATH}:$_luarocks_bindir"
+        fi
+        ;;
+    esac
+  fi
 fi
 unset _luarocks_bindir
 # )))
 
 # Pixi Configuration (((
-# PIXI_HOME should be set prior to the installation of pixi (((
+# PIXI_HOME to be set prior to the installation of pixi (((
 PIXI_HOME="$_xdg_config_home/pixi"
 export PIXI_HOME
 # )))
 
 # Prepend $PIXI_HOME/bin to PATH if the pixi command does not already exist (((
 _pixi_bindir="$PIXI_HOME/bin"
-if [ -n "$SH_FUNCTIONS_SOURCED" ] && ! command_exists "pixi" && command_exists "$_pixi_bindir/pixi"; then
-  update_env_var PATH --prepend "$_pixi_bindir"
-elif ! { type "pixi" > /dev/null 2>&1; } && [ -x "$_pixi_bindir/pixi" ]; then
-  PATH="$_pixi_bindir:$PATH"
+if ! command -v "pixi" > /dev/null 2>&1 && [ -x "$_pixi_bindir/pixi" ]; then
+  if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
+    update_env_var PATH --prepend "$_pixi_bindir"
+  else
+    case ":${PATH-}:" in
+      *:"$_pixi_bindir":*) ;;
+      *)
+        if [ -z "${PATH-}" ]; then
+          PATH="$_pixi_bindir"
+        else
+          PATH="$_pixi_bindir:$PATH"
+        fi
+        ;;
+    esac
+  fi
 fi
 unset _pixi_bindir
 # )))
 # )))
 
-# Append TexLive directories to PATH (and optionally INFOPATH) (((
+# Prepend TexLive directories to PATH (and optionally INFOPATH) (((
 # NOTE: the `date` command is POSIX compliant and portable across POSIX shells
 _tl_year=$(date '+%Y') && _tl_dir="$HOME/.local/texlive/$_tl_year"
 unset _tl_year
 if [ -d "$_tl_dir" ]; then
-  _arch_os_info=$(uname -a)
-
   # Extract the OS and Architecture using strict POSIX parameter expansion
-  _ARCH="${_arch_os_info##* }"         # Last word (Architecture)
-  _OS="${_arch_os_info%% *}"           # First word (OS)
-  unset _arch_os_info
+  _ARCH=$(uname -m)
+  _OS=$(uname -s)
 
   _tl_bin_path="$_tl_dir/bin/$_ARCH-$_OS"
   unset _ARCH _OS
 
   # Now incorporate the TL bin directory to PATH
-  if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
+  if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
     update_env_var PATH --prepend "$_tl_bin_path"
   else
-    pupdate "$_tl_bin_path"
+    case ":${PATH-}:" in
+      *:"$_tl_bin_path":*) ;;
+      *)
+        if [ -z "${PATH-}" ]; then
+          PATH="$_tl_bin_path"
+        else
+          PATH="$_tl_bin_path:$PATH"
+        fi
+        ;;
+    esac
   fi
 
   unset _tl_bin_path
@@ -149,36 +134,66 @@ unset _tl_dir
 _mason_bindir="$_xdg_data_home/nvim/mason/bin"
 
 # mason_bindir may not exist yet if custom neovim config that uses mason is not yet activated
-if [ -n "$SH_FUNCTIONS_SOURCED" ] && ! command_exists "mason"; then
-  update_env_var PATH --prepend "$_mason_bindir"
-elif ! type "mason" > /dev/null 2>&1; then
-  pupdate "$_mason_bindir"
+# However, we will still incorporate mason bindir into PATH ready whenever mason/neovim is installed
+if ! command -v "mason" > /dev/null 2>&1; then
+  if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
+    update_env_var PATH --prepend "$_mason_bindir"
+  else
+    case ":${PATH-}:" in
+      *:"$_mason_bindir":*) ;;
+      *)
+        if [ -z "${PATH-}" ]; then
+          PATH="$_mason_bindir"
+        else
+          PATH="$_mason_bindir:$PATH"
+        fi
+        ;;
+    esac
+  fi
 fi
 
 unset _mason_bindir
 # )))
 
-# Append Homebrew to PATH (((
-# Set HOMEBREW_PREFIX if brew is installed and custom location exists
+# Configuration for Homebrew (((
+
+# Set HOMEBREW_PREFIX if it is not already set and the custom directory exists (((
 _brew_prefix_dir="$HOME/.local/opt/brew"
-if [ -d "$_brew_prefix_dir" ] && [ -z "$HOMEBREW_PREFIX" ]; then
+if [ -z "$HOMEBREW_PREFIX" ] && [ -d "$_brew_prefix_dir" ]; then
   HOMEBREW_PREFIX="$_brew_prefix_dir"
   export HOMEBREW_PREFIX
-  if [ -n "$SH_FUNCTIONS_SOURCED" ] && ! command_exists "brew"; then
+fi
+unset _brew_prefix_dir
+# )))
+
+# Append Homebrew to PATH (((
+if ! command -v "brew" > /dev/null 2>&1 && [ -n "$HOMEBREW_PREFIX" ]; then
+  if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
     update_env_var PATH --append "$HOMEBREW_PREFIX/bin"
-  elif ! type "brew" > /dev/null 2>&1; then
-    pupdate "$HOMEBREW_PREFIX/bin"
+  else
+    case ":${PATH-}:" in
+      *:"$HOMEBREW_PREFIX/bin":*) ;;
+      *)
+        if [ -z "${PATH-}" ]; then
+          PATH="$HOMEBREW_PREFIX/bin"
+        else
+          PATH="${PATH}:$HOMEBREW_PREFIX/bin"
+        fi
+        ;;
+    esac
   fi
 fi
 # )))
 
 # )))
 
-# Set various environment variables provided by shell (can refer to external tools where available) (((
+# )))
+
+# Set various environment variables provided by POSIX sh (can refer to external tools where available) (((
 
 # Set VISUAL, EDITOR and SUDO_EDITOR (((
 # List of preferred editors in order of preference
-_editor_priority_list="nvim vim vi nano"
+_editor_priority_list="nvim vim vi emacs nano"
 
 # Save the current IFS to restore later
 _old_ifs="$IFS"
@@ -187,14 +202,14 @@ _old_ifs="$IFS"
 IFS=" "
 
 # Trim leading and trailing spaces from the list
-if type "trim_spaces" > /dev/null 2>&1; then
+if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v trim_spaces >/dev/null 2>&1; then
   _editor_priority_list=$(trim_spaces "$_editor_priority_list")
 fi
 
 # Try to find the first available editor in the list
-for editor in "$_editor_priority_list"; do
+for editor in $_editor_priority_list; do
   # Check if the editor exists and is executable
-  if { command_exists "editor"  >/dev/null 2>&1; } || { type "$editor" >/dev/null 2>&1;}; then
+  if command -v "$editor" >/dev/null 2>&1; then
     VISUAL="$editor"  # Set VISUAL to the first available editor's name
     break
   fi
@@ -215,51 +230,7 @@ export VISUAL EDITOR SUDO_EDITOR
 unset _editor_priority_list
 # )))
 
-# Set FIGNORE to suppress autocomplete for certain file extensions (((
-# https://stackoverflow.com/questions/32189015/can-i-make-tab-completion-filter-files-by-extension
-# https://unix.stackexchange.com/questions/166857/modify-bash-autocomplete-rule-to-exclude-particular-file-names
-
-# Ignore common temporary, backup, build, editor, and TeX auxiliary files
-FIGNORE=".DS_Store:\
-  .git:.hg:.svn:.bzr:.fslckout:.cvs:\
-  .aux:.bbl:.blg:.toc:.out:.lof:.lot:.fls:.fdb_latexmk:.synctex.gz:.synctex:\
-  .xdv:.nav:.snm:.vrb:.run.xml:.dvi:.pdfsync:.brf:.auxlock:.ilg:.ind:.idx:.glg:.glo:.gls:.glsdefs:.gaux:.loa:.lol:.ltjruby:.luac:.lx64fsl:.maf:.mf:.mlf:.mlt:.mod:.mp:.mw:.nav:.nlg:.nlo:.nls:.pax:.pdfpc:.pre:.pyg:.pytxcode:.save:.sympy:.texpadtmp:.tdo:.ttt:.upa:.upb:.ver:.wrt:.xdy:.xyc:\
-  .tmp:.swp:.swo:.bak:.backup:.old:.orig:.rej:\
-  .o:.obj:.so:.dll:.pyc:.pyo:.rbc:.rbo:.class:\
-  # Emacs lock files
-.#*:\
-  # Vim and NeoVim swap files
-.viminfo:.exrc:.vimrc~:\
-  # JetBrains IDE files
-.idea:*.iml:*.ipr:*.iws:\
-  # Visual Studio files
-*.user:*.suo:*.userosscache:\
-  # Eclipse files
-.project:.classpath:.settings/:
-# Xcode files
-.xcodeproj:.xcworkspace:*.xcuserstate:\
-  # Node.js dependencies
-node_modules/:\
-  # Python bytecode and cache
-*.pyd:*.pyo:*.pyc:\
-  # Java class and bytecode files
-*.class:*.jar:*.war:*.ear:\
-  # Ruby gem and bytecode files
-*.gem:.rbc:.rbo:\
-  # PHP archive and temporary files
-*.phar:*.phtml:\
-  # SQLite and database files
-*.sqlite:*.db:*.db-journal:*.sqlitedb:\
-  # Cache directories
-.cache/:.thumb/:\
-  # Configuration files
-*.cfg:*.conf:*.json:.env"
-
-export FIGNORE
-
-# )))
-
-# Set POSIX sh HISTFILE (may be overridden in shell-specific startup files) (((
+# Set HISTFILE for POSIX sh (may be overridden in other shell-specific startup files) (((
 _sh_histdir="$_xdg_state_home/sh"
 if ! [ -d "$_sh_histdir" ]; then
   mkdir -p "$_sh_histdir"
@@ -290,23 +261,23 @@ unset _inputrc
 # Add color in manpages for less https://unix.stackexchange.com/questions/149614/less-command-change-color-of-and-end
 # ------------------- LESS Color and Appearance -------------------
 # ANSI sequences for text formatting in less
-LESS_TERMCAP_mb=$'\E[01;31m' && export LESS_TERMCAP_mb # blinking?
-LESS_TERMCAP_md=$'\E[01;31m' && export LESS_TERMCAP_md # bold?
-LESS_TERMCAP_me=$'\E[0m' && export LESS_TERMCAP_me     # end mode?
-LESS_TERMCAP_se=$'\E[0m' && export LESS_TERMCAP_se     # end standout-mode?
-LESS_TERMCAP_so=$'\E[30;42m' && export LESS_TERMCAP_so # statusbar background colour for 'more/less'
-LESS_TERMCAP_ue=$'\E[0m' && export LESS_TERMCAP_ue     # end underline?
-LESS_TERMCAP_us=$'\E[01;32m' && export LESS_TERMCAP_us # underscore?
+ESC="$(printf '\033')"
+LESS_TERMCAP_mb="${ESC}[01;31m" && export LESS_TERMCAP_mb
+LESS_TERMCAP_md="${ESC}[01;31m" && export LESS_TERMCAP_md
+LESS_TERMCAP_me="${ESC}[0m"    && export LESS_TERMCAP_me
+LESS_TERMCAP_se="${ESC}[0m"    && export LESS_TERMCAP_se
+LESS_TERMCAP_so="${ESC}[30;42m" && export LESS_TERMCAP_so
+LESS_TERMCAP_ue="${ESC}[0m"    && export LESS_TERMCAP_ue
+LESS_TERMCAP_us="${ESC}[01;32m" && export LESS_TERMCAP_us
+unset ESC
 # export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_me \
   # LESS_TERMCAP_se LESS_TERMCAP_so LESS_TERMCAP_ue LESS_TERMCAP_us
 
 # ------------------- LESS and Bat Integration -------------------
 # Set batpipe location if bat & batpipe are available (((
 _batpipe_location=
-if [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "bat" && command_exists "batpipe"; then
-  _batpipe_location="$(type -p batpipe)"
-elif { type "bat" > /dev/null 2>&1; } && { type "batpipe" > /dev/null 2>&1; }; then
-  _batpipe_location="$(type -p batpipe)"
+if command -v "bat" > /dev/null 2>&1 && command -v "batpipe" > /dev/null 2>&1; then
+  _batpipe_location="$(command -v batpipe)"
 fi
 # )))
 
@@ -317,10 +288,10 @@ if [ -n "$_batpipe_location" ]; then  # use batpipe for LESSOPEN if found in pat
   unset LESSCLOSE
   BATPIPE="color"
   export BATPIPE
-elif { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "lesspipe"; } || { type "lesspipe" > /dev/null 2>&1; }; then
-  LESSOPEN="|$(type -p lesspipe) %s"
-elif { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "lesspipe.sh"; } || { type "lesspipe.sh" > /dev/null 2>&1; }; then
-  LESSOPEN="|$(type -p lesspipe.sh) %s"
+elif command -v "lesspipe" > /dev/null 2>&1; then
+  LESSOPEN="|$(command -v lesspipe) %s"
+elif command -v "lesspipe.sh" > /dev/null 2>&1; then
+  LESSOPEN="|$(command -v lesspipe.sh) %s"
 fi
 export LESSOPEN
 unset _batpipe_location
@@ -345,7 +316,7 @@ export LESS LESSHISTFILE
 # )))
 
 # Set locale-related environment variables for UTF-8 terminal support (((
-LANG="en_GB.UTF-8" # Set language and character encoding
+LANG="en_GB.UTF-8"         # Set language and character encoding
 LC_COLLATE="C"             # Use C locale for sorting (e.g., for programming or POSIX tools)
 LC_CTYPE="en_GB.UTF-8"     # Character classification and conversion (UTF-8 for character types)
 LC_MESSAGES="en_GB.UTF-8"  # Messages and user interface text
@@ -378,7 +349,7 @@ export MANROFFOPT
 # )))
 
 # Set READER/PDFVIEWER etc (((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "zathura"; } || { type "zathura" > /dev/null 2>&1; }; then
+if command -v "zathura" > /dev/null 2>&1; then
   PDFVIEWER="zathura"
   ASYMPTOTE_PDFVIEWER="$PDFVIEWER"
   PDFVIEWER_texdoc="$PDFVIEWER"
@@ -391,8 +362,8 @@ fi
 # )))
 
 
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "tmc"; } || { type "tmc" > /dev/null 2>&1; }; then
-  TMC_LANGS_CONFIG_DIR='/home/demo/.config/tmc-config'
+if command -v "tmc" > /dev/null 2>&1; then
+  TMC_LANGS_CONFIG_DIR="$HOME/.config/tmc-config"
   export TMC_LANGS_CONFIG_DIR
 fi
 
@@ -424,23 +395,23 @@ export BUN_INSTALL
 
 # ------------------- Cargo (Rust) Environment -------------------(((
 # Set Cargo home directory
-# if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "cargo"; } || { type "cargo" > /dev/null 2>&1; }; then
+# if command -v "cargo" > /dev/null 2>&1; then
 CARGO_HOME="$_xdg_data_home/cargo" && export CARGO_HOME
 # fi
 
 # Optionally, you could also prepend cargo bin to PATH if desired:
 # if [ -d "$CARGO_HOME/bin" ]; then
-#   if [ -n "$SH_FUNCTIONS_SOURCED" ]; then
+#   if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
 #     update_env_var PATH --prepend "$CARGO_HOME/bin"
 #   else
-#     pupdate "$CARGO_HOME/bin"
+#     PATH="$CARGO_HOME/bin:$PATH"
 #   fi
 # fi
 # )))
 
 # ------------------- Docker Environment (with detection) ------------------- (((
 # Only set Docker environment if `docker` command exists
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "docker"; } || { type "docker" > /dev/null 2>&1; }; then
+if command -v "docker" > /dev/null 2>&1; then
   # Set Docker configuration directory
   DOCKER_CONFIG="$_xdg_config_home/docker"
   export DOCKER_CONFIG
@@ -571,20 +542,19 @@ if [ "${COLORTERM-}" = "truecolor" ] || [ "${COLORTERM-}" = "24bit" ]; then
   # ------------------- Truecolor 24-bit GCC_COLORS -------------------
   # Format: 38;2;<R>;<G>;<B> foreground, 48;2;<R>;<G>;<B> background
   GCC_COLORS="\
-    error=38;2;255;0;0:warning=38;2;255;165;0:note=38;2;0;255;255:\
-    range1=38;2;0;255;0:range2=38;2;0;0;255:locus=38;2;255;255;0:\
-    quote=38;2;255;0;255:path=38;2;0;255;255:fixit-insert=38;2;0;200;0:fixit-delete=38;2;200;0;0:\
-    diff-filename=38;2;255;255;255:diff-hunk=38;2;0;255;0:diff-delete=38;2;255;0;0:diff-insert=38;2;0;255;0:\
-    type-diff=38;2;0;255;255"
+error=38;2;255;0;0:warning=38;2;255;165;0:note=38;2;0;255;255:\
+range1=38;2;0;255;0:range2=38;2;0;0;255:locus=38;2;255;255;0:\
+quote=38;2;255;0;255:path=38;2;0;255;255:fixit-insert=38;2;0;200;0:fixit-delete=38;2;200;0;0:\
+diff-filename=38;2;255;255;255:diff-hunk=38;2;0;255;0:diff-delete=38;2;255;0;0:diff-insert=38;2;0;255;0:\
+type-diff=38;2;0;255;255"
 else
   # ------------------- Fallback to Classic 16-Color ANSI -------------------
   GCC_COLORS="\
-    error=01;31:warning=01;35:note=01;36:range1=32:range2=34:locus=01:\
-    quote=01:path=01;36:fixit-insert=32:fixit-delete=31:\
-    diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32:\
-    type-diff=01;32"
+error=01;31:warning=01;35:note=01;36:range1=32:range2=34:locus=01:\
+quote=01:path=01;36:fixit-insert=32:fixit-delete=31:\
+diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32:\
+type-diff=01;32"
 fi
-export GCC_COLORS
 
 # Explanation of Key Fields:
 # - error / warning / note: Highlight GCC diagnostics in red, orange, cyan
@@ -617,15 +587,15 @@ fi
 # )))
 
 # Use 'difft' as Git external diff tool if available (((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "difft"; } || { type "difft" > /dev/null 2>&1; }; then
-  GIT_EXTERNAL_DIFF=$(type -p difft)
+if command -v "difft" > /dev/null 2>&1; then
+  GIT_EXTERNAL_DIFF=$(command -v difft)
   export GIT_EXTERNAL_DIFF
 fi
 # )))
 
 # Git Pager Setup -------------------(((
 # Prefer 'bat' as Git pager if available, fallback to 'less'
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "bat"; } || { type "bat" > /dev/null 2>&1; }; then
+if command -v "bat" > /dev/null 2>&1; then
   # Use bat for Git output with plain style and header
   GIT_PAGER="bat --style=plain,header"
 else
@@ -638,14 +608,13 @@ export GIT_PAGER
 
 # ------------------- Go Environment ------------------ (((
 # Set GOCACHE, GOMODCACHE, and GOPATH to user-specific directories
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "go"; } || { type "go" > /dev/null 2>&1; }; then
+if command -v "go" > /dev/null 2>&1; then
   GOCACHE="$_xdg_state_home/go/go-build"
   GOMODCACHE="$_xdg_state_home/go/mod"
   GOPATH="$_xdg_data_home/go"
   export GOCACHE GOMODCACHE GOPATH  # Export all Go-related environment variables in one step
 fi
 # )))
-
 
 # ------------------- Java Environment (((
 _JAVA_OPTIONS=-Djava.util.prefs.userRoot="$_xdg_config_home/java"
@@ -687,12 +656,13 @@ if [ -f "$_npmrc" ]; then
   NPM_CONFIG_USERCONFIG="$_npmrc"
   export NPM_CONFIG_USERCONFIG
 fi
+unset _npmrc
 # )))
 # )))
 
 # ------------------- Python Configuration ------------------- (((
 # Set PYTHONSTARTUP if the user has a custom Python startup script
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && { command_exists "python" || command_exists "python3" ; } } || { type "python" > /dev/null 2>&1 || type "python3" > /dev/null 2>&1 ; }; then
+if command -v "python" > /dev/null 2>&1 || command -v "python3" > /dev/null 2>&1; then
 
   _pythonrc="$_xdg_config_home/python/pythonrc"
   if [ -f "$_pythonrc" ]; then
@@ -717,14 +687,14 @@ fi
 
 # ------------------- Qt6 Configuration Tool ------------------- (((
 # Set Qt platform theme if qt6ct is available
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "qt6ct"; } || { type "qt6ct" > /dev/null 2>&1; }; then
+if command -v "qt6ct" > /dev/null 2>&1; then
   QT_QPA_PLATFORMTHEME="qt6ct"
   export QT_QPA_PLATFORMTHEME
 fi
 # )))
 
 # ------------------- Ripgrep Configuration Directory ------------------- (((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "rg"; } || { type "rg" > /dev/null 2>&1; }; then
+if command -v "rg" > /dev/null 2>&1; then
   _ripgrep_config_file="$_xdg_config_home/ripgrep/config"
   if [ -f "$_ripgrep_config_file" ]; then
     RIPGREP_CONFIG_PATH="$_ripgrep_config_file"
@@ -735,14 +705,14 @@ fi
 # )))
 
 # ------------------- rlwrap Home Directory ------------------- (((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "rlwrap"; } || { type "rlwrap" > /dev/null 2>&1; }; then
+if command -v "rlwrap" > /dev/null 2>&1; then
   RLWRAP_HOME="$_xdg_data_home/rlwrap"
   export RLWRAP_HOME
 fi
 # )))
 
 # ------------------- Ruff Cache Directory ------------------- (((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "ruff"; } || { type "ruff" > /dev/null 2>&1; }; then
+if command -v "ruff" > /dev/null 2>&1; then
   RUFF_CACHE_DIR="$_xdg_state_home/ruff"  # Set Ruff cache directory
   export RUFF_CACHE_DIR
 fi
@@ -754,7 +724,7 @@ export RUSTUP_HOME
 # )))
 
 # ------------------- Sagemath Configuration -------------------(((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "sage"; } || { type "sage" > /dev/null 2>&1; }; then
+if command -v "sage" > /dev/null 2>&1; then
   DOT_SAGE="$XDG_CONFIG_HOME"/sage
   export DOT_SAGE
 fi
@@ -762,7 +732,7 @@ fi
 
 # ------------------- GNU Screen Configuration -------------------(((
 # Set user-specific screen configuration and socket directory if screen exists
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "screen"; } || { type "screen" > /dev/null 2>&1; }; then
+if command -v "screen" > /dev/null 2>&1; then
   _screenrc="$_xdg_config_home/screen/screenrc"
   if [ -f "$_screenrc" ]; then
     SCREENRC="$_screenrc"
@@ -774,15 +744,15 @@ fi
 # )))
 
 # ------------------- Singularity-CE Configuration ------------------ (((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "singularity"; } || { type "singularity" > /dev/null 2>&1; }; then
+if command -v "singularity" > /dev/null 2>&1; then
   SINGULARITY_CONFIGDIR="$_xdg_config_home/singularity"
   SINGULARITY_CACHEDIR="$_xdg_cache_home/singularity"
-  export SINGULARITY_CACHEDIR SINGULARITY_CACHEDIR
+  export SINGULARITY_CONFIGDIR SINGULARITY_CACHEDIR
 fi
 # )))
 
 # ------------------- TexLive Configuration ------------------ (((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "pdflatex"; } || { type "pdflatex" > /dev/null 2>&1; }; then
+if command -v "pdflatex" > /dev/null 2>&1; then
   TEXMFHOME="$_xdg_data_home/texmf"
   TEXMFVAR="$_xdg_cache_home/texlive/texmf-var"
   TEXMFCONFIG="$_xdg_config_home/texlive/texmf-config"
@@ -791,7 +761,7 @@ fi
 # )))
 
 # ------------------- Vagrant Configuration ------------------ (((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "vagrant"; } || { type "vagrant" > /dev/null 2>&1; }; then
+if command -v "vagrant" > /dev/null 2>&1; then
   _vagrant_home="$_xdg_data_home/vagrant"
   VAGRANT_HOME="$_vagrant_home"
   VAGRANT_ALIAS_FILE="$_vagrant_home/aliases"
@@ -802,7 +772,7 @@ fi
 
 # ------------------- w3m Configuration ------------------ (((
 # Set user-specific w3m config directory if w3m exists
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "w3m"; } || { type "w3m" > /dev/null 2>&1; }; then
+if command -v "w3m" > /dev/null 2>&1; then
   W3M_DIR="$_xdg_state_home/w3m"
   export W3M_DIR
 fi
@@ -810,7 +780,7 @@ fi
 
 # ------------------- wget Configuration ------------------- (((
 # Use user-specific wgetrc if both the config and HSTS cache exist
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "wget"; }; then # || { type "wget" > /dev/null 2>&1; }; then
+if command -v "wget" > /dev/null 2>&1; then
   _wget_config_file="$_xdg_config_home/wget/wgetrc"
   if [ -f "$_wget_config_file" ] && [ -f "$_xdg_cache_home/wget-hsts" ]; then
     WGETRC="$_wget_config_file"
@@ -823,48 +793,52 @@ fi
 # )))
 
 # SSH Agent Setup -------------------(((
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "ssh-agent"; } || { type "ssh-agent" > /dev/null 2>&1; }; then  # First check if the `ssh-agent` command exists in PATH
-  _ssh_keys_to_add="$HOME/.ssh/id_ed25519_nov13_2025 $HOME/.ssh/id_ed25519"  # (space-separated list)
+if command -v "ssh-agent" > /dev/null 2>&1; then
 
-  # # strip out the keys which do not exist from _ssh_keys_to_add (((
-  # _valid_ssh_keys_for_keychain=
-  # for _key in $_ssh_keys_to_add; do
-  #   if [ -f "$_key" ] && [ -f "$_key.pub" ]; then
-  #     if [ -z "$_valid_ssh_keys_for_keychain" ]; then
-  #       _valid_ssh_keys_for_keychain=$_key
-  #     else
-  #       _valid_ssh_keys_for_keychain="$_valid_ssh_keys_for_keychain $_key"
-  #       fi
-  #   fi
-  # done
-  #
-  # _ssh_keys_to_add=$_valid_ssh_keys_for_keychain
-  # unset _valid_ssh_keys_for_keychain _key
-  # # )))
+  # Space-separated list of keys we want loaded
+  _ssh_keys_to_add="$HOME/.ssh/id_ed25519_nov13_2025 $HOME/.ssh/id_ed25519"
 
-  # prefer keychain if available, else fall back to (ssh-agent + ssh-add) (((
-  if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "keychain"; } || { type "keychain" > /dev/null 2>&1; }; then
-    eval "$(keychain --absolute --dir "$XDG_RUNTIME_DIR"/keychain --confallhosts --ignore-missing --nogui --ssh-allow-forwarded --quiet --systemd $_ssh_keys_to_add)"
+  # Strip out keys which do not exist
+  _valid_ssh_keys_for_keychain=""
+  for _key in $_ssh_keys_to_add; do
+    if [ -f "$_key" ] && [ -f "$_key.pub" ]; then
+      if [ -z "$_valid_ssh_keys_for_keychain" ]; then
+        _valid_ssh_keys_for_keychain="$_key"
+      else
+        _valid_ssh_keys_for_keychain="$_valid_ssh_keys_for_keychain $_key"
+      fi
+    fi
+  done
+  _ssh_keys_to_add="$_valid_ssh_keys_for_keychain"
+  unset _valid_ssh_keys_for_keychain _key
 
-  else  # only basic ssh-agent is available (no keychain) (((
-    [ -z "$SSH_AUTH_SOCK" ] && eval "$(ssh-agent -s)" >/dev/null  # Start the ssh-agent
+  # Prefer keychain if available, else fallback to ssh-agent + ssh-add
+  if command -v "keychain" > /dev/null 2>&1; then
 
-    if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "ssh-add"; } || { type "ssh-add" > /dev/null 2>&1; }; then
-      set -- "$_ssh_keys_to_add"  # Set positional parameters based on the space-separated string
+    eval "$(keychain --absolute --dir "$XDG_RUNTIME_DIR"/keychain \
+      --confallhosts --ignore-missing --nogui --ssh-allow-forwarded --quiet --systemd \
+      $_ssh_keys_to_add)"
 
-      # Add each ssh key one by one (((
+  else
+
+    # Start ssh-agent only if not already running
+    [ -z "$SSH_AUTH_SOCK" ] && eval "$(ssh-agent -s)" >/dev/null
+
+    # Add each valid key
+    if command -v "ssh-add" > /dev/null 2>&1; then
+      set -- $_ssh_keys_to_add
       while [ $# -gt 0 ]; do
         _current_ssh_key="$1"
         [ -f "$_current_ssh_key" ] && ssh-add "$_current_ssh_key" >/dev/null 2>&1
-        shift # Look at the next parameter
+        shift
       done
-    fi  # end of ssh-add step )))
-    # )))
-  fi # )))
+    fi
+
+  fi
 
   unset _ssh_keys_to_add
-fi
 
+fi
 # )))
 
 # Unset variables local to this file (((
@@ -872,7 +846,7 @@ unset _xdg_state_home _xdg_data_home _xdg_cache_home _xdg_config_home
 unset SH_FUNCTIONS_SOURCED
 # )))
 
-# Some intersting tools (((
+# Some interesting tools (((
 # ---------------------
 # https://calcurse.org/
 # https://github.com/get-iplayer/get_iplayer/
