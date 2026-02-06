@@ -3,6 +3,19 @@ type = "file"
 url = "https://raw.githubusercontent.com/cykerway/complete-alias/refs/heads/master/complete_alias"
 refreshPeriod = "168h"
 
+# [".local/bin/rcalc"]
+# type = "archive-file"
+# executable = true
+# format = "tar"
+# path = "rcalc.linux.release.x86_64.termonly"
+# url = "https://git.sr.ht/~jamis/rcalc/refs/download/v2.1.1/RCalc_Linux_TermOnly.tar.gz"
+# refreshPeriod = "168h"
+
+[".local/bin/rpncalc.jar"]
+type = "file"
+url = "https://github.com/frossm/rpncalc/releases/latest/download/rpncalc.jar"
+refreshPeriod = "168h"
+
 [".config/astronvim"]
 type = "git-repo"
 url = "git@github.com:krishnakumarg1984/astronvim_config.git"

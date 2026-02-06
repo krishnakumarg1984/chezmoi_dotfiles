@@ -5,6 +5,11 @@ channels = ["conda-forge"]
 dependencies = { biome = "*", croc = "*", fx = "*", goawk = "*", jinja-lsp = "*", jnv = "*", jq = "*", jupyter = "*", make = "*", markdown-oxide = "*", mdslw = "*", selene = "*", terraform-ls = "*", treefmt = "*", typos-lsp = "*", yj = "*", zk = "*" }
 exposed = { biome = "biome", croc = "croc", fx = "fx", goawk = "goawk", jinja-lsp = "jinja-lsp", jnv = "jnv", jq = "jq", jupyter = "jupyter", make = "make", markdown-oxide = "markdown-oxide", mdslw = "mdslw", selene = "selene", terraform-ls = "terraform-ls", treefmt = "treefmt", typos-lsp = "typos-lsp", yj = "yj", zk = "zk" }
 
+[envs.pixi_global_env_clang]
+channels = ["conda-forge"]
+dependencies = { clang = "*", clang-tools = "*" }
+exposed = { amdgpu-arch = "amdgpu-arch", analyze-build = "analyze-build", c-index-test = "c-index-test", clang = "clang", clang-apply-replacements = "clang-apply-replacements", clang-apply-replacements-21 = "clang-apply-replacements-21", clang-change-namespace = "clang-change-namespace", clang-change-namespace-21 = "clang-change-namespace-21", clang-check = "clang-check", clang-check-21 = "clang-check-21", clang-cl = "clang-cl", clang-cpp = "clang-cpp", clang-doc = "clang-doc", clang-doc-21 = "clang-doc-21", clang-extdef-mapping = "clang-extdef-mapping", clang-extdef-mapping-21 = "clang-extdef-mapping-21", clang-include-cleaner = "clang-include-cleaner", clang-include-cleaner-21 = "clang-include-cleaner-21", clang-include-fixer = "clang-include-fixer", clang-include-fixer-21 = "clang-include-fixer-21", clang-installapi = "clang-installapi", clang-installapi-21 = "clang-installapi-21", clang-linker-wrapper = "clang-linker-wrapper", clang-linker-wrapper-21 = "clang-linker-wrapper-21", clang-move = "clang-move", clang-move-21 = "clang-move-21", clang-nvlink-wrapper = "clang-nvlink-wrapper", clang-nvlink-wrapper-21 = "clang-nvlink-wrapper-21", clang-offload-bundler = "clang-offload-bundler", clang-offload-bundler-21 = "clang-offload-bundler-21", clang-offload-packager = "clang-offload-packager", clang-offload-packager-21 = "clang-offload-packager-21", clang-query = "clang-query", clang-query-21 = "clang-query-21", clang-refactor = "clang-refactor", clang-refactor-21 = "clang-refactor-21", clang-reorder-fields = "clang-reorder-fields", clang-reorder-fields-21 = "clang-reorder-fields-21", clang-repl = "clang-repl", clang-repl-21 = "clang-repl-21", clang-scan-deps = "clang-scan-deps", clang-scan-deps-21 = "clang-scan-deps-21", clang-sycl-linker = "clang-sycl-linker", clang-sycl-linker-21 = "clang-sycl-linker-21", clang-tidy = "clang-tidy", clang-tidy-21 = "clang-tidy-21", clangd = "clangd", diagtool = "diagtool", find-all-symbols = "find-all-symbols", git-clang-format = "git-clang-format", hmaptool = "hmaptool", intercept-build = "intercept-build", modularize = "modularize", nvptx-arch = "nvptx-arch", offload-arch = "offload-arch", pp-trace = "pp-trace", run-clang-tidy = "run-clang-tidy", scan-build = "scan-build", scan-build-py = "scan-build-py", scan-view = "scan-view" }
+
 [envs.pixi_global_env_cmake]
 channels = ["conda-forge"]
 dependencies = { cmake = "*" }
@@ -14,6 +19,11 @@ exposed = { ccmake = "ccmake", cmake = "cmake", cpack = "cpack", ctest = "ctest"
 channels = ["conda-forge"]
 dependencies = { cppcheck = "*" }
 exposed = { cppcheck = "cppcheck", cppcheck-htmlreport = "cppcheck-htmlreport" }
+
+[envs.pixi_global_env_emacs]
+channels = ["conda-forge"]
+dependencies = { emacs = "*" }
+exposed = { ctags = "ctags", ebrowse = "ebrowse", emacs = "emacs", "emacs-30.2" = "emacs-30.2", emacsclient = "emacsclient", etags = "etags", "x86_64-conda-linux-gnu-gcc-14.3.0" = "x86_64-conda-linux-gnu-gcc-14.3.0" }
 
 [envs.pixi_global_env_fontconfig]
 channels = ["conda-forge"]
@@ -39,11 +49,6 @@ exposed = { git = "git", git-cvsserver = "git-cvsserver", git-receive-pack = "gi
 channels = ["conda-forge"]
 dependencies = { graphviz = "*" }
 exposed = { ".graphviz-post-link" = ".graphviz-post-link", acyclic = "acyclic", bcomps = "bcomps", ccomps = "ccomps", circo = "circo", cluster = "cluster", diffimg = "diffimg", dijkstra = "dijkstra", dot = "dot", dot2gxl = "dot2gxl", dot_builtins = "dot_builtins", dot_sandbox = "dot_sandbox", edgepaint = "edgepaint", fdp = "fdp", gc = "gc", gml2gv = "gml2gv", graphml2gv = "graphml2gv", gv2gml = "gv2gml", gv2gxl = "gv2gxl", gvcolor = "gvcolor", gvgen = "gvgen", gvmap = "gvmap", gvpack = "gvpack", gvpr = "gvpr", gxl2dot = "gxl2dot", gxl2gv = "gxl2gv", mm2gv = "mm2gv", neato = "neato", nop = "nop", osage = "osage", patchwork = "patchwork", sccmap = "sccmap", sfdp = "sfdp", tred = "tred", twopi = "twopi", unflatten = "unflatten" }
-
-[envs.pixi_global_env_clang]
-channels = ["conda-forge"]
-dependencies = { clang = "*", clang-tools = "*" }
-exposed = { amdgpu-arch = "amdgpu-arch", analyze-build = "analyze-build", c-index-test = "c-index-test", clang = "clang", clang-apply-replacements = "clang-apply-replacements", clang-apply-replacements-21 = "clang-apply-replacements-21", clang-change-namespace = "clang-change-namespace", clang-change-namespace-21 = "clang-change-namespace-21", clang-check = "clang-check", clang-check-21 = "clang-check-21", clang-cl = "clang-cl", clang-cpp = "clang-cpp", clang-doc = "clang-doc", clang-doc-21 = "clang-doc-21", clang-extdef-mapping = "clang-extdef-mapping", clang-extdef-mapping-21 = "clang-extdef-mapping-21", clang-include-cleaner = "clang-include-cleaner", clang-include-cleaner-21 = "clang-include-cleaner-21", clang-include-fixer = "clang-include-fixer", clang-include-fixer-21 = "clang-include-fixer-21", clang-installapi = "clang-installapi", clang-installapi-21 = "clang-installapi-21", clang-linker-wrapper = "clang-linker-wrapper", clang-linker-wrapper-21 = "clang-linker-wrapper-21", clang-move = "clang-move", clang-move-21 = "clang-move-21", clang-nvlink-wrapper = "clang-nvlink-wrapper", clang-nvlink-wrapper-21 = "clang-nvlink-wrapper-21", clang-offload-bundler = "clang-offload-bundler", clang-offload-bundler-21 = "clang-offload-bundler-21", clang-offload-packager = "clang-offload-packager", clang-offload-packager-21 = "clang-offload-packager-21", clang-query = "clang-query", clang-query-21 = "clang-query-21", clang-refactor = "clang-refactor", clang-refactor-21 = "clang-refactor-21", clang-reorder-fields = "clang-reorder-fields", clang-reorder-fields-21 = "clang-reorder-fields-21", clang-repl = "clang-repl", clang-repl-21 = "clang-repl-21", clang-scan-deps = "clang-scan-deps", clang-scan-deps-21 = "clang-scan-deps-21", clang-sycl-linker = "clang-sycl-linker", clang-sycl-linker-21 = "clang-sycl-linker-21", clang-tidy = "clang-tidy", clang-tidy-21 = "clang-tidy-21", clangd = "clangd", diagtool = "diagtool", find-all-symbols = "find-all-symbols", git-clang-format = "git-clang-format", hmaptool = "hmaptool", intercept-build = "intercept-build", modularize = "modularize", nvptx-arch = "nvptx-arch", offload-arch = "offload-arch", pp-trace = "pp-trace", run-clang-tidy = "run-clang-tidy", scan-build = "scan-build", scan-build-py = "scan-build-py", scan-view = "scan-view" }
 
 [envs.pixi_global_env_lua]
 channels = ["conda-forge"]
