@@ -431,104 +431,106 @@ fi
 # )))
 
 # ------------------- FZF Advanced Configuration ------------------- (((
-# POSIX-compliant, modern fzf setup with BAT previews, git integration,
-# multi-pane support, truecolor-safe options, and advanced keybindings.
 
-# Only configure if fzf exists
-if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "fzf"; } || { type "fzf" > /dev/null 2>&1; }; then
+# Guard: only run if fzf exists
+if command -v fzf >/dev/null 2>&1; then
 
-  # Ensure bat is present for previews
-  if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "bat"; } || { type "bat" > /dev/null 2>&1; }; then
+  # ---------------- Base defaults (set ONCE) ----------------
+  FZF_DEFAULT_OPTS="
+  --ansi
+  --layout=reverse
+  --height=50%
+  --multi
+  --bind 'ctrl-/:toggle-preview'
+  --pointer=''
+  --marker='▏'
+  --prompt='󰍉 '
+  --separator='─'
+  --color fg+:cyan,bg+:black,info:yellow,pointer:red
+  "
 
-    # CTRL-T (file finder) options
-    # - Show bat preview of the selected file with line numbers and syntax highlighting
-    # - ctrl-/ toggles preview window
-    # - preview window at the bottom, initially hidden
-    FZF_CTRL_T_OPTS="
-    --preview 'bat --style=plain,grid,numbers --color=always {} || cat {}'
-    --bind 'ctrl-/:change-preview-window(down|hidden|)'
-    --height 40%
-    --layout=reverse
-    --ansi
-    --color=fg+:yellow,bg+:black,preview-border:magenta
-    --multi"
-    export FZF_CTRL_T_OPTS
-  fi
+  # ---------------- Unified preview (portable + safe) ----------------
+  FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
+  --preview 'sh -c \"
+    file=\\\"\\\$1\\\"
+    file=\\\${file#./}
 
-  # CTRL-R (history search) options
-  # - Show previous commands with preview of command
-  # - preview window at top, initially hidden
+    if [ -d \\\"\\\$file\\\" ]; then
+      ls -la \\\"\\\$file\\\" 2>/dev/null || ls -laG \\\"\\\$file\\\"
+
+    elif command -v file >/dev/null 2>&1 &&
+         file --mime \\\"\\\$file\\\" | grep -q \"charset=binary\"; then
+      echo \\\"[binary file]\\\"
+
+    elif command -v bat >/dev/null 2>&1; then
+      bat --style=plain,grid,numbers --color=always \
+          --paging=never --line-range :300 \\\"\\\$file\\\" 2>/dev/null
+
+    else
+      cat \\\"\\\$file\\\" 2>/dev/null | head -n 200
+    fi
+  \" _ {}'
+  "
+
+  export FZF_DEFAULT_OPTS
+
+  # ---------------- CTRL-T (file finder) ----------------
+  FZF_CTRL_T_OPTS="
+  --height=40%
+  --layout=reverse
+  --bind 'ctrl-/:toggle-preview'
+  "
+  export FZF_CTRL_T_OPTS
+
+  # ---------------- CTRL-R (history search) ----------------
   FZF_CTRL_R_OPTS="
   --preview 'echo {}'
   --preview-window=up:3:hidden:wrap
+  --height=30%
+  --layout=reverse
   --bind 'ctrl-/:toggle-preview'
   --color header:italic
-  --height 30%
-  --layout=reverse
-  --ansi
-  --cycle"
+  --cycle
+  "
   export FZF_CTRL_R_OPTS
 
-  # File / Directory completion using fzf with BAT previews
-  FZF_PREVIEW="if [ -d {} ]; then ls -la --color=always {}; else bat --style=plain,grid,numbers --color=always {}; fi"
-  FZF_BIND="ctrl-d:toggle-preview,alt-l:accept,alt-h:abort"
-  FZF_COLOR="fg+:cyan,bg+:black,info:yellow,pointer:red"
-  FZF_OPTS="--ansi --height=50% --layout=reverse --multi"
-
-  FZF_DEFAULT_OPTS="$FZF_PREVIEW --bind $FZF_BIND --color $FZF_COLOR $FZF_OPTS"
-# export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-  export FZF_DEFAULT_OPTS
-  unset FZF_PREVIEW FZF_BIND FZF_COLOR FZF_OPTS
-
-
-  # Git integration (if inside a git repo)
-  # - CTRL-G opens git file search
-  # - Shows modified files with diff preview
-  if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "git"; } || { type "git" > /dev/null 2>&1; }; then
-    FZF_GIT_PREVIEW="git diff --color=always -- {} | head -n 50"
-    FZF_GIT_BIND="ctrl-/:toggle-preview"
-    FZF_GIT_COLOR="fg+:green,bg+:black,preview-border:blue"
-    FZF_GIT_OPTS="--height 50% --layout=reverse --ansi --multi"
-
-    FZF_GIT_FILES_OPTS="$FZF_GIT_PREVIEW --bind $FZF_GIT_BIND --color $FZF_GIT_COLOR $FZF_GIT_OPTS"
-    export FZF_GIT_FILES_OPTS
-  fi
-
-  # Use ripgrep (rg) for file searches, if available
-  if { [ -n "$SH_FUNCTIONS_SOURCED" ] && command_exists "rg"; } || { type "rg" > /dev/null 2>&1; }; then
-
-    # File search with ripgrep and BAT previews
-    FZF_DEFAULT_OPTS="
-    --preview 'if [ -d {} ]; then ls -la --color=always {}; else rg --color=always --no-heading --line-number --column {} || cat {}; fi'
-    --bind 'ctrl-d:toggle-preview,alt-l:accept,alt-h:abort'
-    --color=fg+:cyan,bg+:black,info:yellow,pointer:red
+  # ---------------- Git integration (fully hardened) ----------------
+  if command -v git >/dev/null 2>&1; then
+    FZF_GIT_FILES_OPTS="
     --ansi
     --height=50%
     --layout=reverse
-    --multi"
-    export FZF_DEFAULT_OPTS
-
-    # Git files search using ripgrep, if inside a git repo
-    FZF_GIT_FILES_OPTS="
-    --preview 'rg --color=always --no-heading --line-number --column {} | head -n 50'
+    --multi
     --bind 'ctrl-/:toggle-preview'
     --color fg+:green,bg+:black,preview-border:blue
-    --height 50%
-    --layout=reverse
-    --ansi
-    --multi"
+    --preview 'sh -c \"
+      file=\\\"\\\$1\\\"
+      file=\\\${file#./}
+
+      if git diff --quiet -- \\\"\\\$file\\\"; then
+        git show --color=always \\\"HEAD:\\\$file\\\" 2>/dev/null
+      else
+        git diff --color=always -- \\\"\\\$file\\\"
+      fi ||
+      if command -v bat >/dev/null 2>&1; then
+        bat --color=always --paging=never --line-range :300 \\\"\\\$file\\\" 2>/dev/null
+      else
+        cat \\\"\\\$file\\\" 2>/dev/null | head -n 200
+      fi
+    \" _ {}'
+    "
     export FZF_GIT_FILES_OPTS
   fi
 
-  # Keybinding hints (helpful for multi-pane, preview toggle)
-  FZF_KEY_BINDINGS="
-  ctrl-t: files | ctrl-r: history | alt-g: git-files
-  ctrl-/: toggle preview window
-  alt-l: accept | alt-h: abort"
-  export FZF_KEY_BINDINGS
+  # ---------------- File source (rg if available) ----------------
+  if command -v rg >/dev/null 2>&1; then
+    export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git/*"'
+  fi
+
 fi
-# ------------------- END FZF Advanced Configuration -------------------
+
 # )))
+
 
 # ------------------- GCC_COLORS Setup (((
 # This configuration leverages 24-bit RGB colors for modern terminals while
