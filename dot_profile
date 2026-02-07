@@ -1,17 +1,43 @@
 # vim: ft=sh:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=145:syntax=sh:
 # shellcheck shell=sh
 # shellcheck disable=SC1091
-# ~/.profile checked Feb 06, 2026
+# $HOME/.profile checked Feb 06, 2026
+
+# Define local xdg basedir variables (((
+_xdg_config_home="$HOME/.config" && mkdir -p "$_xdg_config_home"
+_xdg_localdir="$HOME/.local" && mkdir -p "$_xdg_localdir"
+_xdg_cache_home="$_xdg_localdir/cache" && mkdir -p "$_xdg_cache_home"
+_xdg_data_home="$_xdg_localdir/share" && mkdir -p "$_xdg_data_home"
+_xdg_state_home="$_xdg_localdir/state" && mkdir -p "$_xdg_state_home"
+# )))
 
 # Source common posix-compliant helper functions if possible (((
-if [ -f "$HOME/.config/sh/sh_functions.sh" ]; then
-  . "$HOME/.config/sh/sh_functions.sh"
+if [ -f "$_xdg_config_home/sh/sh_functions.sh" ]; then
+  . "$_xdg_config_home/sh/sh_functions.sh"
   SH_FUNCTIONS_SOURCED="1"
 fi
 # )))
 
-# Prepend "~/.local/bin" to PATH (irrespective of whether it exists to be ready to go) (((
-_local_bindir="$HOME/.local/bin"
+path_prepend() {
+  case ":${PATH-}:" in
+    *:"$1":*) ;;
+    *) PATH=$1${PATH:+":$PATH"} ;;
+  esac
+}
+
+path_append() {
+  case ":${PATH-}:" in
+    *:"$1":*) ;;
+    *) PATH=${PATH:+$PATH:}$1 ;;
+  esac
+}
+# path_prepend "$HOME/.local/bin"
+# path_append "$_xdg_data_home/luarocks/bin"
+# path_prepend "$PIXI_HOME/bin"
+
+
+# Prepend "$HOME/.local/bin" to PATH (irrespective of whether it exists to be ready to go) (((
+_local_bindir="$_xdg_localdir/bin"
 # if [ -d "$_local_bindir" ]; then
 if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
   update_env_var PATH --prepend "$_local_bindir"
@@ -33,13 +59,6 @@ unset _local_bindir
 # )))
 
 # Incorporate various third-party commands to PATH & set their related environment variables (((
-
-# Define local xdg basedir variables (((
-_xdg_config_home="$HOME/.config"
-_xdg_cache_home="$HOME/.local/cache"
-_xdg_data_home="$HOME/.local/share"
-_xdg_state_home="$HOME/.local/state"
-# )))
 
 # Append "luarocks binaries" to PATH (((
 _luarocks_config_file="$_xdg_config_home/luarocks/config.lua"
@@ -99,15 +118,19 @@ unset _pixi_bindir
 
 # Prepend TexLive directories to PATH (and optionally INFOPATH) (((
 # NOTE: the `date` command is POSIX compliant and portable across POSIX shells
-_tl_year=$(date '+%Y') && _tl_dir="$HOME/.local/texlive/$_tl_year"
+_tl_year=$(date '+%Y' 2>/dev/null) && _tl_dir="$_xdg_localdir/texlive/$_tl_year"
 unset _tl_year
 if [ -d "$_tl_dir" ]; then
   # Extract the OS and Architecture using strict POSIX parameter expansion
   _ARCH=$(uname -m)
   _OS=$(uname -s)
+  # Convert _OS to lowercase manually
+  case $_OS in
+    Darwin) _OS=darwin ;;
+    Linux)  _OS=linux ;;
+  esac
 
   _tl_bin_path="$_tl_dir/bin/$_ARCH-$_OS"
-  unset _ARCH _OS
 
   # Now incorporate the TL bin directory to PATH
   if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
@@ -124,8 +147,6 @@ if [ -d "$_tl_dir" ]; then
         ;;
     esac
   fi
-
-  unset _tl_bin_path
 fi
 unset _tl_dir
 # )))
@@ -158,7 +179,7 @@ unset _mason_bindir
 # Configuration for Homebrew (((
 
 # Set HOMEBREW_PREFIX if it is not already set and the custom directory exists (((
-_brew_prefix_dir="$HOME/.local/opt/brew"
+_brew_prefix_dir="$_xdg_localdir/opt/brew"
 if [ -z "$HOMEBREW_PREFIX" ] && [ -d "$_brew_prefix_dir" ]; then
   HOMEBREW_PREFIX="$_brew_prefix_dir"
   export HOMEBREW_PREFIX
@@ -189,7 +210,7 @@ fi
 
 # )))
 
-# Set various environment variables provided by POSIX sh (can refer to external tools where available) (((
+# Set various environment variables in POSIX sh (can refer to external tools where available) (((
 
 # Set VISUAL, EDITOR and SUDO_EDITOR (((
 # List of preferred editors in order of preference
@@ -202,7 +223,7 @@ _old_ifs="$IFS"
 IFS=" "
 
 # Trim leading and trailing spaces from the list
-if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v trim_spaces >/dev/null 2>&1; then
+if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "trim_spaces" >/dev/null 2>&1; then
   _editor_priority_list=$(trim_spaces "$_editor_priority_list")
 fi
 
@@ -232,9 +253,7 @@ unset _editor_priority_list
 
 # Set HISTFILE for POSIX sh (may be overridden in other shell-specific startup files) (((
 _sh_histdir="$_xdg_state_home/sh"
-if ! [ -d "$_sh_histdir" ]; then
-  mkdir -p "$_sh_histdir"
-fi
+mkdir -p "$_sh_histdir"
 HISTFILE="$_sh_histdir/sh_history"
 export HISTFILE
 unset _sh_histdir
@@ -255,26 +274,27 @@ fi
 unset _inputrc
 # )))
 
-# Set LESS_TERMCAP_xx, LESSPIPE, LESS, LESSKEY, LESSHISTFILE for colorising the output of the `less` pager (((
+# Set LESS_TERMCAP_xx, LESSPIPE, LESS, LESSKEY, LESSHISTFILE for colour `less` pager's output (((
 
 # https://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables/108840#108840
 # Add color in manpages for less https://unix.stackexchange.com/questions/149614/less-command-change-color-of-and-end
-# ------------------- LESS Color and Appearance -------------------
+# ------------------- less Color and Appearance ------------------- (((
 # ANSI sequences for text formatting in less
 ESC="$(printf '\033')"
-LESS_TERMCAP_mb="${ESC}[01;31m" && export LESS_TERMCAP_mb
-LESS_TERMCAP_md="${ESC}[01;31m" && export LESS_TERMCAP_md
-LESS_TERMCAP_me="${ESC}[0m"    && export LESS_TERMCAP_me
-LESS_TERMCAP_se="${ESC}[0m"    && export LESS_TERMCAP_se
-LESS_TERMCAP_so="${ESC}[30;42m" && export LESS_TERMCAP_so
-LESS_TERMCAP_ue="${ESC}[0m"    && export LESS_TERMCAP_ue
-LESS_TERMCAP_us="${ESC}[01;32m" && export LESS_TERMCAP_us
+LESS_TERMCAP_mb="${ESC}[01;31m" && export LESS_TERMCAP_mb   # Red for bold text
+LESS_TERMCAP_md="${ESC}[01;31m" && export LESS_TERMCAP_md   # Red for midline (bold/italic)
+LESS_TERMCAP_me="${ESC}[0m"    && export LESS_TERMCAP_me   # Reset formatting
+LESS_TERMCAP_se="${ESC}[0m"    && export LESS_TERMCAP_se   # Reset standout
+LESS_TERMCAP_so="${ESC}[30;42m" && export LESS_TERMCAP_so  # Green background for standout
+LESS_TERMCAP_ue="${ESC}[0m"    && export LESS_TERMCAP_ue   # Reset underline
+LESS_TERMCAP_us="${ESC}[01;32m" && export LESS_TERMCAP_us  # Green for underlined text
 unset ESC
 # export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_me \
   # LESS_TERMCAP_se LESS_TERMCAP_so LESS_TERMCAP_ue LESS_TERMCAP_us
+# )))
 
-# ------------------- LESS and Bat Integration -------------------
-# Set batpipe location if bat & batpipe are available (((
+# ------------------- less and Bat Integration ------------------- (((
+# Set batpipe location if bat & batpipe are available
 _batpipe_location=
 if command -v "bat" > /dev/null 2>&1 && command -v "batpipe" > /dev/null 2>&1; then
   _batpipe_location="$(command -v batpipe)"
@@ -285,7 +305,7 @@ fi
 LESSOPEN=""
 if [ -n "$_batpipe_location" ]; then  # use batpipe for LESSOPEN if found in path
   LESSOPEN="|$_batpipe_location %s"
-  unset LESSCLOSE
+  LESSCLOSE=""
   BATPIPE="color"
   export BATPIPE
 elif command -v "lesspipe" > /dev/null 2>&1; then
@@ -315,36 +335,76 @@ export LESS LESSHISTFILE
 # )))
 # )))
 
-# Set locale-related environment variables for UTF-8 terminal support (((
-LANG="en_GB.UTF-8"         # Set language and character encoding
+# Set Locale with fallback to en_US.UTF-8 (((
+# Check if the 'locale' command is available
+if ! command -v locale >/dev/null 2>&1; then
+  # Print message and fall back to en_US.UTF-8 if locale isn't available
+  echo "Warning: 'locale' command not found. Falling back to en_US.UTF-8"
+  LANG="en_US.UTF-8"
+else
+  # Check for 'en_GB' or 'en_US' locales using case statement
+  case "$(locale -a 2>/dev/null || printf '')" in
+    *"en_GB.UTF-8"*) LANG="en_GB.UTF-8" ;;  # Set to en_GB.UTF-8 if available
+    *"en_US.UTF-8"*) LANG="en_US.UTF-8" ;;  # Set to en_US.UTF-8 if available
+    *) LANG="en_US.UTF-8" ;;  # Default to en_US.UTF-8 if neither found
+  esac
+fi
+
+# Set specific LC_* variables (some set to en_GB.UTF-8, others to C)
 LC_COLLATE="C"             # Use C locale for sorting (e.g., for programming or POSIX tools)
-LC_CTYPE="en_GB.UTF-8"     # Character classification and conversion (UTF-8 for character types)
-LC_MESSAGES="en_GB.UTF-8"  # Messages and user interface text
-LC_MONETARY="C"
-LC_NAME="C"
-LC_NUMERIC="C"
-LC_PAPER="en_GB.UTF-8"
-LC_TIME="C"  # Set time-related behavior to "C" locale (useful for POSIX systems)
-LC_ALL=""    # Reset LC_ALL to allow specific LC_* variables to take effect
+LC_CTYPE="${LANG:-en_US.UTF-8}"  # Character classification and conversion (UTF-8 for character types)
+LC_MESSAGES="$LANG"        # Messages and user interface text
+LC_MONETARY="C"            # Monetary settings (POSIX standard)
+LC_NAME="C"                # Name-related settings (POSIX standard)
+LC_NUMERIC="C"             # Numeric settings (POSIX standard)
+LC_PAPER="$LANG"           # Paper size (en_GB.UTF-8 or en_US.UTF-8)
+LC_TIME="C"                # Time-related behavior (POSIX standard)
+
+LC_ALL=""                   # Reset LC_ALL to allow specific LC_* variables to take effect
 
 export LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TIME LC_ALL
-
-# Set fallback language (optional)
-# LANGUAGE="en_GB.UTF-8"   # Commented out if LANG is sufficient
-
 # )))
 
-# Set PAGER, MANPAGER, MANROFFOPT (((
-# Use less as the default pager with color support and proper behavior
-PAGER="less -MRF --use-color"
+# Set Pager (feature-gated, long options) (((
+PAGER=more   # guaranteed by POSIX
+
+if command -v less >/dev/null 2>&1; then
+  LESS_FLAGS=
+
+  # Exit the less pager if output fits on one screen
+  if less --quit-if-one-screen </dev/null >/dev/null 2>&1; then
+    LESS_FLAGS="$LESS_FLAGS --quit-if-one-screen"
+  fi
+
+  # Allow raw control characters (ANSI color)
+  if less --raw-control-chars </dev/null >/dev/null 2>&1; then
+    LESS_FLAGS="$LESS_FLAGS --raw-control-chars"
+  fi
+
+  # Highlight search
+  if less --hilite-search </dev/null >/dev/null 2>&1; then
+    LESS_FLAGS="$LESS_FLAGS --hilite-search"
+  fi
+
+  # Verbose prompt
+  if less --long-prompt </dev/null >/dev/null 2>&1; then
+    LESS_FLAGS="$LESS_FLAGS --long-prompt"
+  fi
+
+  # Force color support (GNU extension)
+  if less --use-color </dev/null >/dev/null 2>&1; then
+    LESS_FLAGS="$LESS_FLAGS --use-color"
+  fi
+
+  PAGER="less$LESS_FLAGS"
+  MANPAGER="$PAGER"
+  export MANPAGER
+fi
+
 export PAGER
 
-# Use less as the man page pager with color and proper behavior
-MANPAGER="less -MRF --use-color"
-export MANPAGER
-
-# Use -c option with man for continuous output (suppress page breaks)
-MANROFFOPT="-c"
+# groff/man nicety (ignored if unsupported)
+MANROFFOPT='--continuous'  #  for continuous output in man
 export MANROFFOPT
 # )))
 
@@ -361,490 +421,707 @@ if command -v "zathura" > /dev/null 2>&1; then
 fi
 # )))
 
-
-if command -v "tmc" > /dev/null 2>&1; then
-  TMC_LANGS_CONFIG_DIR="$HOME/.config/tmc-config"
-  export TMC_LANGS_CONFIG_DIR
-fi
-
 # )))
 
 # Set environment variables related to third-party tools (((
 
-# ------------------- AddressSanitizer (ASAN) Options (((
-# https://stackoverflow.com/a/54373833
-# Configure ASAN for safer debugging and controlled crash behavior
-ASAN_OPTIONS="abort_on_error=1:detect_leaks=0:report_objects=1:sleep_before_dying=1"
-export ASAN_OPTIONS
+# # ------------------- AddressSanitizer (ASAN) Options (((
+# # https://stackoverflow.com/a/54373833
+# # Configure ASAN for safer debugging and controlled crash behavior
+# ASAN_OPTIONS="abort_on_error=1:detect_leaks=0:report_objects=1:sleep_before_dying=1"
+# export ASAN_OPTIONS
+# # abort_on_error=1
+# # ASan calls abort() immediately on the first detected error.
+# # Great for:
+# # Getting a core dump
+# # Ensuring crashes are loud and unignorable
+# # You won’t get “best effort” continuation after errors.
+# # detect_leaks=0
+# # Disables LeakSanitizer.
+# # Useful when:
+# # You’re already using Valgrind / heaptrack
+# # You want faster runs
+# # Leak reports are noisy or irrelevant (e.g., short-lived tools)
+# # Note: If your binary is built with -fsanitize=address,leak, this overrides the leak part at runtime.
+# # report_objects=1
+# # ASan reports the actual heap objects involved in errors.
+# # Makes UAF / OOB bugs way easier to reason about.
+# # Minor runtime cost, major debugging win.
+# # sleep_before_dying=1
+# # ASan sleeps for 1 second before aborting.
+# # Super handy for:
+# # * Attaching gdb or lldb
+# # * Letting logs flush
+# # If you ever want interactive debugging:
+# # sleep_before_dying=10
+# # “Fail fast, fail loudly, and give me enough context to fix it.”
+# # It’s ideal for:
+# # * Debug builds
+# # * CI jobs where crashes should halt everything
+# # * Reproducible bug hunting
+# # )))
+
+# # ------------------- Ansible Environment (((
+# _ansible_config_dir="$_xdg_config_home/ansible"
+# ANSIBLE_HOME="$_ansible_config_dir"
+# ANSIBLE_CONFIG="$_ansible_config_dir/ansible.cfg"
+# ANSIBLE_NAVIGATOR_CONFIG="$_ansible_config_dir/ansible-navigator.yml"
+# ANSIBLE_GALAXY_CACHE_DIR="$_xdg_state_home/ansible/galaxy_cache"
+# export ANSIBLE_HOME ANSIBLE_CONFIG ANSIBLE_NAVIGATOR_CONFIG ANSIBLE_GALAXY_CACHE_DIR
+# unset _ansible_config_dir
+# # )))
+
+# # ------------------- Bun Environment (((
+# BUN_INSTALL="$_xdg_data_home/bun"
+# export BUN_INSTALL
+# # )))
+
+# # ------------------- Cargo (Rust) Environment -------------------(((
+# # Set Cargo home directory
+# CARGO_HOME="$_xdg_data_home/cargo" && export CARGO_HOME  # mise tools should not go to $HOME/.cargo
+#
+# # Optionally, you could also prepend cargo bin to PATH if desired:
+# # if [ -d "$CARGO_HOME/bin" ]; then
+# #   if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
+# #     update_env_var PATH --prepend "$CARGO_HOME/bin"
+# #   else
+# #     PATH="$CARGO_HOME/bin:$PATH"
+# #   fi
+# # fi
+# # )))
+
+# # ------------------- Docker Environment ------------------- (((
+# # Only set Docker environment if `docker` command exists
+# # if command -v "docker" > /dev/null 2>&1; then
+#   # Set Docker configuration directory
+#   DOCKER_CONFIG="$_xdg_config_home/docker"
+#   export DOCKER_CONFIG
+#
+#     # Optional: Use user-specific Docker socket (uncomment if needed)
+#     # Ensure that DOCKER_HOST is not already set (if using rootless Docker)
+#     # if [ -z "$DOCKER_HOST" ]; then
+#     #     DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock"
+#     #     export DOCKER_HOST
+#     #     echo "Docker host set to user-specific socket at $DOCKER_HOST"
+#     # fi
+#     # Notes:
+#     #   • Default Docker daemon path: /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+#     #   • Useful if running a rootless Docker daemon
+#
+# # fi
+# # )))
+
+# ------------------- POSIX FZF Terminal-Aware Setup ------------------(((
+# --- Helper to check external tools --------------------------------------
+_has() { command -v "$1" >/dev/null 2>&1; }
+
+_HAS_KITTY=0
+_HAS_WEZTERM=0
+_HAS_ITERM=0
+[ -n "$KITTY_WINDOW_ID" ] && _HAS_KITTY=1
+[ -n "$WEZTERM_EXECUTABLE" ] && _HAS_WEZTERM=1
+[ "$TERM_PROGRAM" = "iTerm.app" ] && _HAS_ITERM=1
+
+# --- Terminal size helper -----------------------------------------------
+_fzf_term_size() {
+  C=${COLUMNS:-80}
+  L=${LINES:-24}
+  COLS=$C
+  LINES_PREVIEW=$((L-2))
+}
+
+# --- File kind detection -----------------------------------------------
+_fzf_kind() {
+  file=$1
+  case "$file" in
+    *.png|*.jpg|*.jpeg|*.gif|*.webp) printf image ;;
+    *.mp4|*.mkv|*.mov|*.avi) printf video ;;
+    *.mp3|*.flac|*.wav|*.ogg) printf audio ;;
+    *.zip|*.tar|*.tgz|*.tar.gz|*.tar.xz|*.xz|*.7z) printf archive ;;
+    *.pdf) printf pdf ;;
+    *.patch) printf patch ;;
+    *.md|*.txt|*.json|*.yaml|*.yml|*.toml|*.sh|*.zsh|*.fish|*.py|*.rs|*.go|*.c|*.h|*.cpp|*.js|*.ts|*.html|*.css)
+      printf text ;;
+    *)
+      b=$(dd if="$file" bs=1 count=1 2>/dev/null)
+      case "$b" in
+        ''|[![:print:]]) printf binary ;;
+        *) printf text ;;
+      esac
+      ;;
+  esac
+}
+
+# --- Preview primitives -----------------------------------------------
+
+_fzf_preview_text() {
+  f=$1
+  if _has bat; then
+    bat --style=plain --color=always --pager=never "$f"
+    return
+  fi
+  if _has less; then
+    less -RFX "$f"
+    return
+  fi
+  cat "$f"
+}
+
+_fzf_preview_pdf() {
+  f=$1
+  _fzf_term_size
+  if _has pdftotext; then
+    pdftotext -layout "$f" - | head -n "$LINES_PREVIEW"
+  else
+    printf 'PDF: %s\n' "$f"
+  fi
+}
+
+_fzf_preview_image() {
+  f=$1
+  _fzf_term_size
+  W=$COLS
+  H=$LINES_PREVIEW
+
+  if [ "$_HAS_KITTY" -eq 1 ] && _has kitty; then
+    mtime=$(stat -c %Y "$f" 2>/dev/null || stat -f %m "$f" 2>/dev/null)
+    cache_id=$(echo "$f-$mtime" | tr '/ ' '_')
+    kitty +kitten icat --clear=no --place="${W}x${H}@0x0" --sync --stdin-name="$cache_id" "$f"
+    return
+  fi
+  if [ "$_HAS_WEZTERM" -eq 1 ] && _has wezterm; then
+    wezterm imgcat "$f"
+    return
+  fi
+  if [ "$_HAS_ITERM" -eq 1 ] && _has imgcat; then
+    imgcat "$f"
+    return
+  fi
+  printf 'Image: %s\n' "$f"
+}
+
+_fzf_preview_video() {
+  f=$1
+  _fzf_term_size
+  W=$COLS
+  H=$LINES_PREVIEW
+
+  if _has ffmpeg; then
+    tmp_img="/tmp/fzf_vid_preview_$$.png"
+    ffmpeg -v quiet -y -i "$f" -vframes 1 -vf "scale=${W}:-1" "$tmp_img" 2>/dev/null
+    _fzf_preview_image "$tmp_img"
+    rm -f "$tmp_img"
+    return
+  fi
+  if _has ffprobe; then
+    ffprobe "$f" 2>/dev/null
+    return
+  fi
+  printf 'Video: %s\n' "$f"
+}
+
+_fzf_preview_audio() {
+  f=$1
+  if _has ffprobe; then
+    ffprobe "$f" 2>/dev/null
+  else
+    printf 'Audio: %s\n' "$f"
+  fi
+}
+
+_fzf_preview_patch() {
+  f=$1
+  if _has git && git rev-parse --show-toplevel >/dev/null 2>&1; then
+    git show --color=always "$f" 2>/dev/null
+  else
+    printf 'Patch: %s\n' "$f"
+  fi
+}
+
+_fzf_preview_binary() {
+  f=$1
+  printf 'Binary: %s\n' "$f"
+}
+
+_fzf_preview_symbols() {
+  f=$1
+  if _has ctags; then
+    ctags -x --sort=no "$f" 2>/dev/null
+  fi
+}
+
+_fzf_preview_dir() {
+  d=$1
+  if _has eza; then
+    eza --icons --group-directories-first "$d"
+    return
+  fi
+  ls "$d"
+}
+
+# --- Archive tree preview ----------------------------------------------
+_fzf_preview_archive_tree() {
+  f=$1
+  _fzf_term_size
+  L=$LINES_PREVIEW
+  case "$f" in
+    *.zip)
+      if _has unzip; then
+        unzip -l "$f" 2>/dev/null | awk '{print $4}' | sed 1,3d | head -n "$L"
+      else
+        printf 'zip: %s\n' "$f"
+      fi
+      ;;
+    *.tar)
+      tar -tf "$f" 2>/dev/null | head -n "$L" ;;
+    *.tar.gz|*.tgz)
+      tar -tzf "$f" 2>/dev/null | head -n "$L" ;;
+    *.tar.xz)
+      tar -tJf "$f" 2>/dev/null | head -n "$L" ;;
+    *.7z)
+      if _has 7z; then
+        7z l "$f" 2>/dev/null | awk '/^----/{p=1;next} p {print $NF}' | head -n "$L"
+      else
+        printf '7z: %s\n' "$f"
+      fi
+      ;;
+    *)
+      printf 'Archive: %s\n' "$f" ;;
+  esac
+}
+
+# --- Unified preview router ---------------------------------------------
+_fzf_preview() {
+  t=$1
+  if [ -d "$t" ]; then
+    _fzf_preview_dir "$t"
+    return
+  fi
+  kind=$(_fzf_kind "$t")
+  case "$kind" in
+    text) _fzf_preview_text "$t"; _fzf_preview_symbols "$t" ;;
+    pdf) _fzf_preview_pdf "$t" ;;
+    image) _fzf_preview_image "$t" ;;
+    video) _fzf_preview_video "$t" ;;
+    audio) _fzf_preview_audio "$t" ;;
+    archive) _fzf_preview_archive_tree "$t" ;;
+    patch) _fzf_preview_patch "$t" ;;
+    binary) _fzf_preview_binary "$t" ;;
+    *) printf 'File: %s\n' "$t" ;;
+  esac
+}
+
+# --- FZF default command -----------------------------------------------
+if _has fd; then
+  FZF_DEFAULT_COMMAND='fd --hidden --follow --exclude .git'
+else
+  FZF_DEFAULT_COMMAND='find . -type f 2>/dev/null'
+fi
+export FZF_DEFAULT_COMMAND
+
+# --- FZF default options (POSIX-compliant) -----------------------------
+export FZF_DEFAULT_OPTS="--layout=reverse \
+--border=rounded \
+--height=80% \
+--prompt=> \
+--info=inline \
+--preview='_fzf_preview {}' \
+--preview-window=right:60%:wrap \
+--bind=ctrl-p:toggle-preview,ctrl-o:change-preview-window(right|down|hidden),ctrl-w:toggle-preview-wrap,?:toggle-help \
+--header='Enter open | Ctrl-P preview | Ctrl-O layout | Ctrl-W wrap | ? help'"
+
+# --- Ctrl-T / Alt-C integration --------------------------------------
+export FZF_CTRL_T_OPTS="--preview='_fzf_preview {}'"
+export FZF_ALT_C_OPTS="--preview='if _has eza; then eza --icons {} 2>/dev/null; else ls {}; fi'"
+
+# --- Ctrl-R reverse history ------------------------------------------
+export FZF_CTRL_R_OPTS="--height 50% --layout=reverse --prompt='History> ' --info=inline --preview='_fzf_preview \$(echo {} 2>/dev/null)'"
+
+# --- Git commit browser (optional) -------------------------------------
+fzf_git_commits() {
+  if ! _has git || ! git rev-parse --show-toplevel >/dev/null 2>&1; then
+    return
+  fi
+  git log --graph --oneline --decorate --color=always | \
+  fzf --ansi --preview='git show --color=always {}'
+}
+
 # )))
 
-# ------------------- Ansible environment variables (((
-_ansible_config_dir="$_xdg_config_home/ansible"
-ANSIBLE_HOME="$_ansible_config_dir"
-ANSIBLE_CONFIG="$_ansible_config_dir/ansible.cfg"
-ANSIBLE_NAVIGATOR_CONFIG="$_ansible_config_dir/ansible-navigator.yml"
-ANSIBLE_GALAXY_CACHE_DIR="$_xdg_state_home/ansible/galaxy_cache"
-export ANSIBLE_HOME ANSIBLE_CONFIG ANSIBLE_NAVIGATOR_CONFIG ANSIBLE_GALAXY_CACHE_DIR
-unset _ansible_config_dir
-# )))
-
-# ------------------- Bun environment variables (((
-BUN_INSTALL="$_xdg_data_home/bun"
-export BUN_INSTALL
-# )))
-
-# ------------------- Cargo (Rust) Environment -------------------(((
-# Set Cargo home directory
-# if command -v "cargo" > /dev/null 2>&1; then
-CARGO_HOME="$_xdg_data_home/cargo" && export CARGO_HOME
+# # ------------------- GCC_COLORS Setup (((
+# # This configuration leverages 24-bit RGB colors for modern terminals while
+# # falling back to classic 16-color ANSI codes for older terminals.
+# # It covers all GCC diagnostic elements: errors, warnings, notes, code ranges,
+# # file paths, diff highlights, and fixit hints.
+# # -----------------------------------------------------------------------------
+#
+# # Detect if terminal supports truecolor (24-bit)
+# if [ "${COLORTERM-}" = "truecolor" ] || [ "${COLORTERM-}" = "24bit" ]; then
+#   # ------------------- Truecolor 24-bit GCC_COLORS -------------------
+#   # Format: 38;2;<R>;<G>;<B> foreground, 48;2;<R>;<G>;<B> background
+#   GCC_COLORS="\
+# error=38;2;255;0;0:warning=38;2;255;165;0:note=38;2;0;255;255:\
+# range1=38;2;0;255;0:range2=38;2;0;0;255:locus=38;2;255;255;0:\
+# quote=38;2;255;0;255:path=38;2;0;255;255:fixit-insert=38;2;0;200;0:fixit-delete=38;2;200;0;0:\
+# diff-filename=38;2;255;255;255:diff-hunk=38;2;0;255;0:diff-delete=38;2;255;0;0:diff-insert=38;2;0;255;0:\
+# type-diff=38;2;0;255;255"
+# else
+#   # ------------------- Fallback to Classic 16-Color ANSI -------------------
+#   GCC_COLORS="\
+# error=01;31:warning=01;35:note=01;36:range1=32:range2=34:locus=01:\
+# quote=01:path=01;36:fixit-insert=32:fixit-delete=31:\
+# diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32:\
+# type-diff=01;32"
 # fi
+#
+# # Explanation of Key Fields:
+# # - error / warning / note: Highlight GCC diagnostics in red, orange, cyan
+# # - range1 / range2: Highlight ranges in green / blue for code selection
+# # - locus: Emphasize the locus (location) of diagnostic
+# # - quote: Quoted strings in diagnostics
+# # - path: File paths
+# # - fixit-insert / fixit-delete: Proposed code modifications
+# # - diff-filename / diff-hunk / diff-delete / diff-insert / type-diff: Highlight diffs in compiler output
+#
+# # Export GCC_COLORS for all GCC invocations
+# export GCC_COLORS
+# # -----------------------------------------------------------------------------
+# # )))
 
-# Optionally, you could also prepend cargo bin to PATH if desired:
-# if [ -d "$CARGO_HOME/bin" ]; then
-#   if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
-#     update_env_var PATH --prepend "$CARGO_HOME/bin"
+# # ------------------- ghcup Setup (((
+# GHCUP_USE_XDG_DIRS=true
+# export GHCUP_USE_XDG_DIRS
+# # )))
+
+# # ------------------- Git Editor and Diff Setup ------------------- (((
+# # Use VISUAL as Git editor, optionally start in insert mode for vim/neovim (((
+# if [ -n "$VISUAL" ]; then
+#   case "$VISUAL" in
+#     vim|nvim) GIT_EDITOR="$VISUAL -c startinsert" ;;
+#     *) GIT_EDITOR="$VISUAL" ;;
+#   esac
+#   export GIT_EDITOR
+# fi
+# # )))
+#
+# # Use 'difft' as Git external diff tool if available (((
+# if command -v "difft" > /dev/null 2>&1; then
+#   GIT_EXTERNAL_DIFF=$(command -v "difft")
+#   export GIT_EXTERNAL_DIFF
+# fi
+# # )))
+#
+# # Git Pager Setup -------------------(((
+# # Prefer 'bat' as Git pager if available, fallback to 'less'
+# if command -v "bat" > /dev/null 2>&1; then
+#   # Use bat for Git output with plain style and header
+#   GIT_PAGER="bat --style=plain,header"
+# else
+#   # Fallback to less if bat is not available
+#   GIT_PAGER="less"
+# fi
+# export GIT_PAGER
+# # )))
+# # )))
+
+# # ------------------- Go Environment ------------------ (((
+# # Set GOCACHE, GOMODCACHE, and GOPATH to user-specific directories
+# if command -v "go" > /dev/null 2>&1; then
+#   GOCACHE="$_xdg_state_home/go/go-build"
+#   GOMODCACHE="$_xdg_cache_home/go/pkg/mod"
+#   GOPATH="$_xdg_data_home/go"
+#   export GOCACHE GOMODCACHE GOPATH  # Export all Go-related environment variables in one step
+# fi
+# # )))
+
+# # ------------------- Java Environment (((
+# _JAVA_OPTIONS=-Djava.util.prefs.userRoot="$_xdg_config_home/java"
+# export _JAVA_OPTIONS
+# # )))
+
+# # ------------------- Jupyter Environment ------------------- (((
+# # Set JUPYTER_CONFIG_DIR to a user-specific config directory
+# JUPYTER_CONFIG_DIR="$_xdg_config_home/jupyter"
+# export JUPYTER_CONFIG_DIR
+# # )))
+
+# # ------------------- K9S Environment (((
+# K9SCONFIG="$_xdg_config_home/k9s"
+# export K9SCONFIG
+# # )))
+
+# # ------------------- MAXIMA Environment (((
+# MAXIMA_USERDIR="$_xdg_config_home/maxima"
+# export MAXIMA_USERDIR
+# # )))
+
+# # ------------------- Minikube Environment (((
+# MINIKUBE_HOME="$_xdg_data_home/minikube"
+# export MINIKUBE_HOME
+# # )))
+
+# # ------------------- Nodejs Environment ------------------- (((
+# # ------------------- Node.js REPL History ------------------- (((
+# # Set NODE_REPL_HISTORY to a custom location for persistent REPL history
+# NODE_REPL_HISTORY="$_xdg_state_home/node_repl_history"
+# export NODE_REPL_HISTORY
+# # )))
+#
+# # ------------------- NPM User Environment ------------------- (((
+# # Set NPM_CONFIG_USERCONFIG if a custom npmrc exists
+# _npmrc="$_xdg_config_home/npm/npmrc"
+# if [ -f "$_npmrc" ]; then
+#   NPM_CONFIG_USERCONFIG="$_npmrc"
+#   export NPM_CONFIG_USERCONFIG
+# fi
+# unset _npmrc
+# # )))
+# # )))
+
+# # ------------------- Python Environment ------------------- (((
+# # Set PYTHONSTARTUP if the user has a custom Python startup script
+# if command -v "python3" > /dev/null 2>&1 || command -v "python" > /dev/null 2>&1; then
+#
+#   _pythonrc="$_xdg_config_home/python/pythonrc"
+#   if [ -f "$_pythonrc" ]; then
+#     PYTHONSTARTUP="$_pythonrc"
+#   fi
+#
+#   _python_histdir="$_xdg_state_home/python"
+#   mkdir -p "$_python_histdir"
+#   PYTHON_HISTORY="$_python_histdir/python_history"
+#
+#   PYTHON_EGG_CACHE="$_xdg_cache_home/python-eggs"
+#   PYTHONPYCACHEPREFIX="$_xdg_cache_home/python"
+#   PYTHONUSERBASE="$_xdg_data_home/python"
+#   export PYTHONSTARTUP PYTHON_HISTORY PYTHON_EGG_CACHE PYTHONPYCACHEPREFIX PYTHONUSERBASE
+# fi
+# # )))
+
+# # ------------------- Qt Platform Environment ------------------- (((
+# # Set QT_QPA_PLATFORM suitably only on Linux systems
+# if [ "$(uname -s)" = "Linux" ]; then
+#   # Check if Wayland is available
+#   if [ "$XDG_SESSION_TYPE" = "wayland" ] && command -v "wayland-info" > /dev/null 2>&1; then
+#     QT_QPA_PLATFORM="wayland"  # Use Wayland if available
+#   # Check if running under Xwayland (Xwayland provides X11 compatibility)
+#   elif [ "$XDG_SESSION_TYPE" = "x11" ] && command -v "xset" > /dev/null 2>&1; then
+#     QT_QPA_PLATFORM="xcb"  # Use XCB if running under X11 or Xwayland
+#   # Check for offscreen/headless environment
+#   elif [ -z "$DISPLAY" ]; then
+#     QT_QPA_PLATFORM="offscreen"  # Use offscreen rendering if no display is available (headless environment)
 #   else
-#     PATH="$CARGO_HOME/bin:$PATH"
+#     # Default to XCB if no specific conditions match
+#     QT_QPA_PLATFORM="xcb"  # Default to XCB
+#   fi
+#
+#   # Export the environment variable
+#   export QT_QPA_PLATFORM
+# fi
+# # )))
+
+# # ------------------- Qt6 Environment ------------------- (((
+# # Set Qt platform theme if qt6ct is available
+# if command -v "qt6ct" > /dev/null 2>&1; then
+#   QT_QPA_PLATFORMTHEME="qt6ct"
+#   export QT_QPA_PLATFORMTHEME
+# fi
+# # )))
+
+# # ------------------- Ripgrep Environment Directory ------------------- (((
+# if command -v "rg" > /dev/null 2>&1; then
+#   _ripgrep_config_file="$_xdg_config_home/ripgrep/config"
+#   if [ -f "$_ripgrep_config_file" ]; then
+#     RIPGREP_CONFIG_PATH="$_ripgrep_config_file"
+#     export RIPGREP_CONFIG_PATH
 #   fi
 # fi
-# )))
+# # )))
 
-# ------------------- Docker Environment (with detection) ------------------- (((
-# Only set Docker environment if `docker` command exists
-if command -v "docker" > /dev/null 2>&1; then
-  # Set Docker configuration directory
-  DOCKER_CONFIG="$_xdg_config_home/docker"
-  export DOCKER_CONFIG
+# # ------------------- rlwrap Home Directory ------------------- (((
+# # if command -v "rlwrap" > /dev/null 2>&1; then
+#   RLWRAP_HOME="$_xdg_data_home/rlwrap"
+#   export RLWRAP_HOME
+# # fi
+# # )))
 
-    # Optional: Use user-specific Docker socket (uncomment if needed)
-    # Ensure that DOCKER_HOST is not already set (if using rootless Docker)
-    # if [ -z "$DOCKER_HOST" ]; then
-    #     DOCKER_HOST="unix://$XDG_RUNTIME_DIR/docker.sock"
-    #     export DOCKER_HOST
-    #     echo "Docker host set to user-specific socket at $DOCKER_HOST"
-    # fi
-    # Notes:
-    #   • Default Docker daemon path: /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
-    #   • Useful if running a rootless Docker daemon
+# # ------------------- Ruff Cache Directory ------------------- (((
+# # if command -v "ruff" > /dev/null 2>&1; then
+#   RUFF_CACHE_DIR="$_xdg_state_home/ruff"  # Set Ruff cache directory
+#   export RUFF_CACHE_DIR
+# # fi
+# # )))
 
-fi
-# )))
+# # ------------------- Rustup Environment -------------------(((
+# RUSTUP_HOME="$_xdg_data_home/rustup"  # Set Rustup home directory
+# export RUSTUP_HOME
+# # )))
 
-# ------------------- FZF Advanced Configuration ------------------- (((
+# # ------------------- Sagemath Environment -------------------(((
+# # if command -v "sage" > /dev/null 2>&1; then
+#   DOT_SAGE="$XDG_CONFIG_HOME"/sage
+#   export DOT_SAGE
+# # fi
+# # )))
 
-# Guard: only run if fzf exists
-if command -v fzf >/dev/null 2>&1; then
+# # ------------------- GNU Screen Environment -------------------(((
+# # Set user-specific screen configuration and socket directory if screen exists
+# # if command -v "screen" > /dev/null 2>&1; then
+#   _screenrc="$_xdg_config_home/screen/screenrc"
+#   if [ -f "$_screenrc" ]; then
+#     SCREENRC="$_screenrc"
+#     SCREENDIR="${XDG_RUNTIME_DIR:-/tmp}/screen"
+#     export SCREENRC SCREENDIR
+#   fi
+#   unset _screenrc
+# # fi
+# # )))
 
-  # ---------------- Base defaults (set ONCE) ----------------
-  FZF_DEFAULT_OPTS="
-  --ansi
-  --layout=reverse
-  --height=50%
-  --multi
-  --bind 'ctrl-/:toggle-preview'
-  --pointer=''
-  --marker='▏'
-  --prompt='󰍉 '
-  --separator='─'
-  --color fg+:cyan,bg+:black,info:yellow,pointer:red
-  "
+# # ------------------- Singularity-CE Environment ------------------ (((
+# # if command -v "singularity" > /dev/null 2>&1; then
+#   SINGULARITY_CONFIGDIR="$_xdg_config_home/singularity"
+#   SINGULARITY_CACHEDIR="$_xdg_cache_home/singularity"
+#   export SINGULARITY_CONFIGDIR SINGULARITY_CACHEDIR
+# # fi
+# # )))
 
-  # ---------------- Unified preview (portable + safe) ----------------
-  FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
-  --preview 'sh -c \"
-    file=\\\"\\\$1\\\"
-    file=\\\${file#./}
+# # ------------------- TexLive Environment ------------------ (((
+# # if command -v "pdflatex" > /dev/null 2>&1; then
+#   TEXMFHOME="$_xdg_data_home/texmf"
+#   TEXMFVAR="$_xdg_cache_home/texlive/texmf-var"
+#   TEXMFCONFIG="$_xdg_config_home/texlive/texmf-config"
+#   export TEXMFHOME TEXMFVAR TEXMFCONFIG
+# # fi
+# # )))
 
-    if [ -d \\\"\\\$file\\\" ]; then
-      ls -la \\\"\\\$file\\\" 2>/dev/null || ls -laG \\\"\\\$file\\\"
+# # ------------------- TMC Environment --------------------------- (((
+# # if command -v "tmc" > /dev/null 2>&1; then
+#   TMC_LANGS_CONFIG_DIR="$_xdg_config_home/tmc-config"
+#   export TMC_LANGS_CONFIG_DIR
+# # fi
+# # )))
 
-    elif command -v file >/dev/null 2>&1 &&
-         file --mime \\\"\\\$file\\\" | grep -q \"charset=binary\"; then
-      echo \\\"[binary file]\\\"
+# # ------------------- Vagrant Environment ------------------ (((
+# # if command -v "vagrant" > /dev/null 2>&1; then
+#   _vagrant_home="$_xdg_data_home/vagrant"
+#
+#   # Create the VAGRANT_HOME directory if it doesn't exist
+#   mkdir -p "$_vagrant_home"
+#   VAGRANT_HOME="$_vagrant_home"
+#
+#   # Ensure the alias file exists (create if not)
+#   VAGRANT_ALIAS_FILE="$_vagrant_home/aliases"
+#   if [ ! -f "$VAGRANT_ALIAS_FILE" ]; then
+#     touch "$VAGRANT_ALIAS_FILE"
+#   fi
+#
+#   export VAGRANT_HOME VAGRANT_ALIAS_FILE
+# # fi
+# # )))
 
-    elif command -v bat >/dev/null 2>&1; then
-      bat --style=plain,grid,numbers --color=always \
-          --paging=never --line-range :300 \\\"\\\$file\\\" 2>/dev/null
+# # ------------------- w3m Environment ------------------ (((
+# # Set user-specific w3m config directory if w3m exists
+# # if command -v "w3m" > /dev/null 2>&1; then
+#   W3M_DIR="$_xdg_state_home/w3m"
+#   export W3M_DIR
+# # fi
+# # )))
 
-    else
-      cat \\\"\\\$file\\\" 2>/dev/null | head -n 200
-    fi
-  \" _ {}'
-  "
-
-  export FZF_DEFAULT_OPTS
-
-  # ---------------- CTRL-T (file finder) ----------------
-  FZF_CTRL_T_OPTS="
-  --height=40%
-  --layout=reverse
-  --bind 'ctrl-/:toggle-preview'
-  "
-  export FZF_CTRL_T_OPTS
-
-  # ---------------- CTRL-R (history search) ----------------
-  FZF_CTRL_R_OPTS="
-  --preview 'echo {}'
-  --preview-window=up:3:hidden:wrap
-  --height=30%
-  --layout=reverse
-  --bind 'ctrl-/:toggle-preview'
-  --color header:italic
-  --cycle
-  "
-  export FZF_CTRL_R_OPTS
-
-  # ---------------- Git integration (fully hardened) ----------------
-  if command -v git >/dev/null 2>&1; then
-    FZF_GIT_FILES_OPTS="
-    --ansi
-    --height=50%
-    --layout=reverse
-    --multi
-    --bind 'ctrl-/:toggle-preview'
-    --color fg+:green,bg+:black,preview-border:blue
-    --preview 'sh -c \"
-      file=\\\"\\\$1\\\"
-      file=\\\${file#./}
-
-      if git diff --quiet -- \\\"\\\$file\\\"; then
-        git show --color=always \\\"HEAD:\\\$file\\\" 2>/dev/null
-      else
-        git diff --color=always -- \\\"\\\$file\\\"
-      fi ||
-      if command -v bat >/dev/null 2>&1; then
-        bat --color=always --paging=never --line-range :300 \\\"\\\$file\\\" 2>/dev/null
-      else
-        cat \\\"\\\$file\\\" 2>/dev/null | head -n 200
-      fi
-    \" _ {}'
-    "
-    export FZF_GIT_FILES_OPTS
-  fi
-
-  # ---------------- File source (rg if available) ----------------
-  if command -v rg >/dev/null 2>&1; then
-    export FZF_DEFAULT_COMMAND='rg --files --hidden --glob "!.git/*"'
-  fi
-
-fi
-
-# )))
-
-
-# ------------------- GCC_COLORS Setup (((
-# This configuration leverages 24-bit RGB colors for modern terminals while
-# falling back to classic 16-color ANSI codes for older terminals.
-# It covers all GCC diagnostic elements: errors, warnings, notes, code ranges,
-# file paths, diff highlights, and fixit hints.
-# -----------------------------------------------------------------------------
-
-# Detect if terminal supports truecolor (24-bit)
-if [ "${COLORTERM-}" = "truecolor" ] || [ "${COLORTERM-}" = "24bit" ]; then
-  # ------------------- Truecolor 24-bit GCC_COLORS -------------------
-  # Format: 38;2;<R>;<G>;<B> foreground, 48;2;<R>;<G>;<B> background
-  GCC_COLORS="\
-error=38;2;255;0;0:warning=38;2;255;165;0:note=38;2;0;255;255:\
-range1=38;2;0;255;0:range2=38;2;0;0;255:locus=38;2;255;255;0:\
-quote=38;2;255;0;255:path=38;2;0;255;255:fixit-insert=38;2;0;200;0:fixit-delete=38;2;200;0;0:\
-diff-filename=38;2;255;255;255:diff-hunk=38;2;0;255;0:diff-delete=38;2;255;0;0:diff-insert=38;2;0;255;0:\
-type-diff=38;2;0;255;255"
-else
-  # ------------------- Fallback to Classic 16-Color ANSI -------------------
-  GCC_COLORS="\
-error=01;31:warning=01;35:note=01;36:range1=32:range2=34:locus=01:\
-quote=01:path=01;36:fixit-insert=32:fixit-delete=31:\
-diff-filename=01:diff-hunk=32:diff-delete=31:diff-insert=32:\
-type-diff=01;32"
-fi
-
-# Explanation of Key Fields:
-# - error / warning / note: Highlight GCC diagnostics in red, orange, cyan
-# - range1 / range2: Highlight ranges in green / blue for code selection
-# - locus: Emphasize the locus (location) of diagnostic
-# - quote: Quoted strings in diagnostics
-# - path: File paths
-# - fixit-insert / fixit-delete: Proposed code modifications
-# - diff-filename / diff-hunk / diff-delete / diff-insert / type-diff: Highlight diffs in compiler output
-
-# Export GCC_COLORS for all GCC invocations
-export GCC_COLORS
-# -----------------------------------------------------------------------------
-# )))
-
-# ------------------- ghcup Setup (((
-GHCUP_USE_XDG_DIRS=true
-export GHCUP_USE_XDG_DIRS
-# )))
-
-# ------------------- Git Editor and Diff Setup ------------------- (((
-# Use VISUAL as Git editor, optionally start in insert mode for vim/neovim (((
-if [ -n "$VISUAL" ]; then
-  case "$VISUAL" in
-    vim|nvim) GIT_EDITOR="$VISUAL -c startinsert" ;;
-    *) GIT_EDITOR="$VISUAL" ;;
-  esac
-  export GIT_EDITOR
-fi
-# )))
-
-# Use 'difft' as Git external diff tool if available (((
-if command -v "difft" > /dev/null 2>&1; then
-  GIT_EXTERNAL_DIFF=$(command -v difft)
-  export GIT_EXTERNAL_DIFF
-fi
-# )))
-
-# Git Pager Setup -------------------(((
-# Prefer 'bat' as Git pager if available, fallback to 'less'
-if command -v "bat" > /dev/null 2>&1; then
-  # Use bat for Git output with plain style and header
-  GIT_PAGER="bat --style=plain,header"
-else
-  # Fallback to less if bat is not available
-  GIT_PAGER="less"
-fi
-export GIT_PAGER
-# )))
-# )))
-
-# ------------------- Go Environment ------------------ (((
-# Set GOCACHE, GOMODCACHE, and GOPATH to user-specific directories
-if command -v "go" > /dev/null 2>&1; then
-  GOCACHE="$_xdg_state_home/go/go-build"
-  GOMODCACHE="$_xdg_state_home/go/mod"
-  GOPATH="$_xdg_data_home/go"
-  export GOCACHE GOMODCACHE GOPATH  # Export all Go-related environment variables in one step
-fi
-# )))
-
-# ------------------- Java Environment (((
-_JAVA_OPTIONS=-Djava.util.prefs.userRoot="$_xdg_config_home/java"
-export _JAVA_OPTIONS
-# )))
-
-# ------------------- Jupyter Configuration ------------------- (((
-# Set JUPYTER_CONFIG_DIR to a user-specific config directory
-JUPYTER_CONFIG_DIR="$_xdg_config_home/jupyter"
-export JUPYTER_CONFIG_DIR
-# )))
-
-# ------------------- K9S Configuration (((
-K9SCONFIG="$_xdg_config_home/k9s"
-export K9SCONFIG
-# )))
-
-# ------------------- MAXIMA Configuration (((
-MAXIMA_USERDIR="$_xdg_config_home/maxima"
-export MAXIMA_USERDIR
-# )))
-
-# ------------------- Minikube Configuration (((
-MINIKUBE_HOME="$_xdg_data_home/minikube"
-export MINIKUBE_HOME
-# )))
-
-# ------------------- Nodejs Configuration ------------------- (((
-# ------------------- Node.js REPL History ------------------- (((
-# Set NODE_REPL_HISTORY to a custom location for persistent REPL history
-NODE_REPL_HISTORY="$_xdg_state_home/node_repl_history"
-export NODE_REPL_HISTORY
-# )))
-
-# ------------------- NPM User Configuration ------------------- (((
-# Set NPM_CONFIG_USERCONFIG if a custom npmrc exists
-_npmrc="$_xdg_config_home/npm/npmrc"
-if [ -f "$_npmrc" ]; then
-  NPM_CONFIG_USERCONFIG="$_npmrc"
-  export NPM_CONFIG_USERCONFIG
-fi
-unset _npmrc
-# )))
-# )))
-
-# ------------------- Python Configuration ------------------- (((
-# Set PYTHONSTARTUP if the user has a custom Python startup script
-if command -v "python" > /dev/null 2>&1 || command -v "python3" > /dev/null 2>&1; then
-
-  _pythonrc="$_xdg_config_home/python/pythonrc"
-  if [ -f "$_pythonrc" ]; then
-    PYTHONSTARTUP="$_pythonrc"
-    export PYTHONSTARTUP
-  fi
-  unset _pythonrc
-
-  _python_histdir="$_xdg_state_home/python"
-  if ! [ -d "$_python_histdir" ]; then
-    mkdir -p "$_python_histdir"
-  fi
-  PYTHON_HISTORY="$_python_histdir/python_history"
-  unset _python_histdir
-
-  PYTHON_EGG_CACHE="$_xdg_cache_home/python-eggs"
-  PYTHONPYCACHEPREFIX="$_xdg_cache_home/python"
-  PYTHONUSERBASE="$_xdg_data_home/python"
-  export PYTHON_HISTORY PYTHON_EGG_CACHE PYTHONPYCACHEPREFIX PYTHONUSERBASE
-fi
-# )))
-
-# ------------------- Qt6 Configuration Tool ------------------- (((
-# Set Qt platform theme if qt6ct is available
-if command -v "qt6ct" > /dev/null 2>&1; then
-  QT_QPA_PLATFORMTHEME="qt6ct"
-  export QT_QPA_PLATFORMTHEME
-fi
-# )))
-
-# ------------------- Ripgrep Configuration Directory ------------------- (((
-if command -v "rg" > /dev/null 2>&1; then
-  _ripgrep_config_file="$_xdg_config_home/ripgrep/config"
-  if [ -f "$_ripgrep_config_file" ]; then
-    RIPGREP_CONFIG_PATH="$_ripgrep_config_file"
-    export RIPGREP_CONFIG_PATH
-  fi
-  unset _ripgrep_config_file
-fi
-# )))
-
-# ------------------- rlwrap Home Directory ------------------- (((
-if command -v "rlwrap" > /dev/null 2>&1; then
-  RLWRAP_HOME="$_xdg_data_home/rlwrap"
-  export RLWRAP_HOME
-fi
-# )))
-
-# ------------------- Ruff Cache Directory ------------------- (((
-if command -v "ruff" > /dev/null 2>&1; then
-  RUFF_CACHE_DIR="$_xdg_state_home/ruff"  # Set Ruff cache directory
-  export RUFF_CACHE_DIR
-fi
-# )))
-
-# ------------------- Rustup Environment -------------------(((
-RUSTUP_HOME="$_xdg_data_home/rustup"  # Set Rustup home directory
-export RUSTUP_HOME
-# )))
-
-# ------------------- Sagemath Configuration -------------------(((
-if command -v "sage" > /dev/null 2>&1; then
-  DOT_SAGE="$XDG_CONFIG_HOME"/sage
-  export DOT_SAGE
-fi
-# )))
-
-# ------------------- GNU Screen Configuration -------------------(((
-# Set user-specific screen configuration and socket directory if screen exists
-if command -v "screen" > /dev/null 2>&1; then
-  _screenrc="$_xdg_config_home/screen/screenrc"
-  if [ -f "$_screenrc" ]; then
-    SCREENRC="$_screenrc"
-    SCREENDIR="${XDG_RUNTIME_DIR:-/tmp}/screen"
-    export SCREENRC SCREENDIR
-  fi
-  unset _screenrc
-fi
-# )))
-
-# ------------------- Singularity-CE Configuration ------------------ (((
-if command -v "singularity" > /dev/null 2>&1; then
-  SINGULARITY_CONFIGDIR="$_xdg_config_home/singularity"
-  SINGULARITY_CACHEDIR="$_xdg_cache_home/singularity"
-  export SINGULARITY_CONFIGDIR SINGULARITY_CACHEDIR
-fi
-# )))
-
-# ------------------- TexLive Configuration ------------------ (((
-if command -v "pdflatex" > /dev/null 2>&1; then
-  TEXMFHOME="$_xdg_data_home/texmf"
-  TEXMFVAR="$_xdg_cache_home/texlive/texmf-var"
-  TEXMFCONFIG="$_xdg_config_home/texlive/texmf-config"
-  export TEXMFHOME TEXMFVAR TEXMFCONFIG
-fi
-# )))
-
-# ------------------- Vagrant Configuration ------------------ (((
-if command -v "vagrant" > /dev/null 2>&1; then
-  _vagrant_home="$_xdg_data_home/vagrant"
-  VAGRANT_HOME="$_vagrant_home"
-  VAGRANT_ALIAS_FILE="$_vagrant_home/aliases"
-  export VAGRANT_HOME VAGRANT_ALIAS_FILE
-  unset _vagrant_home
-fi
-# )))
-
-# ------------------- w3m Configuration ------------------ (((
-# Set user-specific w3m config directory if w3m exists
-if command -v "w3m" > /dev/null 2>&1; then
-  W3M_DIR="$_xdg_state_home/w3m"
-  export W3M_DIR
-fi
-# )))
-
-# ------------------- wget Configuration ------------------- (((
-# Use user-specific wgetrc if both the config and HSTS cache exist
-if command -v "wget" > /dev/null 2>&1; then
-  _wget_config_file="$_xdg_config_home/wget/wgetrc"
-  if [ -f "$_wget_config_file" ] && [ -f "$_xdg_cache_home/wget-hsts" ]; then
-    WGETRC="$_wget_config_file"
-    export WGETRC
-  fi
-  unset _wget_config_file
-fi
-# )))
+# # ------------------- wget Environment ------------------- (((
+# # Use user-specific wgetrc if both the config and HSTS cache exist
+# # if command -v "wget" > /dev/null 2>&1; then
+#   _wget_config_file="$_xdg_config_home/wget/wgetrc"
+#   if [ -f "$_wget_config_file" ]; then
+#     WGETRC="$_wget_config_file"
+#     export WGETRC
+#   fi
+# # fi
+# # )))
 
 # )))
 
 # SSH Agent Setup -------------------(((
+# Check if the `ssh-agent` command is available (whether the agent is installed)
 if command -v "ssh-agent" > /dev/null 2>&1; then
 
-  # Space-separated list of keys we want loaded
+  # Define a space-separated list of SSH keys you want to add to the agent.
+  # You can specify the full path to each SSH private key.
   _ssh_keys_to_add="$HOME/.ssh/id_ed25519_nov13_2025 $HOME/.ssh/id_ed25519"
+  case "$_ssh_keys_to_add" in *" "*)
+  : ;;  # documented: SSH key paths must not contain spaces
+  esac
 
-  # Strip out keys which do not exist
+  # Initialize an empty string to hold valid SSH keys that actually exist
   _valid_ssh_keys_for_keychain=""
+
+  # Loop through the list of SSH keys to check if both the private key and its corresponding public key exist
   for _key in $_ssh_keys_to_add; do
+    # Check if the private key file and the corresponding public key file exist
     if [ -f "$_key" ] && [ -f "$_key.pub" ]; then
-      if [ -z "$_valid_ssh_keys_for_keychain" ]; then
-        _valid_ssh_keys_for_keychain="$_key"
-      else
-        _valid_ssh_keys_for_keychain="$_valid_ssh_keys_for_keychain $_key"
-      fi
+      # If both exist, add the key to the valid keys list
+      _valid_ssh_keys_for_keychain="$_valid_ssh_keys_for_keychain $_key"
     fi
   done
+
+  # Update the list of SSH keys to add, now containing only valid keys
   _ssh_keys_to_add="$_valid_ssh_keys_for_keychain"
-  unset _valid_ssh_keys_for_keychain _key
 
-  # Prefer keychain if available, else fallback to ssh-agent + ssh-add
-  if command -v "keychain" > /dev/null 2>&1; then
+  # Check if the operating system is macOS (Darwin)
+  if [ "$(uname)" = "Darwin" ]; then
+    # On macOS, we can use the system's built-in SSH agent, which is automatically integrated with macOS's keychain.
 
-    eval "$(keychain --absolute --dir "$XDG_RUNTIME_DIR"/keychain \
-      --confallhosts --ignore-missing --nogui --ssh-allow-forwarded --quiet --systemd \
-      $_ssh_keys_to_add)"
-
-  else
-
-    # Start ssh-agent only if not already running
-    [ -z "$SSH_AUTH_SOCK" ] && eval "$(ssh-agent -s)" >/dev/null
-
-    # Add each valid key
-    if command -v "ssh-add" > /dev/null 2>&1; then
-      set -- $_ssh_keys_to_add
-      while [ $# -gt 0 ]; do
-        _current_ssh_key="$1"
-        [ -f "$_current_ssh_key" ] && ssh-add "$_current_ssh_key" >/dev/null 2>&1
-        shift
-      done
+    # Check if the SSH agent is already running by checking the SSH_AUTH_SOCK environment variable
+    if [ -z "$SSH_AUTH_SOCK" ]; then
+      # If the agent is not running, start it
+      eval "$(ssh-agent -s 2>/dev/null)" >/dev/null
     fi
 
+    # Add each valid SSH key to the SSH agent using ssh-add
+    # if command -v "ssh-add" > /dev/null 2>&1; then
+      set -- $_ssh_keys_to_add  # Set positional parameters to the valid keys
+      # Loop through each key and add it to the agent
+      while [ $# -gt 0 ]; do
+        _current_ssh_key="$1"  # Get the current SSH key
+        [ -f "$_current_ssh_key" ] && ssh-add "$_current_ssh_key" >/dev/null 2>&1  # Add the key if it exists
+        shift  # Move to the next key in the list
+      done
+    # fi
+  else
+    # On Linux (or non-macOS systems), prefer using `keychain` if it's installed.
+    # If keychain is installed, it will help manage the SSH agent and keys.
+
+    if command -v "keychain" > /dev/null 2>&1; then
+      _old_pos="$*"; set -- $_ssh_keys_to_add
+      # Use `keychain` to manage the keys and the SSH agent
+      eval "$(keychain --absolute --dir "${XDG_RUNTIME_DIR:-/tmp}/keychain" \
+        --confallhosts --ignore-missing --nogui --ssh-allow-forwarded --quiet --systemd \
+        "$@")"
+      set -- $_old_pos; unset _old_pos
+    else
+      # If `keychain` isn't available, fall back to using the `ssh-agent` directly.
+
+      # Start the SSH agent if it's not already running
+      if [ -z "$SSH_AUTH_SOCK" ]; then
+        eval "$(ssh-agent -s 2>/dev/null)" >/dev/null
+      fi
+
+      # Add each valid SSH key to the SSH agent using ssh-add
+      # if command -v "ssh-add" > /dev/null 2>&1; then
+        set -- $_ssh_keys_to_add  # Set positional parameters to the valid keys
+        # Loop through each key and add it to the agent
+        while [ $# -gt 0 ]; do
+          _current_ssh_key="$1"  # Get the current SSH key
+          [ -f "$_current_ssh_key" ] && ssh-add "$_current_ssh_key" >/dev/null 2>&1  # Add the key if it exists
+          shift  # Move to the next key in the list
+        done
+      # fi
+    fi
   fi
-
-  unset _ssh_keys_to_add
-
 fi
 # )))
 
 # Unset variables local to this file (((
-unset _xdg_state_home _xdg_data_home _xdg_cache_home _xdg_config_home
+unset _xdg_state_home _xdg_data_home _xdg_cache_home _xdg_localdir _xdg_config_home
 unset SH_FUNCTIONS_SOURCED
 # )))
 
