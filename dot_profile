@@ -1,7 +1,7 @@
 # vim: ft=sh:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=145:syntax=sh:
 # shellcheck shell=sh
 # shellcheck disable=SC1091
-# $HOME/.profile checked Feb 06, 2026
+# $HOME/.profile checked Feb 07, 2026
 
 # Define local xdg basedir variables (((
 _xdg_config_home="$HOME/.config" && mkdir -p "$_xdg_config_home"
@@ -18,6 +18,7 @@ if [ -f "$_xdg_config_home/sh/sh_functions.sh" ]; then
 fi
 # )))
 
+# path_prepend() and path_append() functions (((
 path_prepend() {
   case ":${PATH-}:" in
     *:"$1":*) ;;
@@ -31,10 +32,11 @@ path_append() {
     *) PATH=${PATH:+$PATH:}$1 ;;
   esac
 }
-# path_prepend "$HOME/.local/bin"
+
 # path_append "$_xdg_data_home/luarocks/bin"
 # path_prepend "$PIXI_HOME/bin"
 
+# )))
 
 # Prepend "$HOME/.local/bin" to PATH (irrespective of whether it exists to be ready to go) (((
 _local_bindir="$_xdg_localdir/bin"
@@ -42,17 +44,7 @@ _local_bindir="$_xdg_localdir/bin"
 if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
   update_env_var PATH --prepend "$_local_bindir"
 else
-  case ":${PATH-}:" in
-    *:"$_local_bindir":*)
-      ;; # already present
-    *)
-      if [ -z "${PATH-}" ]; then
-        PATH="$_local_bindir"
-      else
-        PATH="$_local_bindir:$PATH"
-      fi
-      ;;
-  esac
+  path_prepend "$_local_bindir"
 fi
 # fi
 unset _local_bindir
@@ -73,16 +65,7 @@ if [ -d "$_luarocks_bindir" ]; then
   if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
     update_env_var PATH --append "$_luarocks_bindir"
   else
-    case ":${PATH-}:" in
-      *:"$_luarocks_bindir":*) ;;
-      *)
-        if [ -z "${PATH-}" ]; then
-          PATH="$_luarocks_bindir"
-        else
-          PATH="${PATH}:$_luarocks_bindir"
-        fi
-        ;;
-    esac
+    path_append "$_luarocks_bindir"
   fi
 fi
 unset _luarocks_bindir
@@ -100,16 +83,7 @@ if ! command -v "pixi" > /dev/null 2>&1 && [ -x "$_pixi_bindir/pixi" ]; then
   if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
     update_env_var PATH --prepend "$_pixi_bindir"
   else
-    case ":${PATH-}:" in
-      *:"$_pixi_bindir":*) ;;
-      *)
-        if [ -z "${PATH-}" ]; then
-          PATH="$_pixi_bindir"
-        else
-          PATH="$_pixi_bindir:$PATH"
-        fi
-        ;;
-    esac
+    path_prepend "$_pixi_bindir"
   fi
 fi
 unset _pixi_bindir
@@ -122,8 +96,9 @@ _tl_year=$(date '+%Y' 2>/dev/null) && _tl_dir="$_xdg_localdir/texlive/$_tl_year"
 unset _tl_year
 if [ -d "$_tl_dir" ]; then
   # Extract the OS and Architecture using strict POSIX parameter expansion
-  _ARCH=$(uname -m)
-  _OS=$(uname -s)
+  _ARCH=$(uname -m 2>/dev/null)
+  _OS=$(uname -s 2>/dev/null)
+  _UNAME_S="$_OS"
   # Convert _OS to lowercase manually
   case $_OS in
     Darwin) _OS=darwin ;;
@@ -136,16 +111,7 @@ if [ -d "$_tl_dir" ]; then
   if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
     update_env_var PATH --prepend "$_tl_bin_path"
   else
-    case ":${PATH-}:" in
-      *:"$_tl_bin_path":*) ;;
-      *)
-        if [ -z "${PATH-}" ]; then
-          PATH="$_tl_bin_path"
-        else
-          PATH="$_tl_bin_path:$PATH"
-        fi
-        ;;
-    esac
+    path_prepend "$_tl_bin_path"
   fi
 fi
 unset _tl_dir
@@ -217,7 +183,7 @@ fi
 _editor_priority_list="nvim vim vi emacs nano"
 
 # Save the current IFS to restore later
-_old_ifs="$IFS"
+_old_ifs=${IFS-}
 
 # Set IFS to space to split the list into individual words
 IFS=" "
@@ -237,7 +203,7 @@ for editor in $_editor_priority_list; do
 done
 
 # Restore the original IFS
-IFS="$_old_ifs"
+IFS=$_old_ifs
 unset _old_ifs
 
 # Set both SUDO_EDITOR and EDITOR to the same editor
@@ -304,16 +270,18 @@ fi
 # Set LESSOPEN (((
 LESSOPEN=""
 if [ -n "$_batpipe_location" ]; then  # use batpipe for LESSOPEN if found in path
-  LESSOPEN="|$_batpipe_location %s"
-  LESSCLOSE=""
-  BATPIPE="color"
+  LESSOPEN="|$_batpipe_location -- %s"
+  BATPIPE=color
   export BATPIPE
 elif command -v "lesspipe" > /dev/null 2>&1; then
+  # shellcheck disable=SC2046
   LESSOPEN="|$(command -v lesspipe) %s"
 elif command -v "lesspipe.sh" > /dev/null 2>&1; then
+  # shellcheck disable=SC2046
   LESSOPEN="|$(command -v lesspipe.sh) %s"
 fi
 export LESSOPEN
+export LESSSECURE=1
 unset _batpipe_location
 # )))
 
@@ -335,35 +303,19 @@ export LESS LESSHISTFILE
 # )))
 # )))
 
-# Set Locale with fallback to en_US.UTF-8 (((
-# Check if the 'locale' command is available
-if ! command -v locale >/dev/null 2>&1; then
-  # Print message and fall back to en_US.UTF-8 if locale isn't available
-  echo "Warning: 'locale' command not found. Falling back to en_US.UTF-8"
-  LANG="en_US.UTF-8"
-else
-  # Check for 'en_GB' or 'en_US' locales using case statement
-  case "$(locale -a 2>/dev/null || printf '')" in
-    *"en_GB.UTF-8"*) LANG="en_GB.UTF-8" ;;  # Set to en_GB.UTF-8 if available
-    *"en_US.UTF-8"*) LANG="en_US.UTF-8" ;;  # Set to en_US.UTF-8 if available
-    *) LANG="en_US.UTF-8" ;;  # Default to en_US.UTF-8 if neither found
-  esac
-fi
-
-# Set specific LC_* variables (some set to en_GB.UTF-8, others to C)
+# Set locale-related environment variables for UTF-8 terminal support (((
+LANG="en_GB.UTF-8" # Set language and character encoding
 LC_COLLATE="C"             # Use C locale for sorting (e.g., for programming or POSIX tools)
-LC_CTYPE="${LANG:-en_US.UTF-8}"  # Character classification and conversion (UTF-8 for character types)
-LC_MESSAGES="$LANG"        # Messages and user interface text
-LC_MONETARY="C"            # Monetary settings (POSIX standard)
-LC_NAME="C"                # Name-related settings (POSIX standard)
-LC_NUMERIC="C"             # Numeric settings (POSIX standard)
-LC_PAPER="$LANG"           # Paper size (en_GB.UTF-8 or en_US.UTF-8)
-LC_TIME="C"                # Time-related behavior (POSIX standard)
-
-LC_ALL=""                   # Reset LC_ALL to allow specific LC_* variables to take effect
+LC_CTYPE="en_GB.UTF-8"     # Character classification and conversion (UTF-8 for character types)
+LC_MESSAGES="en_GB.UTF-8"  # Messages and user interface text
+LC_MONETARY="C"
+LC_NAME="C"
+LC_NUMERIC="C"
+LC_PAPER="en_GB.UTF-8"
+LC_TIME="C"  # Set time-related behavior to "C" locale (useful for POSIX systems)
+LC_ALL=""    # Reset LC_ALL to allow specific LC_* variables to take effect
 
 export LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TIME LC_ALL
-# )))
 
 # Set Pager (feature-gated, long options) (((
 PAGER=more   # guaranteed by POSIX
@@ -485,7 +437,7 @@ fi
 # #   if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
 # #     update_env_var PATH --prepend "$CARGO_HOME/bin"
 # #   else
-# #     PATH="$CARGO_HOME/bin:$PATH"
+# #     path_prepend "$CARGO_HOME/bin"
 # #   fi
 # # fi
 # # )))
@@ -511,241 +463,104 @@ fi
 # # fi
 # # )))
 
-# ------------------- POSIX FZF Terminal-Aware Setup ------------------(((
-# --- Helper to check external tools --------------------------------------
-_has() { command -v "$1" >/dev/null 2>&1; }
+# ------------------- FZF Advanced Configuration ------------------- (((
+# POSIX-compliant, modern fzf setup with BAT previews, git integration,
+# multi-pane support, truecolor-safe options, and advanced keybindings.
 
-_HAS_KITTY=0
-_HAS_WEZTERM=0
-_HAS_ITERM=0
-[ -n "$KITTY_WINDOW_ID" ] && _HAS_KITTY=1
-[ -n "$WEZTERM_EXECUTABLE" ] && _HAS_WEZTERM=1
-[ "$TERM_PROGRAM" = "iTerm.app" ] && _HAS_ITERM=1
+# Only configure if fzf exists
+if command -v "fzf" > /dev/null 2>&1; then
 
-# --- Terminal size helper -----------------------------------------------
-_fzf_term_size() {
-  C=${COLUMNS:-80}
-  L=${LINES:-24}
-  COLS=$C
-  LINES_PREVIEW=$((L-2))
-}
+  # Ensure bat is present for previews
+  if command -v "bat" > /dev/null 2>&1; then
 
-# --- File kind detection -----------------------------------------------
-_fzf_kind() {
-  file=$1
-  case "$file" in
-    *.png|*.jpg|*.jpeg|*.gif|*.webp) printf image ;;
-    *.mp4|*.mkv|*.mov|*.avi) printf video ;;
-    *.mp3|*.flac|*.wav|*.ogg) printf audio ;;
-    *.zip|*.tar|*.tgz|*.tar.gz|*.tar.xz|*.xz|*.7z) printf archive ;;
-    *.pdf) printf pdf ;;
-    *.patch) printf patch ;;
-    *.md|*.txt|*.json|*.yaml|*.yml|*.toml|*.sh|*.zsh|*.fish|*.py|*.rs|*.go|*.c|*.h|*.cpp|*.js|*.ts|*.html|*.css)
-      printf text ;;
-    *)
-      b=$(dd if="$file" bs=1 count=1 2>/dev/null)
-      case "$b" in
-        ''|[![:print:]]) printf binary ;;
-        *) printf text ;;
-      esac
-      ;;
-  esac
-}
-
-# --- Preview primitives -----------------------------------------------
-
-_fzf_preview_text() {
-  f=$1
-  if _has bat; then
-    bat --style=plain --color=always --pager=never "$f"
-    return
+    # CTRL-T (file finder) options
+    # - Show bat preview of the selected file with line numbers and syntax highlighting
+    # - ctrl-/ toggles preview window
+    # - preview window at the bottom, initially hidden
+    FZF_CTRL_T_OPTS="
+    --preview 'bat --style=plain,grid,numbers --color=always -- {} || cat -- {}'
+    --bind 'ctrl-/:change-preview-window(down|hidden|)'
+    --height 40%
+    --layout=reverse
+    --ansi
+    --color=fg+:yellow,bg+:black,preview-border:magenta
+    --multi"
+    export FZF_CTRL_T_OPTS
   fi
-  if _has less; then
-    less -RFX "$f"
-    return
+
+  # CTRL-R (history search) options
+  # - Show previous commands with preview of command
+  # - preview window at top, initially hidden
+  FZF_CTRL_R_OPTS="
+  --preview 'echo {}'
+  --preview-window=up:3:hidden:wrap
+  --bind 'ctrl-/:toggle-preview'
+  --color header:italic
+  --height 30%
+  --layout=reverse
+  --ansi
+  --cycle"
+  export FZF_CTRL_R_OPTS
+
+  # File / Directory completion using fzf with BAT previews
+  FZF_PREVIEW="if [ -d {} ]; then ls -la --color=always -- {}; else bat --style=plain,grid,numbers --color=always -- {}; fi"
+  FZF_BIND="ctrl-d:toggle-preview,alt-l:accept,alt-h:abort"
+  FZF_COLOR="fg+:cyan,bg+:black,info:yellow,pointer:red"
+  FZF_OPTS="--ansi --height=50% --layout=reverse --multi"
+
+  FZF_DEFAULT_OPTS="$FZF_PREVIEW --bind $FZF_BIND --color $FZF_COLOR $FZF_OPTS"
+# export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+  export FZF_DEFAULT_OPTS
+  unset FZF_PREVIEW FZF_BIND FZF_COLOR FZF_OPTS
+
+
+  # Git integration (if inside a git repo)
+  # - CTRL-G opens git file search
+  # - Shows modified files with diff preview
+  if command -v "git" > /dev/null 2>&1; then
+    FZF_GIT_PREVIEW="git diff --color=always -- {} | head -n 50"
+    FZF_GIT_BIND="ctrl-/:toggle-preview"
+    FZF_GIT_COLOR="fg+:green,bg+:black,preview-border:blue"
+    FZF_GIT_OPTS="--height 50% --layout=reverse --ansi --multi"
+
+    FZF_GIT_FILES_OPTS="$FZF_GIT_PREVIEW --bind $FZF_GIT_BIND --color $FZF_GIT_COLOR $FZF_GIT_OPTS"
+    export FZF_GIT_FILES_OPTS
   fi
-  cat "$f"
-}
 
-_fzf_preview_pdf() {
-  f=$1
-  _fzf_term_size
-  if _has pdftotext; then
-    pdftotext -layout "$f" - | head -n "$LINES_PREVIEW"
-  else
-    printf 'PDF: %s\n' "$f"
+  # Use ripgrep (rg) for file searches, if available
+  if command -v "rg" > /dev/null 2>&1; then
+
+    # File search with ripgrep and BAT previews
+    FZF_DEFAULT_OPTS="
+    --preview 'if [ -d {} ]; then ls -la --color=always {}; else rg --color=always --no-heading --line-number --column {} || cat {}; fi'
+    --bind 'ctrl-d:toggle-preview,alt-l:accept,alt-h:abort'
+    --color=fg+:cyan,bg+:black,info:yellow,pointer:red
+    --ansi
+    --height=50%
+    --layout=reverse
+    --multi"
+    export FZF_DEFAULT_OPTS
+
+    # Git files search using ripgrep, if inside a git repo
+    FZF_GIT_FILES_OPTS="
+    --preview 'rg --color=always --no-heading --line-number --column {} | head -n 50'
+    --bind 'ctrl-/:toggle-preview'
+    --color fg+:green,bg+:black,preview-border:blue
+    --height 50%
+    --layout=reverse
+    --ansi
+    --multi"
+    export FZF_GIT_FILES_OPTS
   fi
-}
 
-_fzf_preview_image() {
-  f=$1
-  _fzf_term_size
-  W=$COLS
-  H=$LINES_PREVIEW
-
-  if [ "$_HAS_KITTY" -eq 1 ] && _has kitty; then
-    mtime=$(stat -c %Y "$f" 2>/dev/null || stat -f %m "$f" 2>/dev/null)
-    cache_id=$(echo "$f-$mtime" | tr '/ ' '_')
-    kitty +kitten icat --clear=no --place="${W}x${H}@0x0" --sync --stdin-name="$cache_id" "$f"
-    return
-  fi
-  if [ "$_HAS_WEZTERM" -eq 1 ] && _has wezterm; then
-    wezterm imgcat "$f"
-    return
-  fi
-  if [ "$_HAS_ITERM" -eq 1 ] && _has imgcat; then
-    imgcat "$f"
-    return
-  fi
-  printf 'Image: %s\n' "$f"
-}
-
-_fzf_preview_video() {
-  f=$1
-  _fzf_term_size
-  W=$COLS
-  H=$LINES_PREVIEW
-
-  if _has ffmpeg; then
-    tmp_img="/tmp/fzf_vid_preview_$$.png"
-    ffmpeg -v quiet -y -i "$f" -vframes 1 -vf "scale=${W}:-1" "$tmp_img" 2>/dev/null
-    _fzf_preview_image "$tmp_img"
-    rm -f "$tmp_img"
-    return
-  fi
-  if _has ffprobe; then
-    ffprobe "$f" 2>/dev/null
-    return
-  fi
-  printf 'Video: %s\n' "$f"
-}
-
-_fzf_preview_audio() {
-  f=$1
-  if _has ffprobe; then
-    ffprobe "$f" 2>/dev/null
-  else
-    printf 'Audio: %s\n' "$f"
-  fi
-}
-
-_fzf_preview_patch() {
-  f=$1
-  if _has git && git rev-parse --show-toplevel >/dev/null 2>&1; then
-    git show --color=always "$f" 2>/dev/null
-  else
-    printf 'Patch: %s\n' "$f"
-  fi
-}
-
-_fzf_preview_binary() {
-  f=$1
-  printf 'Binary: %s\n' "$f"
-}
-
-_fzf_preview_symbols() {
-  f=$1
-  if _has ctags; then
-    ctags -x --sort=no "$f" 2>/dev/null
-  fi
-}
-
-_fzf_preview_dir() {
-  d=$1
-  if _has eza; then
-    eza --icons --group-directories-first "$d"
-    return
-  fi
-  ls "$d"
-}
-
-# --- Archive tree preview ----------------------------------------------
-_fzf_preview_archive_tree() {
-  f=$1
-  _fzf_term_size
-  L=$LINES_PREVIEW
-  case "$f" in
-    *.zip)
-      if _has unzip; then
-        unzip -l "$f" 2>/dev/null | awk '{print $4}' | sed 1,3d | head -n "$L"
-      else
-        printf 'zip: %s\n' "$f"
-      fi
-      ;;
-    *.tar)
-      tar -tf "$f" 2>/dev/null | head -n "$L" ;;
-    *.tar.gz|*.tgz)
-      tar -tzf "$f" 2>/dev/null | head -n "$L" ;;
-    *.tar.xz)
-      tar -tJf "$f" 2>/dev/null | head -n "$L" ;;
-    *.7z)
-      if _has 7z; then
-        7z l "$f" 2>/dev/null | awk '/^----/{p=1;next} p {print $NF}' | head -n "$L"
-      else
-        printf '7z: %s\n' "$f"
-      fi
-      ;;
-    *)
-      printf 'Archive: %s\n' "$f" ;;
-  esac
-}
-
-# --- Unified preview router ---------------------------------------------
-_fzf_preview() {
-  t=$1
-  if [ -d "$t" ]; then
-    _fzf_preview_dir "$t"
-    return
-  fi
-  kind=$(_fzf_kind "$t")
-  case "$kind" in
-    text) _fzf_preview_text "$t"; _fzf_preview_symbols "$t" ;;
-    pdf) _fzf_preview_pdf "$t" ;;
-    image) _fzf_preview_image "$t" ;;
-    video) _fzf_preview_video "$t" ;;
-    audio) _fzf_preview_audio "$t" ;;
-    archive) _fzf_preview_archive_tree "$t" ;;
-    patch) _fzf_preview_patch "$t" ;;
-    binary) _fzf_preview_binary "$t" ;;
-    *) printf 'File: %s\n' "$t" ;;
-  esac
-}
-
-# --- FZF default command -----------------------------------------------
-if _has fd; then
-  FZF_DEFAULT_COMMAND='fd --hidden --follow --exclude .git'
-else
-  FZF_DEFAULT_COMMAND='find . -type f 2>/dev/null'
+  # Keybinding hints (helpful for multi-pane, preview toggle)
+  FZF_KEY_BINDINGS="
+  ctrl-t: files | ctrl-r: history | alt-g: git-files
+  ctrl-/: toggle preview window
+  alt-l: accept | alt-h: abort"
+  export FZF_KEY_BINDINGS
 fi
-export FZF_DEFAULT_COMMAND
-
-# --- FZF default options (POSIX-compliant) -----------------------------
-export FZF_DEFAULT_OPTS="--layout=reverse \
---border=rounded \
---height=80% \
---prompt=> \
---info=inline \
---preview='_fzf_preview {}' \
---preview-window=right:60%:wrap \
---bind=ctrl-p:toggle-preview,ctrl-o:change-preview-window(right|down|hidden),ctrl-w:toggle-preview-wrap,?:toggle-help \
---header='Enter open | Ctrl-P preview | Ctrl-O layout | Ctrl-W wrap | ? help'"
-
-# --- Ctrl-T / Alt-C integration --------------------------------------
-export FZF_CTRL_T_OPTS="--preview='_fzf_preview {}'"
-export FZF_ALT_C_OPTS="--preview='if _has eza; then eza --icons {} 2>/dev/null; else ls {}; fi'"
-
-# --- Ctrl-R reverse history ------------------------------------------
-export FZF_CTRL_R_OPTS="--height 50% --layout=reverse --prompt='History> ' --info=inline --preview='_fzf_preview \$(echo {} 2>/dev/null)'"
-
-# --- Git commit browser (optional) -------------------------------------
-fzf_git_commits() {
-  if ! _has git || ! git rev-parse --show-toplevel >/dev/null 2>&1; then
-    return
-  fi
-  git log --graph --oneline --decorate --color=always | \
-  fzf --ansi --preview='git show --color=always {}'
-}
-
+# ------------------- END FZF Advanced Configuration -------------------
 # )))
 
 # # ------------------- GCC_COLORS Setup (((
@@ -1072,8 +887,13 @@ if command -v "ssh-agent" > /dev/null 2>&1; then
 
     # Check if the SSH agent is already running by checking the SSH_AUTH_SOCK environment variable
     if [ -z "$SSH_AUTH_SOCK" ]; then
+      umask 077
       # If the agent is not running, start it
-      eval "$(ssh-agent -s 2>/dev/null)" >/dev/null
+      _ssh_agent_out=$(ssh-agent -s 2>/dev/null) || :
+      case $_ssh_agent_out in
+        *SSH_AUTH_SOCK*) eval "$_ssh_agent_out" >/dev/null ;;
+      esac
+      unset _ssh_agent_out
     fi
 
     # Add each valid SSH key to the SSH agent using ssh-add
@@ -1091,18 +911,25 @@ if command -v "ssh-agent" > /dev/null 2>&1; then
     # If keychain is installed, it will help manage the SSH agent and keys.
 
     if command -v "keychain" > /dev/null 2>&1; then
-      _old_pos="$*"; set -- $_ssh_keys_to_add
       # Use `keychain` to manage the keys and the SSH agent
-      eval "$(keychain --absolute --dir "${XDG_RUNTIME_DIR:-/tmp}/keychain" \
+      _keychain_out=$(keychain --absolute --dir "${XDG_RUNTIME_DIR:-/tmp}/keychain" \
         --confallhosts --ignore-missing --nogui --ssh-allow-forwarded --quiet --systemd \
-        "$@")"
-      set -- $_old_pos; unset _old_pos
+        $_ssh_keys_to_add 2>/dev/null) || :
+      case $_keychain_out in
+        *SSH_AUTH_SOCK*) eval "$_keychain_out" >/dev/null ;;
+      esac
+      unset _keychain_out
     else
       # If `keychain` isn't available, fall back to using the `ssh-agent` directly.
 
       # Start the SSH agent if it's not already running
       if [ -z "$SSH_AUTH_SOCK" ]; then
-        eval "$(ssh-agent -s 2>/dev/null)" >/dev/null
+        umask 077
+        _ssh_agent_out=$(ssh-agent -s 2>/dev/null) || :
+        case $_ssh_agent_out in
+          *SSH_AUTH_SOCK*) eval "$_ssh_agent_out" >/dev/null ;;
+        esac
+        unset _ssh_agent_out
       fi
 
       # Add each valid SSH key to the SSH agent using ssh-add
@@ -1118,6 +945,20 @@ if command -v "ssh-agent" > /dev/null 2>&1; then
     fi
   fi
 fi
+# )))
+
+# Remove '.' from PATH if present (PATH injection hardening) (((
+case ":$PATH:" in
+  *":.:"*)
+    _new_path=
+    _old_ifs=${IFS-}; IFS=:
+    for _p in $PATH; do
+      [ "$_p" = "." ] || _new_path=${_new_path:+$_new_path:}$_p
+    done
+    IFS=$_old_ifs; unset _old_ifs _p
+    PATH=$_new_path; unset _new_path
+    ;;
+esac
 # )))
 
 # Unset variables local to this file (((
