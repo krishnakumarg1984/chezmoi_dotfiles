@@ -11,6 +11,12 @@ _xdg_data_home="$_xdg_localdir/share" && mkdir -p "$_xdg_data_home"
 _xdg_state_home="$_xdg_localdir/state" && mkdir -p "$_xdg_state_home"
 # )))
 
+# Detect interactive shell once (((
+case $- in
+  *i*) _INTERACTIVE_SHELL=1 ;;
+esac
+# )))
+
 # Source common posix-compliant helper functions if possible (((
 if [ -f "$_xdg_config_home/sh/sh_functions.sh" ]; then
   . "$_xdg_config_home/sh/sh_functions.sh"
@@ -98,7 +104,13 @@ if [ -d "$_tl_dir" ]; then
   # Extract the OS and Architecture using strict POSIX parameter expansion
   _ARCH=$(uname -m 2>/dev/null)
   _OS=$(uname -s 2>/dev/null)
-  _UNAME_S="$_OS"
+
+  # Only proceed on platforms TexLive actually supports here
+  case $_OS in
+    Darwin|Linux) ;;
+    *) unset _tl_dir _ARCH _OS; ;;
+  esac
+
   # Convert _OS to lowercase manually
   case $_OS in
     Darwin) _OS=darwin ;;
@@ -107,11 +119,13 @@ if [ -d "$_tl_dir" ]; then
 
   _tl_bin_path="$_tl_dir/bin/$_ARCH-$_OS"
 
-  # Now incorporate the TL bin directory to PATH
-  if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
-    update_env_var PATH --prepend "$_tl_bin_path"
-  else
-    path_prepend "$_tl_bin_path"
+  # Now incorporate the TL bin directory to PATH (only if it exists)
+  if [ -d "$_tl_bin_path" ]; then
+    if [ -n "$SH_FUNCTIONS_SOURCED" ] && command -v "update_env_var" >/dev/null 2>&1; then
+      update_env_var PATH --prepend "$_tl_bin_path"
+    else
+      path_prepend "$_tl_bin_path"
+    fi
   fi
 fi
 unset _tl_dir
@@ -245,25 +259,30 @@ unset _inputrc
 # https://unix.stackexchange.com/questions/108699/documentation-on-less-termcap-variables/108840#108840
 # Add color in manpages for less https://unix.stackexchange.com/questions/149614/less-command-change-color-of-and-end
 # ------------------- less Color and Appearance ------------------- (((
-# ANSI sequences for text formatting in less
-ESC="$(printf '\033')"
-LESS_TERMCAP_mb="${ESC}[01;31m" && export LESS_TERMCAP_mb   # Red for bold text
-LESS_TERMCAP_md="${ESC}[01;31m" && export LESS_TERMCAP_md   # Red for midline (bold/italic)
-LESS_TERMCAP_me="${ESC}[0m"    && export LESS_TERMCAP_me   # Reset formatting
-LESS_TERMCAP_se="${ESC}[0m"    && export LESS_TERMCAP_se   # Reset standout
-LESS_TERMCAP_so="${ESC}[30;42m" && export LESS_TERMCAP_so  # Green background for standout
-LESS_TERMCAP_ue="${ESC}[0m"    && export LESS_TERMCAP_ue   # Reset underline
-LESS_TERMCAP_us="${ESC}[01;32m" && export LESS_TERMCAP_us  # Green for underlined text
-unset ESC
-# export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_me \
+# Interactive-only UX
+if [ -n "$_INTERACTIVE_SHELL" ]; then
+  # ANSI sequences for text formatting in less
+  ESC="$(printf '\033')"
+  LESS_TERMCAP_mb="${ESC}[01;31m" && export LESS_TERMCAP_mb   # Red for bold text
+  LESS_TERMCAP_md="${ESC}[01;31m" && export LESS_TERMCAP_md   # Red for midline (bold/italic)
+  LESS_TERMCAP_me="${ESC}[0m"    && export LESS_TERMCAP_me   # Reset formatting
+  LESS_TERMCAP_se="${ESC}[0m"    && export LESS_TERMCAP_se   # Reset standout
+  LESS_TERMCAP_so="${ESC}[30;42m" && export LESS_TERMCAP_so  # Green background for standout
+  LESS_TERMCAP_ue="${ESC}[0m"    && export LESS_TERMCAP_ue   # Reset underline
+  LESS_TERMCAP_us="${ESC}[01;32m" && export LESS_TERMCAP_us  # Green for underlined text
+  unset ESC
+  # export LESS_TERMCAP_mb LESS_TERMCAP_md LESS_TERMCAP_me \
   # LESS_TERMCAP_se LESS_TERMCAP_so LESS_TERMCAP_ue LESS_TERMCAP_us
+fi
 # )))
 
 # ------------------- less and Bat Integration ------------------- (((
 # Set batpipe location if bat & batpipe are available
 _batpipe_location=
-if command -v "bat" > /dev/null 2>&1 && command -v "batpipe" > /dev/null 2>&1; then
-  _batpipe_location="$(command -v batpipe)"
+if [ -n "$_INTERACTIVE_SHELL" ]; then
+  if command -v "bat" > /dev/null 2>&1 && command -v "batpipe" > /dev/null 2>&1; then
+    _batpipe_location="$(command -v batpipe)"
+  fi
 fi
 # )))
 
@@ -286,20 +305,19 @@ unset _batpipe_location
 # )))
 
 # LESS Defaults (((
-# Enable colors, ignore case, quit if one screen, and show raw control chars
-LESS="--quit-if-one-screen --ignore-case --hilite-search --jump-target=4 --RAW-CONTROL-CHARS"
-
-# LESSKEY configuration file
+# LESSKEY configuration file (((
 _lesskey_file="$_xdg_config_home/less/lesskey"
 if [ -f "$_lesskey_file" ]; then
   LESSKEY="$_lesskey_file"
   export LESSKEY
 fi
 unset _lesskey_file
+# )))
 
 # history file used by less
 LESSHISTFILE="$_xdg_state_home/lesshistory.txt"
-export LESS LESSHISTFILE
+export LESSHISTFILE
+
 # )))
 # )))
 
@@ -318,10 +336,9 @@ LC_ALL=""    # Reset LC_ALL to allow specific LC_* variables to take effect
 export LANG LC_COLLATE LC_CTYPE LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TIME LC_ALL
 
 # Set Pager (feature-gated, long options) (((
-PAGER=more   # guaranteed by POSIX
-
-if command -v less >/dev/null 2>&1; then
-  LESS_FLAGS=
+if [ -n "$_INTERACTIVE_SHELL" ]; then
+  if command -v less >/dev/null 2>&1; then
+    LESS_FLAGS=" --jump-target=4"
 
   # Exit the less pager if output fits on one screen
   if less --quit-if-one-screen </dev/null >/dev/null 2>&1; then
@@ -348,15 +365,18 @@ if command -v less >/dev/null 2>&1; then
     LESS_FLAGS="$LESS_FLAGS --use-color"
   fi
 
+  LESS="$LESS_FLAGS"
+  export LESS
   PAGER="less$LESS_FLAGS"
+  fi
+  PAGER=${PAGER:-more}
+  export PAGER
   MANPAGER="$PAGER"
   export MANPAGER
 fi
 
-export PAGER
-
 # groff/man nicety (ignored if unsupported)
-MANROFFOPT='--continuous'  #  for continuous output in man
+[ -n "$_INTERACTIVE_SHELL" ] && MANROFFOPT='--continuous'  # for continuous output in man
 export MANROFFOPT
 # )))
 
@@ -373,6 +393,7 @@ if command -v "zathura" > /dev/null 2>&1; then
 fi
 # )))
 
+# )))
 # )))
 
 # Set environment variables related to third-party tools (((
@@ -464,103 +485,105 @@ fi
 # # )))
 
 # ------------------- FZF Advanced Configuration ------------------- (((
-# POSIX-compliant, modern fzf setup with BAT previews, git integration,
-# multi-pane support, truecolor-safe options, and advanced keybindings.
+# Interactive-only UX
+if [ -n "$_INTERACTIVE_SHELL" ]; then
+  # POSIX-compliant, modern fzf setup with BAT previews, git integration,
+  # multi-pane support, truecolor-safe options, and advanced keybindings.
 
-# Only configure if fzf exists
-if command -v "fzf" > /dev/null 2>&1; then
+  # Only configure if fzf exists
+  if command -v "fzf" > /dev/null 2>&1; then
 
-  # Ensure bat is present for previews
-  if command -v "bat" > /dev/null 2>&1; then
+    # Ensure bat is present for previews
+    if command -v "bat" > /dev/null 2>&1; then
 
-    # CTRL-T (file finder) options
-    # - Show bat preview of the selected file with line numbers and syntax highlighting
-    # - ctrl-/ toggles preview window
-    # - preview window at the bottom, initially hidden
-    FZF_CTRL_T_OPTS="
-    --preview 'bat --style=plain,grid,numbers --color=always -- {} || cat -- {}'
-    --bind 'ctrl-/:change-preview-window(down|hidden|)'
-    --height 40%
-    --layout=reverse
-    --ansi
-    --color=fg+:yellow,bg+:black,preview-border:magenta
-    --multi"
-    export FZF_CTRL_T_OPTS
-  fi
+      # CTRL-T (file finder) options
+      # - Show bat preview of the selected file with line numbers and syntax highlighting
+      # - ctrl-/ toggles preview window
+      # - preview window at the bottom, initially hidden
+      FZF_CTRL_T_OPTS="
+      --preview 'bat --style=plain,grid,numbers --color=always -- {} || cat -- {}'
+      --bind 'ctrl-/:change-preview-window(down|hidden|)'
+      --height 40%
+      --layout=reverse
+      --ansi
+      --color=fg+:yellow,bg+:black,preview-border:magenta
+      --multi"
+      export FZF_CTRL_T_OPTS
+    fi
 
-  # CTRL-R (history search) options
-  # - Show previous commands with preview of command
-  # - preview window at top, initially hidden
-  FZF_CTRL_R_OPTS="
-  --preview 'echo {}'
-  --preview-window=up:3:hidden:wrap
-  --bind 'ctrl-/:toggle-preview'
-  --color header:italic
-  --height 30%
-  --layout=reverse
-  --ansi
-  --cycle"
-  export FZF_CTRL_R_OPTS
-
-  # File / Directory completion using fzf with BAT previews
-  FZF_PREVIEW="if [ -d {} ]; then ls -la --color=always -- {}; else bat --style=plain,grid,numbers --color=always -- {}; fi"
-  FZF_BIND="ctrl-d:toggle-preview,alt-l:accept,alt-h:abort"
-  FZF_COLOR="fg+:cyan,bg+:black,info:yellow,pointer:red"
-  FZF_OPTS="--ansi --height=50% --layout=reverse --multi"
-
-  FZF_DEFAULT_OPTS="$FZF_PREVIEW --bind $FZF_BIND --color $FZF_COLOR $FZF_OPTS"
-# export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-  export FZF_DEFAULT_OPTS
-  unset FZF_PREVIEW FZF_BIND FZF_COLOR FZF_OPTS
-
-
-  # Git integration (if inside a git repo)
-  # - CTRL-G opens git file search
-  # - Shows modified files with diff preview
-  if command -v "git" > /dev/null 2>&1; then
-    FZF_GIT_PREVIEW="git diff --color=always -- {} | head -n 50"
-    FZF_GIT_BIND="ctrl-/:toggle-preview"
-    FZF_GIT_COLOR="fg+:green,bg+:black,preview-border:blue"
-    FZF_GIT_OPTS="--height 50% --layout=reverse --ansi --multi"
-
-    FZF_GIT_FILES_OPTS="$FZF_GIT_PREVIEW --bind $FZF_GIT_BIND --color $FZF_GIT_COLOR $FZF_GIT_OPTS"
-    export FZF_GIT_FILES_OPTS
-  fi
-
-  # Use ripgrep (rg) for file searches, if available
-  if command -v "rg" > /dev/null 2>&1; then
-
-    # File search with ripgrep and BAT previews
-    FZF_DEFAULT_OPTS="
-    --preview 'if [ -d {} ]; then ls -la --color=always {}; else rg --color=always --no-heading --line-number --column {} || cat {}; fi'
-    --bind 'ctrl-d:toggle-preview,alt-l:accept,alt-h:abort'
-    --color=fg+:cyan,bg+:black,info:yellow,pointer:red
-    --ansi
-    --height=50%
-    --layout=reverse
-    --multi"
-    export FZF_DEFAULT_OPTS
-
-    # Git files search using ripgrep, if inside a git repo
-    FZF_GIT_FILES_OPTS="
-    --preview 'rg --color=always --no-heading --line-number --column {} | head -n 50'
+    # CTRL-R (history search) options
+    # - Show previous commands with preview of command
+    # - preview window at top, initially hidden
+    FZF_CTRL_R_OPTS="
+    --preview 'echo {}'
+    --preview-window=up:3:hidden:wrap
     --bind 'ctrl-/:toggle-preview'
-    --color fg+:green,bg+:black,preview-border:blue
-    --height 50%
+    --color header:italic
+    --height 30%
     --layout=reverse
     --ansi
-    --multi"
-    export FZF_GIT_FILES_OPTS
-  fi
+    --cycle"
+    export FZF_CTRL_R_OPTS
 
-  # Keybinding hints (helpful for multi-pane, preview toggle)
-  FZF_KEY_BINDINGS="
-  ctrl-t: files | ctrl-r: history | alt-g: git-files
-  ctrl-/: toggle preview window
-  alt-l: accept | alt-h: abort"
-  export FZF_KEY_BINDINGS
+    # File / Directory completion using fzf with BAT previews
+    FZF_PREVIEW="if [ -d {} ]; then ls -la --color=always -- {}; else bat --style=plain,grid,numbers --color=always -- {}; fi"
+    FZF_BIND="ctrl-d:toggle-preview,alt-l:accept,alt-h:abort"
+    FZF_COLOR="fg+:cyan,bg+:black,info:yellow,pointer:red"
+    FZF_OPTS="--ansi --height=50% --layout=reverse --multi"
+
+    FZF_DEFAULT_OPTS="$FZF_PREVIEW --bind $FZF_BIND --color $FZF_COLOR $FZF_OPTS"
+    # export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
+    export FZF_DEFAULT_OPTS
+    unset FZF_PREVIEW FZF_BIND FZF_COLOR FZF_OPTS
+
+
+    # Git integration (if inside a git repo)
+    # - CTRL-G opens git file search
+    # - Shows modified files with diff preview
+    if command -v "git" > /dev/null 2>&1; then
+      FZF_GIT_PREVIEW="git diff --color=always -- {} | head -n 50"
+      FZF_GIT_BIND="ctrl-/:toggle-preview"
+      FZF_GIT_COLOR="fg+:green,bg+:black,preview-border:blue"
+      FZF_GIT_OPTS="--height 50% --layout=reverse --ansi --multi"
+
+      FZF_GIT_FILES_OPTS="$FZF_GIT_PREVIEW --bind $FZF_GIT_BIND --color $FZF_GIT_COLOR $FZF_GIT_OPTS"
+      export FZF_GIT_FILES_OPTS
+    fi
+
+    # Use ripgrep (rg) for file searches, if available
+    if command -v "rg" > /dev/null 2>&1; then
+
+      # File search with ripgrep and BAT previews
+      FZF_DEFAULT_OPTS="
+      --preview 'if [ -d {} ]; then ls -la --color=always {}; else rg --color=always --no-heading --line-number --column {} || cat {}; fi'
+      --bind 'ctrl-d:toggle-preview,alt-l:accept,alt-h:abort'
+      --color=fg+:cyan,bg+:black,info:yellow,pointer:red
+      --ansi
+      --height=50%
+      --layout=reverse
+      --multi"
+      export FZF_DEFAULT_OPTS
+
+      # Git files search using ripgrep, if inside a git repo
+      FZF_GIT_FILES_OPTS="
+      --preview 'rg --color=always --no-heading --line-number --column {} | head -n 50'
+      --bind 'ctrl-/:toggle-preview'
+      --color fg+:green,bg+:black,preview-border:blue
+      --height 50%
+      --layout=reverse
+      --ansi
+      --multi"
+      export FZF_GIT_FILES_OPTS
+    fi
+
+    # Keybinding hints (helpful for multi-pane, preview toggle)
+    FZF_KEY_BINDINGS="
+    ctrl-t: files | ctrl-r: history | alt-g: git-files
+    ctrl-/: toggle preview window
+    alt-l: accept | alt-h: abort"
+    export FZF_KEY_BINDINGS
+  fi
 fi
-# ------------------- END FZF Advanced Configuration -------------------
 # )))
 
 # # ------------------- GCC_COLORS Setup (((
@@ -855,16 +878,32 @@ fi
 
 # )))
 
+# Remove '.' from PATH if present (PATH injection hardening) (((
+case ":$PATH:" in
+  *":.:"*)
+    _new_path=
+    _old_ifs=${IFS-}; IFS=:
+    for _p in $PATH; do
+      [ "$_p" = "." ] || _new_path=${_new_path:+$_new_path:}$_p
+    done
+    IFS=$_old_ifs; unset _old_ifs _p
+    PATH=$_new_path; unset _new_path
+    ;;
+esac
+# )))
+
 # SSH Agent Setup -------------------(((
-# Check if the `ssh-agent` command is available (whether the agent is installed)
-if command -v "ssh-agent" > /dev/null 2>&1; then
+# Interactive-only UX
+if [ -n "$_INTERACTIVE_SHELL" ]; then
+  # Check if the `ssh-agent` command is available (whether the agent is installed)
+  if command -v "ssh-agent" > /dev/null 2>&1; then
 
   # Define a space-separated list of SSH keys you want to add to the agent.
   # You can specify the full path to each SSH private key.
   _ssh_keys_to_add="$HOME/.ssh/id_ed25519_nov13_2025 $HOME/.ssh/id_ed25519"
   case "$_ssh_keys_to_add" in *" "*)
-  : ;;  # documented: SSH key paths must not contain spaces
-  esac
+    : ;;  # documented: SSH key paths must not contain spaces
+esac
 
   # Initialize an empty string to hold valid SSH keys that actually exist
   _valid_ssh_keys_for_keychain=""
@@ -898,13 +937,15 @@ if command -v "ssh-agent" > /dev/null 2>&1; then
 
     # Add each valid SSH key to the SSH agent using ssh-add
     # if command -v "ssh-add" > /dev/null 2>&1; then
-      set -- $_ssh_keys_to_add  # Set positional parameters to the valid keys
-      # Loop through each key and add it to the agent
-      while [ $# -gt 0 ]; do
-        _current_ssh_key="$1"  # Get the current SSH key
-        [ -f "$_current_ssh_key" ] && ssh-add "$_current_ssh_key" >/dev/null 2>&1  # Add the key if it exists
-        shift  # Move to the next key in the list
-      done
+    set -- $_ssh_keys_to_add  # Set positional parameters to the valid keys
+    # Loop through each key and add it to the agent
+    while [ $# -gt 0 ]; do
+      _current_ssh_key="$1"  # Get the current SSH key
+      if [ -f "$_current_ssh_key" ]; then
+        ssh-add -l >/dev/null 2>&1 || ssh-add "$_current_ssh_key" >/dev/null 2>&1
+      fi
+      shift  # Move to the next key in the list
+    done
     # fi
   else
     # On Linux (or non-macOS systems), prefer using `keychain` if it's installed.
@@ -934,36 +975,25 @@ if command -v "ssh-agent" > /dev/null 2>&1; then
 
       # Add each valid SSH key to the SSH agent using ssh-add
       # if command -v "ssh-add" > /dev/null 2>&1; then
-        set -- $_ssh_keys_to_add  # Set positional parameters to the valid keys
-        # Loop through each key and add it to the agent
-        while [ $# -gt 0 ]; do
-          _current_ssh_key="$1"  # Get the current SSH key
-          [ -f "$_current_ssh_key" ] && ssh-add "$_current_ssh_key" >/dev/null 2>&1  # Add the key if it exists
-          shift  # Move to the next key in the list
-        done
+      set -- $_ssh_keys_to_add  # Set positional parameters to the valid keys
+      # Loop through each key and add it to the agent
+      while [ $# -gt 0 ]; do
+        _current_ssh_key="$1"  # Get the current SSH key
+        if [ -f "$_current_ssh_key" ]; then
+          ssh-add -l >/dev/null 2>&1 || ssh-add "$_current_ssh_key" >/dev/null 2>&1
+        fi
+        shift  # Move to the next key in the list
+      done
       # fi
     fi
+  fi
   fi
 fi
 # )))
 
-# Remove '.' from PATH if present (PATH injection hardening) (((
-case ":$PATH:" in
-  *":.:"*)
-    _new_path=
-    _old_ifs=${IFS-}; IFS=:
-    for _p in $PATH; do
-      [ "$_p" = "." ] || _new_path=${_new_path:+$_new_path:}$_p
-    done
-    IFS=$_old_ifs; unset _old_ifs _p
-    PATH=$_new_path; unset _new_path
-    ;;
-esac
-# )))
-
 # Unset variables local to this file (((
 unset _xdg_state_home _xdg_data_home _xdg_cache_home _xdg_localdir _xdg_config_home
-unset SH_FUNCTIONS_SOURCED
+unset _INTERACTIVE_SHELL SH_FUNCTIONS_SOURCED
 # )))
 
 # Some interesting tools (((

@@ -1,21 +1,32 @@
-# vim: ft=sh:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=130:syntax=sh:ft=sh
+# vim: ft=bash:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=130:syntax=sh:ft=sh
 # shellcheck shell=bash
 # shellcheck disable=SC1091
-# Usually runs for every interactive _non-login_ bash shell
+# Usually runs for every interactive non-login bash shell
 # While interactive, non-login bash shells do not explicitly source ~/.bash_profile, they still inherit the environment from their parent process (which may be a login shell).
 
 # echo "start bashrc"
 
+# Prevent double-sourcing (by login shells, tmux, nested shells, etc.) (((
+[[ ${__CUSTOM_BASHRC_SOURCED-} ]] && return
+readonly __CUSTOM_BASHRC_SOURCED=1
+# )))
+
 # Short-circuit sourcing of ~/.bashrc for non-interactive shells
 [[ $- == *i* ]] || return
 
-# Source some useful POSIX functions (like non-duplicate adding of directories to PATH)
-[[ -f $HOME/.config/sh/sh_functions.sh ]] && source "$HOME/.config/sh/sh_functions.sh"
+# Define local xdg basedir variables (((
+_xdg_config_home="$HOME/.config" && mkdir -p "$_xdg_config_home"
+_xdg_localdir="$HOME/.local" && mkdir -p "$_xdg_localdir"
+_xdg_cache_home="$_xdg_localdir/cache" && mkdir -p "$_xdg_cache_home"
+_xdg_data_home="$_xdg_localdir/share" && mkdir -p "$_xdg_data_home"
+_xdg_state_home="$_xdg_localdir/state" && mkdir -p "$_xdg_state_home"
+# )))
 
-# # Source global bashrcs (/etc/bashrc: redhat distros, /etc/bash.bashrc: deb distros) (((
-# [[ -f /etc/bashrc ]] && source /etc/bashrc
-# [[ -f /etc/bash.bashrc ]] && source /etc/bash.bashrc
-# # )))
+# Source some useful POSIX functions (eg idempotent environment variable manager) (((
+if [[ -r "$_xdg_config_home/sh/sh_functions.sh" ]]; then
+  source "$_xdg_config_home/sh/sh_functions.sh" 2>/dev/null || true
+fi
+# )))
 
 # Set FIGNORE to suppress autocomplete for certain file extensions (((
 # https://stackoverflow.com/questions/32189015/can-i-make-tab-completion-filter-files-by-extension
@@ -42,7 +53,7 @@
 # Generic temporary, cache, and state files
 #   .bak/.old     patch & backup leftovers
 #   .tmp/.cache   temporary & cache files
-#   .log/.pid     logs and process IDs
+#   .pid          process IDs
 #
 # Native compiled artifacts
 #   .o/.obj       object files
@@ -74,174 +85,42 @@
 # Disk images
 #   .iso/.img     images
 #   .qcow2/.vmdk  VM disks
-
-export FIGNORE="\
-~:#:#~:.swp:.swo:.swn:.swm:.swl:.vimrc~:.exrc:.viminfo:\
-.DS_Store:\
-.bak:.backup:.old:.orig:.rej:.tmp:.temp:.cache:.log:.trace:.pid:\
-.o:.obj:.lo:.la:.a:.so:.dylib:.dll:.exe:.out:.core:\
-.class:.jar:.war:.ear:.pyc:.pyo:.pyd:.rbc:.rbo:.gem:.beam:.ez:.go.build:.test:\
-.toc:.aux:.bbl:.blg:.lof:.lot:.fls:.fdb_latexmk:.synctex:.synctex.gz:\
-.nav:.snm:.vrb:.run.xml:.xdv:.dvi:.pdfsync:.idx:.ilg:.ind:.glg:.glo:.glsdefs:.mp:.mf:.mlf:.mlt:.mod:\
-.sqlitedb:.sqlite:.db:.db-journal:.parquet:.avro:\
-.zip:.tar:.tgz:.tbz:.txz:.gz:.bz2:.xz:.lz:.zst:\
-.iso:.img:.qcow2:.vmdk"
+export FIGNORE='~:#:.swp:.swo:.swn:.swm:.swl:.viminfo:.DS_Store:.bak:.backup:.old:.orig:.rej:.tmp:.temp:.cache:.trace:.pid:.o:.obj:.lo:.la:.a:.so:.dylib:.dll:.exe:.out:.core:.class:.jar:.war:.ear:.pyc:.pyo:.pyd:.rbc:.rbo:.gem:.beam:.ez:.go.build:.test:.aux:.toc:.bbl:.blg:.lof:.lot:.fls:.fdb_latexmk:.synctex:.synctex.gz:.nav:.snm:.vrb:.run.xml:.xdv:.dvi:.pdfsync:.idx:.ilg:.ind:.glg:.glo:.glsdefs:.zip:.tar:.tgz:.tbz:.txz:.gz:.bz2:.xz:.lz:.zst:.iso:.img:.qcow2:.vmdk'
 
 # )))
-
-# # Set bash HISTFILE (overrides the setting in ~/.profile for bash shells) (((
-_xdg_state_home="$HOME/.local/state"
-_bash_histdir="$_xdg_state_home/bash"
-if ! [ -d "$_bash_histdir" ]; then
-  mkdir -p "$_bash_histdir"
-fi
-HISTFILE="$_bash_histdir/bash_history"
-export HISTFILE
-unset _bash_histdir
-# # )))
 
 # Setup bash prompt (((
-if command -v starship 2>&1 >/dev/null; then
-  source <(starship init bash)
-else
-# Git-aware Bash prompt (((
-  # --- Terminal color detection ---
-  color_mode=
-  if [[ "$COLORTERM" == *truecolor* ]] || [[ "$TERM" == *-truecolor* ]]; then
-    color_mode=24bit
-  elif [[ "$TERM" == *-256color ]] || [[ "$TERM" == screen* ]] || [[ "$TERM" == tmux* ]]; then
-    color_mode=256
-  elif [[ "$TERM" == xterm* || "$TERM" == rxvt* ]]; then
-    color_mode=16
-  fi
-  [[ -n $force_color_prompt ]] && color_mode=${color_mode:-16}
-
-# --- Color definitions ---
-case $color_mode in
-  24bit)
-    RED="\[\033[38;2;255;50;50m\]"
-    GREEN="\[\033[38;2;50;255;50m\]"
-    ORANGE="\[\033[38;2;255;165;0m\]"
-    BLUE="\[\033[38;2;100;149;237m\]"
-    MAGENTA="\[\033[38;2;200;100;255m\]"
-    BOLD="\[\033[1m\]"
-    RESET="\[\033[0m\]"
-    ;;
-  256)
-    RED="\[\033[38;5;196m\]"
-    GREEN="\[\033[38;5;82m\]"
-    ORANGE="\[\033[38;5;208m\]"
-    BLUE="\[\033[38;5;75m\]"
-    MAGENTA="\[\033[38;5;141m\]"
-    BOLD="\[\033[1m\]"
-    RESET="\[\033[0m\]"
-    ;;
-  16)
-    RED="\[\033[31m\]"
-    GREEN="\[\033[32m\]"
-    ORANGE="\[\033[33m\]"
-    BLUE="\[\033[34m\]"
-    MAGENTA="\[\033[35m\]"
-    BOLD="\[\033[1m\]"
-    RESET="\[\033[0m\]"
-    ;;
-esac
-
-# --- Git prompt cache ---
-GIT_PROMPT_CACHE=""
-GIT_PROMPT_DIR=""
-
-precompute_git_prompt() {
-  local dir="$PWD"
-  if [[ "$dir" != "$GIT_PROMPT_DIR" ]]; then
-    if git rev-parse --is-inside-work-tree &>/dev/null; then
-      local gitdir branch icon dirty untracked stash ahead behind upstream
-      gitdir=$(git rev-parse --git-dir 2>/dev/null) || return
-
-      # Branch
-      read -r ref < "$gitdir/HEAD"
-      branch="${ref#ref: refs/heads/}"
-      [[ -z $branch ]] && branch="DETACHED"
-
-      # Status
-      local dirty_flag untracked_flag
-      while IFS= read -r line; do
-        case "$line" in
-          "??"*) untracked_flag=1 ;;
-          [ADMRC]??*) dirty_flag=1 ;;
-        esac
-      done < <(git status --porcelain -uno 2>/dev/null)
-
-      [[ $dirty_flag ]] && { dirty="*"; icon="🔴"; } || icon="🟢"
-      [[ $untracked_flag ]] && untracked="❓"
-
-      # Upstream
-      local ahead_count behind_count
-      read -r ahead_count behind_count < <(git rev-list --left-right --count @{upstream}...HEAD 2>/dev/null || echo 0 0)
-      [[ $ahead_count -gt 0 ]] && upstream+="${GREEN}↑${ahead_count}${RESET}"
-      [[ $behind_count -gt 0 ]] && upstream+="${RED}↓${behind_count}${RESET}"
-
-      # Stash
-      local stash_count
-      stash_count=$(git rev-parse --verify refs/stash 2>/dev/null && git stash list 2>/dev/null | wc -l)
-      [[ $stash_count -gt 0 ]] && stash="⚑${stash_count}"
-
-      GIT_PROMPT_CACHE="[${icon}${branch}${dirty}${untracked}${upstream}${stash}]"
-    else
-      GIT_PROMPT_CACHE=""
-    fi
-    GIT_PROMPT_DIR="$dir"
-  fi
-}
-
-# Shorten path helper
-shorten_path() {
-  local path="$PWD"
-  [[ "$path" == "$HOME"* ]] && path="~${path#$HOME}"
-  local base="${path##*/}"
-  [[ "$path" =~ "/" ]] && path="…/${base}"
-  echo -n "$path"
-}
-
-# Construct PS1
-PS1="${GREEN}\u${RESET}@${ORANGE}\h${RESET}: {${BLUE}\$(shorten_path)${RESET}\${GIT_PROMPT_CACHE}}\n${BOLD}\$${RESET} "
-
-# Terminal title
-case "$TERM" in
-  xterm*|rxvt*|screen*|tmux*)
-    PS1="\[\e]0;\u@\h: \w\a\]$PS1"
-    ;;
-esac
-
-# Update Git prompt before each display
-PROMPT_COMMAND="precompute_git_prompt"
-
-# Optional LS_COLORS
-[[ -f "$HOME/.config/bash/lscolors.sh" ]] && source "$HOME/.config/bash/lscolors.sh"
-fi
-# )))
 # )))
 
 # Set bash-specific environment variables (((
-if declare -f update_env_var > /dev/null; then
-  update_env_var HISTCONTROL "erasedups" prepend  # To remove all but the last identical command
-  update_env_var HISTCONTROL "ignorespace" append # To avoid saving commands that start with a space
-  # echo "just after setting: $HISTCONTROL"
-  [[ -f "/home/demo/.config/bash/update_env_variables_tab_completion.sh" ]] && source "/home/demo/.config/bash/update_env_variables_tab_completion.sh"
-else
-  export HISTCONTROL="erasedups:ignorespace"
-fi
+export HISTCONTROL=ignoreboth:erasedups
+# export BASH_COMPLETION_USER_FILE="$_xdg_config_home/bash_completion/bash_completion"
 # )))
-BASH_COMPLETION_USER_FILE="$HOME/.config/bash_completion/bash_completion" && export BASH_COMPLETION_USER_FILE
 
 # Set bash-specific history-related env vars HISTFILE, HISTFILESIZE, HISTIGNORE, HISTTIMEFORMAT (((
-[[ -d "$HOME/.local/state/bash" ]] && export HISTFILE="$HOME/.local/state/bash/bash_history"
-export HISTFILESIZE=$HISTSIZE
+
+# Set bash HISTFILE (overrides the setting in ~/.profile for bash shells) (((
+_bash_histdir="$_xdg_state_home/bash"
+[[ -d $_bash_histdir ]] || mkdir -p "$_bash_histdir"
+export HISTFILE="$_bash_histdir/bash_history"
+unset _bash_histdir
+# )))
+
+export HISTFILESIZE=${HISTFILESIZE:-${HISTSIZE:-50000}}
 export HISTTIMEFORMAT='[%a, %b %d %Y %T] '
 # export HISTIGNORE="bc:bg:cd:clear:cls:df:dir:exit:fg:free:gd:gg:glog:gp:gpull:groot:h:history:l:la:lg:ll:ls:lt:lx:lz:mc:pwd:sl:su:top:topu:watch" # commands to ignore from bash history
+export HISTIGNORE='&:[ ]*:exit:bg:fg:clear:history'
 
 # export PROMPT_COMMAND='history -a; history -n' # By default, bash only records a session to the .bash_history file on disk when the session terminates. This means that if you crash or your session terminates improperly, you lose the history up to that point. You can fix this by recording each line of history as you issue it, through the PROMPT_COMMAND variable.
+__history_sync() {
+  builtin history -a
+  builtin history -n
+}
 
+[[ -n $PS1 ]] && case ";$PROMPT_COMMAND;" in
+  *";__history_sync;"*) ;;
+  *) PROMPT_COMMAND="__history_sync${PROMPT_COMMAND:+; $PROMPT_COMMAND}" ;;
+esac
 # )))
 
 # Bash settings (((
@@ -281,140 +160,173 @@ shopt -u mailwarn 2>/dev/null
 
 # Completions from the `bash-completions` package & other third-party tools (((
 
-# Source `bash-completion` (may already be enabled in /etc/bash.bashrc or /etc/profile) (((
-# Attempt Homebrew first, then system paths
+# Helper to lazily source a completion file for a command (((
+# Usage: __lazy_source_completion <cmd> <completion_file>
+__lazy_source_completion() {
+  local cmd=$1 file=$2 var
+  [[ $cmd =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || return
+  [[ -r $file ]] || return
+
+  var="__lazy_completion_file_${cmd}"
+  printf -v "$var" '%s' "$file"
+
+  # Attach dispatcher once
+  local flag="__lazy_completion_attached_$cmd"
+  [[ ${!flag-} ]] && return
+  complete -F __lazy_source_completion_dispatch -- "$cmd"
+  printf -v "$flag" 1
+}
+
+# Dispatcher: invoked once when user requests completion
+__lazy_source_completion_dispatch() {
+  local cmd=$1 var file old_COMPREPLY
+  [[ -z $cmd ]] && return
+  var="__lazy_completion_file_$cmd"
+  file=${!var-}
+  [[ -r $file ]] || file=${__lazy_completion_file__default-}
+  [[ -r $file ]] || return
+
+  old_COMPREPLY=("${COMPREPLY[@]}")
+  COMPREPLY=()
+
+  source "$file" 2>/dev/null || true
+
+  [[ $(type -t "${cmd}_completion") == function ]] && "${cmd}_completion"
+
+  [[ ${#COMPREPLY[@]} -eq 0 ]] && COMPREPLY=("${old_COMPREPLY[@]}")
+
+  complete -r "$cmd" 2>/dev/null
+  unset "$var" old_COMPREPLY
+  }
+# )))
+
+# Register update_env_var completion now that helpers exist (((
+[[ -r "$_xdg_config_home/bash/update_env_variables_tab_completion.sh" ]] && \
+  __lazy_source_completion update_env_var "$_xdg_config_home/bash/update_env_variables_tab_completion.sh"
+# )))
+
+# ----- bash-completion system files ----- (((
 for bc in \
   "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" \
   /usr/share/bash-completion/bash_completion \
   /etc/bash_completion; do
-    [[ -f "$bc" ]] && source "$bc" && break
+if [[ -r "$bc" ]]; then
+  # Lazy-load bash-completion on first completion attempt
+  __lazy_completion_file__default="$bc"
+
+    # Only attach default dispatcher if no default completions exist yet
+    if ! complete -p -D &>/dev/null; then
+      # Guarded default dispatcher
+      __lazy_default_dispatcher() {
+        # Only run if command has no completion
+        local cmd=$1
+        [[ -n $cmd ]] || return
+        if ! complete -p "$cmd" &>/dev/null; then
+          __lazy_source_completion_dispatch "$cmd"
+        fi
+      }
+    complete -D -F __lazy_default_dispatcher
+    fi
+    break
+fi
 done
 # )))
 
-# type -P aws_completer &>/dev/null && complete -C aws_completer aws
+# )))
 
-# tab completion for `helm` (((
-if command_exists "exercism"; then
-  source <(exercism completion bash)
+# ----- Some third party tool completions ----- (((
+for completion in \
+  keychain:$_xdg_config_home/bash/bashrc_keychain_completion_functions.sh \
+  podman:$_xdg_config_home/bash/bashrc_podman_completion_functions.sh \
+  docker:$_xdg_config_home/bash/bashrc_docker_completion_functions.sh \
+  tmc:$_xdg_config_home/bash/bashrc_tmc_completion_functions.sh \
+  ssh:$_xdg_config_home/bash/bashrc_ssh_hosts_completion_functions.sh \
+  tenv:$_xdg_config_home/bash/bashrc_tenv_completion_functions.sh; do
+
+cmd=${completion%%:*}
+file=${completion#*:}
+[[ -r $file ]] && __lazy_source_completion "$cmd" "$file"
+done
+
+# Pixi completion (((
+if command -v pixi &>/dev/null; then
+  pixi_cache="$_xdg_cache_home/pixi.bash"
+  if [[ ! -s $pixi_cache ]]; then
+    tmp_file="$_xdg_cache_home/pixi.bash.$$"
+    pixi completion --shell bash >"$tmp_file" && mv -f "$tmp_file" "$pixi_cache"
+    unset tmp_file
+  fi
+  __lazy_source_completion pixi "$pixi_cache"
 fi
 # )))
 
-# # tab completion for `helm` (((
-# if command_exists "helm"; then
-#   # If the helm completion functions file exists and is readable, source it
-#   [[ -f "$HOME/.config/bash/bashrc_helm_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_helm_completion_functions.sh"
-# fi
-# # )))
-
-# tab completion for `keychain` (((
-if command_exists "keychain"; then
-    [[ -f "$HOME/.config/bash/bashrc_keychain_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_keychain_completion_functions.sh"
-fi
-# )))
-
-# # tab completion for `kind` (((
-# if command_exists "kind"; then
-#     [[ -f "$HOME/.config/bash/bashrc_kind_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_kind_completion_functions.sh"
-# fi
-# # )))
-
-# # tab completion for `kubectl` (((
-# if command_exists kubectl; then
-#   [[ -f "$HOME/.config/bash/bashrc_kubectl_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_kubectl_completion_functions.sh"
-# fi
-# # )))
-
-# # tab completion for `minikube` (((
-# if command_exists minikube; then
-#   [[ -r "$HOME/.config/bash/bashrc_minikube_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_minikube_completion_functions.sh"
-# fi
-# # )))
-
-# # tab completion for `nerdctl` (((
-# if command_exists "nerdctl"; then
-#   [[ -f "$HOME/.config/bash/bashrc_nerdctl_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_nerdctl_completion_functions.sh"
-# fi
-# # )))
-
-# tab completion for `pixi` (((
-if command_exists "pixi"; then
-  eval "$(pixi completion --shell bash)"
-  source "$PIXI_HOME/completions/bash/*" 2>/dev/null
-fi
-# )))
-
-# tab completion for `podman` (((
-if command_exists "podman"; then
-  [[ -f "$HOME/.config/bash/bashrc_podman_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_podman_completion_functions.sh"
-fi
-# )))
-
-# tab completion for `docker` based on `podman` script (((
-if [ -x "$(command -v docker)" ]; then
-  test -r "$HOME/.config/bash/bashrc_docker_completion_functions.sh" && . "$HOME/.config/bash/bashrc_docker_completion_functions.sh"
-fi
-# )))
-
-# tab completion for `tmc` (((
-if [ -x "$(command -v tmc)" ]; then
-  [[ -f "$HOME/.config/bash/bashrc_tmc_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_tmc_completion_functions.sh"
-fi
-# )))
-
-# tab completion for the `ssh` command for hosts in the user's config file
-[[ -f "$HOME/.config/bash/bashrc_ssh_hosts_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_ssh_hosts_completion_functions.sh"
-
-# tab completion for `tenv` (((
-if command_exists tenv; then
-  [[ -f "$HOME/.config/bash/bashrc_tenv_completion_functions.sh" ]] && source "$HOME/.config/bash/bashrc_tenv_completion_functions.sh"
-fi
-# )))
-
-# tab completion for `terraform` (((
-if command_exists "terraform"; then
-  complete -C terraform tf
+# Terraform binary-based completion (((
+if command -v terraform &>/dev/null; then
+  __lazy_terraform_completion() {
+    complete -C terraform terraform tf
+    complete -r tf
+    unset -f __lazy_terraform_completion
+  }
+# Only attach completion if no existing tf completion exists
+! complete -p tf &>/dev/null && complete -F __lazy_terraform_completion tf
 fi
 # )))
 # )))
 
-# [[ -r "$HOME/.config/bash/complete_alias.sh" ]] && source "$HOME/.config/bash/complete_alias.sh"  # Source _complete_alias function
-test -r "$HOME/.config/bash/bash_aliases" && . "$HOME/.config/bash/bash_aliases"           # Source bash aliases
-test -r "$HOME/.config/bash/bash_functions.sh" && . "$HOME/.config/bash/bash_functions.sh" # Source bash functions
-# [ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh ssh-copy-id
-# [ -d "$HOME/.ssh/config/modular_ssh_configs" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config/modular_ssh_configs/* | grep -v "[?*]" | cut -d " " -f2- | tr ' ' '\n')" scp sftp ssh ssh-copy-id
+# )))
+
+# Source aliases and functions (((
+if [[ -r "$_xdg_config_home/bash/complete_alias.sh" ]]; then
+  source "$_xdg_config_home/bash/complete_alias.sh" 2>/dev/null || true  # Source _complete_alias function
+fi
+if [[ -r "$_xdg_config_home/bash/bash_aliases" ]]; then
+  source "$_xdg_config_home/bash/bash_aliases" 2>/dev/null || true           # Source bash aliases
+fi
+if [[ -r "$_xdg_config_home/bash/bash_functions.sh" ]]; then
+  source "$_xdg_config_home/bash/bash_functions.sh" 2>/dev/null || true # Source bash functions
+fi
+# )))
 
 # Use ~/.Xresources to set colors in linux virtual terminal console on the framebuffer (((
 # The colors in the Linux virtual console running on the framebuffer can be changed. This is done by writing the escape code \\e]PXRRGGBB, where X is the hexadecimal index of the color from 0-F, and RRGGBB is a traditional hexadecimal RGB code.
 # For example, to reuse existing colors defined in ~/.Xresources, add the following to the shell initialization file (such as ~/.bashrc):
 if [ "$TERM" = "linux" ]; then
   _SEDCMD='s/.*\*color\([0-9]\{1,\}\).*#\([0-9a-fA-F]\{6\}\).*/\1 \2/p'
-  for i in "$(sed -n "$_SEDCMD" "$HOME/.Xresources" | awk '$1 < 16 {printf "\\e]P%X%s", $1, $2}')"; do
-    echo -en "$i"
-  done
-  clear
+  sed -n "$_SEDCMD" "$HOME/.Xresources" 2>/dev/null |
+    awk '$1 < 16 {printf "\\e]P%X%s\n", $1, $2}' |
+    while IFS= read -r esc; do
+      echo -en "$esc"
+    done
+    clear
 fi
 # )))
 
-[ -f "$HOME/.config/bash/fzf.bash" ] && . "$HOME/.config/bash/fzf.bash"
+if [[ -r "$_xdg_config_home/bash/fzf.bash" ]]; then
+  source "$_xdg_config_home/bash/fzf.bash" 2>/dev/null || true
+fi
 
 # mamba config (((
-MAMBA_EXE="$(command -v micromamba)"
-if [ -x "$MAMBA_EXE" ]; then
+if command -v micromamba >/dev/null 2>&1; then
+  MAMBA_EXE="$(command -v micromamba)"
   # >>> mamba initialize >>>
   # !! Contents within this block are managed by 'mamba init' !!
   export MAMBA_EXE
   export MAMBA_ROOT_PREFIX="$(dirname "$(dirname "$MAMBA_EXE")")"
-  __mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"
-  # echo $__mamba_setup
-  if [ $? -eq 0 ]; then
-    eval "$__mamba_setup"
+  if __mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"; then
+    # echo $__mamba_setup
+    # if [ $? -eq 0 ]; then
+    # Avoid eval: write hook to temp file and source it
+    tmp_mamba_hook="$_xdg_cache_home/mamba_hook.$$"
+    printf '%s\n' "$__mamba_setup" > "$tmp_mamba_hook"
+    source "$tmp_mamba_hook"
+    rm -f "$tmp_mamba_hook"
   else
     alias micromamba="$MAMBA_EXE" # Fallback on help from mamba activate
   fi
   unset __mamba_setup
   alias mamba='micromamba' && alias conda='mamba'
   # <<< mamba initialize <<<
-  mamba activate mambaenv_base 2>/dev/null
+  [[ $PS1 && $TERM != dumb ]] && mamba activate mambaenv_base 2>/dev/null
 fi
 # )))
 
@@ -422,14 +334,19 @@ fi
 # eval "$(aliae init bash)"
 
 # if [ -x "$(command -v direnv)" ]; then
-#   eval "$(direnv hook bash)"
+#    source <(direnv hook bash)
 # fi
 
 # Unset variables local to this file (((
-# unset _xdg_state_home _xdg_data_home _xdg_cache_home _xdg_config_home
-unset _xdg_state_home
+unset _xdg_state_home _xdg_data_home _xdg_cache_home _xdg_config_home
 # )))
 
-# echo "at the end: $HISTCONTROL"
-
 # echo "end of bashrc"
+# # Source global bashrcs (/etc/bashrc: redhat distros, /etc/bash.bashrc: deb distros) (((
+# if [[ -r /etc/bashrc ]]; then
+#    source /etc/bashrc 2>/dev/null || true
+# fi
+# if [[ -r /etc/bash.bashrc ]]; then
+#    source /etc/bash.bashrc
+# fi
+# # )))

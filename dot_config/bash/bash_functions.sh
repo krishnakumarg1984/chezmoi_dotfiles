@@ -48,3 +48,46 @@ if [ -x "$(command -v chezmoi)" ]; then
   }
 fi
 # )))
+
+# Lazy-load SSH hosts completion using only Bash builtins (((
+__lazy_ssh_completion() {
+    local hosts=() line file
+
+    # Main ssh config
+    file="$HOME/.ssh/config"
+    if [[ -f "$file" ]]; then
+        while IFS= read -r line; do
+            [[ $line == Host[[:space:]]* ]] || continue
+            # Extract words after 'Host' (ignore '?' and '*')
+            for host in ${line#Host }; do
+                [[ $host == *[\?\*]* ]] && continue
+                hosts+=("$host")
+            done
+        done <"$file"
+    fi
+
+    # Modular ssh configs
+    if [[ -d "$HOME/.ssh/config/modular_ssh_configs" ]]; then
+        for file in "$HOME/.ssh/config/modular_ssh_configs"/*; do
+            [[ -f "$file" ]] || continue
+            while IFS= read -r line; do
+                [[ $line == Host[[:space:]]* ]] || continue
+                for host in ${line#Host }; do
+                    [[ $host == *[\?\*]* ]] && continue
+                    hosts+=("$host")
+                done
+            done <"$file"
+        done
+    fi
+
+    # Register completion
+    complete -o default -o nospace -W "${hosts[*]}" ssh scp sftp ssh-copy-id
+    unset -f __lazy_ssh_completion
+}
+
+# Lazy-load on first TAB
+for cmd in ssh scp sftp ssh-copy-id; do
+    complete -F __lazy_ssh_completion "$cmd"
+done
+# )))
+
