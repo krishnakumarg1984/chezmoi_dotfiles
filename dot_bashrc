@@ -78,14 +78,10 @@ fi
 #   SQLite        .sqlite .db
 #   Columnar      .parquet .avro
 #
-# Archives & compressed files
-#   .zip/.tar     archives
-#   .gz/.xz       compression
-#
 # Disk images
 #   .iso/.img     images
 #   .qcow2/.vmdk  VM disks
-export FIGNORE='~:#:.swp:.swo:.swn:.swm:.swl:.viminfo:.DS_Store:.bak:.backup:.old:.orig:.rej:.tmp:.temp:.cache:.trace:.pid:.o:.obj:.lo:.la:.a:.so:.dylib:.dll:.exe:.out:.core:.class:.jar:.war:.ear:.pyc:.pyo:.pyd:.rbc:.rbo:.gem:.beam:.ez:.go.build:.test:.aux:.toc:.bbl:.blg:.lof:.lot:.fls:.fdb_latexmk:.synctex:.synctex.gz:.nav:.snm:.vrb:.run.xml:.xdv:.dvi:.pdfsync:.idx:.ilg:.ind:.glg:.glo:.glsdefs:.zip:.tar:.tgz:.tbz:.txz:.gz:.bz2:.xz:.lz:.zst:.iso:.img:.qcow2:.vmdk'
+export FIGNORE='~:#:.swp:.swo:.swn:.swm:.swl:.viminfo:.DS_Store:.bak:.backup:.old:.orig:.rej:.tmp:.temp:.cache:.trace:.pid:.o:.obj:.lo:.la:.a:.so:.dylib:.dll:.exe:.out:.core:.class:.jar:.war:.ear:.pyc:.pyo:.pyd:.rbc:.rbo:.gem:.beam:.ez:.go.build:.test:.aux:.toc:.bbl:.blg:.lof:.lot:.fls:.fdb_latexmk:.synctex:.synctex.gz:.nav:.snm:.vrb:.run.xml:.xdv:.dvi:.pdfsync:.idx:.ilg:.ind:.glg:.glo:.glsdefs:.iso:.img:.qcow2:.vmdk'
 
 # )))
 
@@ -93,7 +89,8 @@ export FIGNORE='~:#:.swp:.swo:.swn:.swm:.swl:.viminfo:.DS_Store:.bak:.backup:.ol
 # )))
 
 # Set bash-specific environment variables (((
-export HISTCONTROL=ignoreboth:erasedups
+# To remove all but the last identical command, and commands that start with a space
+export HISTCONTROL="erasedups:ignorespace"
 # export BASH_COMPLETION_USER_FILE="$_xdg_config_home/bash_completion/bash_completion"
 # )))
 
@@ -111,10 +108,10 @@ export HISTTIMEFORMAT='[%a, %b %d %Y %T] '
 # export HISTIGNORE="bc:bg:cd:clear:cls:df:dir:exit:fg:free:gd:gg:glog:gp:gpull:groot:h:history:l:la:lg:ll:ls:lt:lx:lz:mc:pwd:sl:su:top:topu:watch" # commands to ignore from bash history
 export HISTIGNORE='&:[ ]*:exit:bg:fg:clear:history'
 
-# export PROMPT_COMMAND='history -a; history -n' # By default, bash only records a session to the .bash_history file on disk when the session terminates. This means that if you crash or your session terminates improperly, you lose the history up to that point. You can fix this by recording each line of history as you issue it, through the PROMPT_COMMAND variable.
+# By default, bash only records a session to the .bash_history file on disk when the session terminates. This means that if you crash or your session terminates improperly, you lose the history up to that point. You can fix this by recording each line of history as you issue it, through the PROMPT_COMMAND variable.
 __history_sync() {
   builtin history -a
-  builtin history -n
+  # builtin history -n
 }
 
 [[ -n $PS1 ]] && case ";$PROMPT_COMMAND;" in
@@ -310,23 +307,23 @@ if command -v micromamba >/dev/null 2>&1; then
   MAMBA_EXE="$(command -v micromamba)"
   # >>> mamba initialize >>>
   # !! Contents within this block are managed by 'mamba init' !!
-  export MAMBA_EXE
-  export MAMBA_ROOT_PREFIX="$(dirname "$(dirname "$MAMBA_EXE")")"
+  # MAMBA_ROOT_PREFIX="$(dirname "$(dirname "$MAMBA_EXE")")"
+  MAMBA_ROOT_PREFIX="$(dirname "$MAMBA_EXE")"
   if __mamba_setup="$("$MAMBA_EXE" shell hook --shell bash --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"; then
-    # echo $__mamba_setup
-    # if [ $? -eq 0 ]; then
+    eval "$__mamba_setup"
     # Avoid eval: write hook to temp file and source it
-    tmp_mamba_hook="$_xdg_cache_home/mamba_hook.$$"
-    printf '%s\n' "$__mamba_setup" > "$tmp_mamba_hook"
-    source "$tmp_mamba_hook"
-    rm -f "$tmp_mamba_hook"
+    # tmp_mamba_hook="$_xdg_cache_home/mamba_hook.$$"
+    # printf '%s\n' "$__mamba_setup" > "$tmp_mamba_hook"
+    # source "$tmp_mamba_hook"
+    # \rm -f "$tmp_mamba_hook"
+    unset __mamba_setup
   else
-    alias micromamba="$MAMBA_EXE" # Fallback on help from mamba activate
+    alias micromamba="$MAMBA_EXE"  # Fallback on help from micromamba activate
   fi
-  unset __mamba_setup
   alias mamba='micromamba' && alias conda='mamba'
   # <<< mamba initialize <<<
-  [[ $PS1 && $TERM != dumb ]] && mamba activate mambaenv_base 2>/dev/null
+  # [[ $PS1 && $TERM != dumb ]] && mamba activate 2>/dev/null
+  micromamba activate
 fi
 # )))
 

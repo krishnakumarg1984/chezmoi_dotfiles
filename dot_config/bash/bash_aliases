@@ -75,6 +75,14 @@ elif [ -x "$(command -v ncal)" ]; then
 fi
 # )))
 
+# cp aliases (((
+if [ -x "$(command -v cpz)" ]; then
+  alias cp='cpz'
+elif [ -x "$(command -v ncal)" ]; then
+  alias cp='cp -Rivu'
+fi
+# )))
+
 # dirs/pushd aliases (((
 alias d='dirs -p -v'
 alias p='pushd'
@@ -84,6 +92,8 @@ alias popd='popd >/dev/null'
 # df alias (((
 if [ -x "$(command -v dysk)" ]; then
   alias df="dysk -s free-d -c label+default+dev"
+elif [ -x "$(command -v duf)" ]; then
+  alias df="duf"
 else
   alias df='df -x"squashfs" -x"cgroup" -x"tmpfs" -Th --total'
 fi
@@ -337,9 +347,8 @@ fi
 # Safety features (((
 # Ask, and then copy contents of directories (r)ecursively and explain (v) what was done
 # alias cp='rsync -ae ssh'
-alias cp='cp -Rivu'
-alias cpa='rsync -vhae ssh --progress --append'
-alias cpv='rsync -ah --info=progress2'
+# alias cpa='rsync -vhae ssh --progress --append'
+# alias cpv='rsync -ah --info=progress2'
 alias ln='ln -i'
 alias mv='mv -iv'
 alias rd='rmdir'
@@ -374,7 +383,7 @@ alias nano='nano --nowrap --softwrap'
 alias open='xdg-open'
 alias reboot='echo -e "\n Hostname: $(hostname)\n Warning! You are rebooting $(hostname).\n This may be a remote machine.\n Use backslash(\) reboot to proceed...\n\n"'
 # alias sshhosts="grep -w -i -E 'Host|HostName' ~/.ssh/config | sed 's/Host //' | sed 's/HostName //'" # https://dev.to/ahmedmusallam/how-to-autocomplete-ssh-hosts-1hob
-alias wget='wget -c --hsts-file="$HOME/.cache/wget-hsts"'
+alias wget='wget -c'
 alias which='which -a'
 
 # Windows-like aliases (((

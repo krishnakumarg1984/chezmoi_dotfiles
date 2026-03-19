@@ -91,5 +91,5 @@ LESSHISTFILE="$HOME/.config/less/lesshistory.txt"
 # https://unix.stackexchange.com/questions/255862/search-in-less-with-wrap-around-at-eof
 \eB back-search
 \eF forw-search
-/ noaction gg\eF
-? noaction G\eB
+# / noaction gg\eF
+# ? noaction G\eB

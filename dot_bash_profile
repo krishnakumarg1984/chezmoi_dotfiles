@@ -5,18 +5,34 @@
 # Intentionally minimal: all interactive shell behavior (aliases, functions,
 # options) is consolidated in ~/.bashrc
 
-# echo "Start of ~/.bash_profile"
+# Prevent accidental sourcing in non-Bash shells
+[[ -n "$BASH_VERSION" ]] || { return 0 2>/dev/null || exit 0; }  # return if sourced, exit if executed
+
+# Prevent double-sourcing of ~/.bash_profile (((
+[[ -n "$__BASH_PROFILE_LOADED" ]] && { return 0 2>/dev/null || exit 0; }
+readonly __BASH_PROFILE_LOADED=1
+# )))
+
+# [[ -r "$HOME/.config/bash/bashprofile_startup_profiler.sh" ]] && source "$HOME/.config/bash/bashprofile_startup_profiler.sh"
+
+[[ -n "$BASH_PROFILE_DEBUG" ]] && echo "Start of ~/.bash_profile"
 
 # Source ~/.profile (which contains common settings across shells e.g. environment variables)
-[[ -f "$HOME/.profile" ]] && source "$HOME/.profile"
+[[ -r "$HOME/.profile" ]] && source "$HOME/.profile"
 
 # Activate mise (the path of the mise executable should have been added to PATH within ~/.profile)
-command -v mise &>/dev/null && source <(mise activate bash --shims)
+# command -v mise &>/dev/null && source <(mise activate bash --shims)
+# hash mise &>/dev/null && source <(mise activate bash --shims)
+if hash mise &>/dev/null; then
+  eval "$(mise activate bash --shims)"
+fi
 
 # ((( Source ~/.bashrc (if present) to have aliases/functions etc defined for login shell sessions also
 # Most bash settings are in ~/.bashrc file to consolidate settings in one place ~/.bashrc
 # https://superuser.com/questions/183870/difference-between-bashrc-and-bash-profile/183980
-[[ "$-" == *i* && -f "$HOME/.bashrc" ]] && source "$HOME/.bashrc"
+case $- in
+  *i*) [[ -r "$HOME/.bashrc" ]] && source "$HOME/.bashrc" ;;
+esac
 # )))
 
-# echo "End of ~/.bash_profile"
+[[ -n "$BASH_PROFILE_DEBUG" ]] && echo "End of ~/.bash_profile"
