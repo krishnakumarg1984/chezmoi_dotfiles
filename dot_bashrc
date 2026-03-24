@@ -234,8 +234,6 @@ done
 # ----- Some third party tool completions ----- (((
 for completion in \
   keychain:$_xdg_config_home/bash/bashrc_keychain_completion_functions.sh \
-  podman:$_xdg_config_home/bash/bashrc_podman_completion_functions.sh \
-  docker:$_xdg_config_home/bash/bashrc_docker_completion_functions.sh \
   tmc:$_xdg_config_home/bash/bashrc_tmc_completion_functions.sh \
   ssh:$_xdg_config_home/bash/bashrc_ssh_hosts_completion_functions.sh \
   tenv:$_xdg_config_home/bash/bashrc_tenv_completion_functions.sh; do
@@ -244,6 +242,8 @@ cmd=${completion%%:*}
 file=${completion#*:}
 [[ -r $file ]] && __lazy_source_completion "$cmd" "$file"
 done
+# podman:$_xdg_config_home/bash/bashrc_podman_completion_functions.sh \
+# docker:$_xdg_config_home/bash/bashrc_docker_completion_functions.sh \
 
 # Pixi completion (((
 if command -v pixi &>/dev/null; then
