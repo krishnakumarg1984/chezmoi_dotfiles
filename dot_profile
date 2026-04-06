@@ -826,22 +826,22 @@ esac
 # )))
 
 # SSH Agent Setup -------------------(((
-# Interactive-only UX
-if [ -n "$_INTERACTIVE_SHELL" ]; then
-  # Check if the `ssh-agent` command is available (whether the agent is installed)
-  if _has ssh-agent; then
+# Check if interactive shell & if `ssh-agent` command is available (i.e the agent is installed)
+if [ -n "$_INTERACTIVE_SHELL" ] && _has "ssh-agent"; then
 
-  # Define a space-separated list of SSH keys you want to add to the agent.
-  # You can specify the full path to each SSH private key.
+  # A space-separated list of SSH private keys (with full path) to add to agent (((
   _ssh_keys_to_add="$HOME/.ssh/id_ed25519_nov13_2025 $HOME/.ssh/id_ed25519"
   case "$_ssh_keys_to_add" in *" "*)
     : ;;  # documented: SSH key paths must not contain spaces
   esac
+  # )))
+
+  # Obtain a sanitised/validated list of ssh keys to add to the agent (((
 
   # Initialize an empty string to hold valid SSH keys that actually exist
   _valid_ssh_keys_for_keychain=""
 
-  # Loop through the list of SSH keys to check if both the private key and its corresponding public key exist
+  # Loop through SSH key list to check if both the private key and its associated public key exist (((
   for _key in $_ssh_keys_to_add; do
     # Check if the private key file and the corresponding public key file exist
     if [ -r "$_key" ] && [ -r "$_key.pub" ]; then
@@ -849,17 +849,20 @@ if [ -n "$_INTERACTIVE_SHELL" ]; then
       _valid_ssh_keys_for_keychain="$_valid_ssh_keys_for_keychain $_key"
     fi
   done
+  # )))
 
   # Update the list of SSH keys to add, now containing only valid keys
   _ssh_keys_to_add="$_valid_ssh_keys_for_keychain"
+  # ))) Obtained a validated/sanitised list of ssh keys to add
 
-  # Check if the operating system is macOS (Darwin)
+  # Actual addition of SSH keys tailored accordingly to the current OS (((
+  # Obtain the operating system name
   _UNAME_S=$(uname -s 2>/dev/null || :)
 
   if [ "$_UNAME_S" = "Darwin" ]; then
-    # On macOS, we can use the system's built-in SSH agent, which is automatically integrated with macOS's keychain.
+    # On macOS, use the system's built-in SSH agent, which is integrated with macOS's keychain. (((
 
-    # Check if the SSH agent is already running by checking the SSH_AUTH_SOCK environment variable
+    # Check if the SSH agent is already running by checking the SSH_AUTH_SOCK environment variable (((
     if [ -z "$SSH_AUTH_SOCK" ]; then
       umask 077
       # If the agent is not running, start it
@@ -869,8 +872,9 @@ if [ -n "$_INTERACTIVE_SHELL" ]; then
       esac
       unset _ssh_agent_out
     fi
+    # )))
 
-    # Add each valid SSH key to the SSH agent using ssh-add
+    # Add each valid SSH key to the SSH agent using ssh-add (((
     # if command -v "ssh-add" > /dev/null 2>&1; then
     set -- $_ssh_keys_to_add  # Set positional parameters to the valid keys
     while [ $# -gt 0 ]; do
@@ -884,10 +888,11 @@ if [ -n "$_INTERACTIVE_SHELL" ]; then
       shift  # Move to the next key in the list
     done
     # fi
+    # )))
+    # )))
   else
-    # On Linux (or non-macOS systems), prefer using `keychain` if it's installed.
-    # If keychain is installed, it will help manage the SSH agent and keys.
-
+ # On Linux or other non-macOS systems, prefer using `keychain` if it is installed (((
+    # If keychain is installed, it will help manage the SSH agent and keys. (((
     if _has "keychain"; then
       # Use `keychain` to manage the keys and the SSH agent
       _keychain_out=$(keychain --absolute --dir "${XDG_RUNTIME_DIR:-/tmp}/keychain" \
@@ -897,10 +902,9 @@ if [ -n "$_INTERACTIVE_SHELL" ]; then
         *SSH_AUTH_SOCK*) eval "$_keychain_out" >/dev/null ;;
       esac
       unset _keychain_out
-    else
-      # If `keychain` isn't available, fall back to using the `ssh-agent` directly.
-
-      # Start the SSH agent if it's not already running
+      # )))
+    else # where `keychain` isn't available, fall back to using the `ssh-agent` directly. (((
+      # Start the SSH agent if it's not already running (((
       if [ -z "$SSH_AUTH_SOCK" ]; then
         umask 077
         _ssh_agent_out=$(ssh-agent -s 2>/dev/null) || :
@@ -909,8 +913,9 @@ if [ -n "$_INTERACTIVE_SHELL" ]; then
         esac
         unset _ssh_agent_out
       fi
+      # )))
 
-      # Add each valid SSH key to the SSH agent using ssh-add
+      # Add each valid SSH key to the SSH agent using ssh-add (((
       # if command -v "ssh-add" > /dev/null 2>&1; then
       set -- $_ssh_keys_to_add  # Set positional parameters to the valid keys
       while [ $# -gt 0 ]; do
@@ -924,10 +929,14 @@ if [ -n "$_INTERACTIVE_SHELL" ]; then
         shift  # Move to the next key in the list
       done
       # fi
+      # )))
     fi
+    # )))
+  # )))
   fi
-  fi
-fi
+  # )))
+
+fi  # End of check for interactive shell and ssh-agent installed or not
 # )))
 
 # Unset variables local to this file (((
