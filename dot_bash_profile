@@ -17,22 +17,34 @@ readonly __BASH_PROFILE_LOADED=1
 
 [[ -n "$BASH_PROFILE_DEBUG" ]] && echo "Start of ~/.bash_profile"
 
-# Source ~/.profile (which contains common settings across shells e.g. environment variables)
-[[ -r "$HOME/.profile" ]] && source "$HOME/.profile"
+# echo "In ~/.bash_profile: home PATH before sourcing ~/.profile: "
+# echo $PATH | tr ":" "\n" | grep -E "^/home"
 
-# Activate mise (the path of the mise executable should have been added to PATH within ~/.profile)
-# command -v mise &>/dev/null && source <(mise activate bash --shims)
-# hash mise &>/dev/null && source <(mise activate bash --shims)
-if hash mise &>/dev/null; then
-  eval "$(mise activate bash --shims)"
-fi
+# Now source ~/.profile (which contains common settings across shells e.g. environment variables)
+[[ -r "$HOME/.profile" ]] && source "$HOME/.profile" # && echo "Success in sourcing ~/.profile!"
+
+# echo "In ~/.bash_profile: home PATH after sourcing ~/.profile: "
+# echo $PATH | tr ":" "\n" | grep -E "^/home"
 
 # ((( Source ~/.bashrc (if present) to have aliases/functions etc defined for login shell sessions also
 # Most bash settings are in ~/.bashrc file to consolidate settings in one place ~/.bashrc
 # https://superuser.com/questions/183870/difference-between-bashrc-and-bash-profile/183980
-case $- in
-  *i*) [[ -r "$HOME/.bashrc" ]] && source "$HOME/.bashrc" ;;
-esac
+# case $- in
+#   *i*) [[ -r "$HOME/.bashrc" ]] && source "$HOME/.bashrc" ;;
+# esac
 # )))
 
+# echo "In ~/.bash_profile: PATH at the end of ~/.bash_profile: "
+# echo $PATH | tr ":" "\n" | grep -E "^/home"
+
 [[ -n "$BASH_PROFILE_DEBUG" ]] && echo "End of ~/.bash_profile"
+
+# Commented-out blocks of startup logic (outdates/unnecessary/redundant/incorrect etc) (((
+# ------------------------------------------------------------------------------------
+# Activate mise (the path of the mise executable should have been added to PATH within ~/.profile)
+# command -v mise &>/dev/null && source <(mise activate bash --shims)
+# hash mise &>/dev/null && source <(mise activate bash --shims)
+# if hash mise &>/dev/null; then
+#   eval "$(mise activate bash --shims)"
+# fi
+# )))

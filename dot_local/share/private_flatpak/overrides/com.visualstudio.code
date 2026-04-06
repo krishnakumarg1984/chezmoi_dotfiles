@@ -1,0 +1,6 @@
+[Context]
+filesystems=!home;
+
+[Environment]
+VSCODE_PORTABLE=~/.var/app/com.visualstudio.code/data
+

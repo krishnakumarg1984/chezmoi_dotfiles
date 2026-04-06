@@ -227,16 +227,6 @@ unset _local_bindir
 
 # Incorporate various third-party commands to PATH & set related environment variables (((
 
-# Append luarocks binaries to PATH (((
-_luarocks_config_file="$_xdg_config_home/luarocks/config.lua"
-if [ -r "$_luarocks_config_file" ]; then
-  LUAROCKS_CONFIG="$_luarocks_config_file"
-  export LUAROCKS_CONFIG
-fi
-unset _luarocks_config_file
-
-update_env_var PATH --append --check dir "$_xdg_data_home/luarocks/bin"
-# )))
 
 # Pixi configuration (((
 # PIXI_HOME to be set prior to the installation of pixi (((
@@ -253,16 +243,28 @@ unset _pixi_bindir
 # )))
 # )))
 
-# Incorporate tools installed by `mason` to PATH (((
+# Append tools installed by `mason` to PATH (((
 _mason_bindir="$_xdg_data_home/nvim/mason/bin"
 
 # mason_bindir may not exist yet if custom neovim config that uses mason is not yet activated
 # However, we will still incorporate mason bindir into PATH ready whenever mason/neovim is installed
 if ! _has "mason"; then
-  update_env_var PATH --prepend "$_mason_bindir"
+  update_env_var PATH --append "$_mason_bindir"
 fi
 unset _mason_bindir
 # )))
+
+# Append luarocks binaries to PATH (((
+_luarocks_config_file="$_xdg_config_home/luarocks/config.lua"
+if [ -r "$_luarocks_config_file" ]; then
+  LUAROCKS_CONFIG="$_luarocks_config_file"
+  export LUAROCKS_CONFIG
+fi
+unset _luarocks_config_file
+
+update_env_var PATH --append --check dir "$_xdg_data_home/luarocks/bin"
+# )))
+
 
 # Homebrew configuration (((
 
@@ -282,6 +284,16 @@ fi
 # )))
 
 # )))
+
+# Prepend $HOME/.local/share/mise/bin to PATH (unconditionally, so tools can be in PATH asap) (((
+# if _has "mise"; then
+  _mise_shimsdir="$_xdg_data_home/mise/shims"
+  update_env_var PATH --prepend "$_mise_shimsdir"
+  unset _mise_shimsdir
+# fi
+# )))
+
+# mise > pixi > luarocks > mason > brew (for third party package manager tools)
 
 # )))
 
@@ -471,7 +483,7 @@ export BUN_INSTALL
 
 # ------------------- Cargo (Rust) Environment -------------------(((
 # Set Cargo home directory
-CARGO_HOME="$_xdg_data_home/cargo" && export CARGO_HOME  # mise tools should not go to $HOME/.cargo
+CARGO_HOME="$_xdg_data_home/cargo" && export CARGO_HOME  # mise cargo tools not to be in $HOME/.cargo
 
 # Optionally, you could also prepend cargo bin to PATH if desired:
 # if [ -d "$CARGO_HOME/bin" ]; then
@@ -716,6 +728,12 @@ export RUSTUP_HOME
 # fi
 # )))
 
+# ------------------- Shiv (pipx) Environment -------------------(((
+SHIV_ROOT="$_xdg_cache_home/shiv"
+export SHIV_ROOT
+# )))
+
+
 # ------------------- GNU Screen Environment -------------------(((
 # Set user-specific screen configuration and socket directory if screen exists
 # if _has "screen"; then
@@ -916,6 +934,9 @@ fi
 unset _xdg_state_home _xdg_data_home _xdg_cache_home _xdg_localdir _xdg_config_home
 unset _INTERACTIVE_SHELL _UNAME_S
 # )))
+
+# echo "In ~/.profile: home PATH at the end of ~/.profile: "
+# echo $PATH | tr ":" "\n" | grep -E "^/home"
 
 # Some interesting tools (((
 # ---------------------

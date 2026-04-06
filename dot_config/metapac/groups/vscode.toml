@@ -1,0 +1,10 @@
+[flatpak]
+packages = [
+    "com.visualstudio.code"
+]
+
+[vscode]
+packages = [
+    "tamasfe.even-better-toml"
+]
+

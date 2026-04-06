@@ -11,3 +11,4 @@ for file in *.pdf; do
     "$HOME/bin/pdfsizeopt_podman.sh" $file
 
 done
+f2 --max-depth 1 --allow-overwrites --exec -f '.pso.pdf' -r '.pdf'
