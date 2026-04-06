@@ -29,9 +29,9 @@ readonly __BASH_PROFILE_LOADED=1
 # ((( Source ~/.bashrc (if present) to have aliases/functions etc defined for login shell sessions also
 # Most bash settings are in ~/.bashrc file to consolidate settings in one place ~/.bashrc
 # https://superuser.com/questions/183870/difference-between-bashrc-and-bash-profile/183980
-# case $- in
-#   *i*) [[ -r "$HOME/.bashrc" ]] && source "$HOME/.bashrc" ;;
-# esac
+case $- in
+  *i*) [[ -r "$HOME/.bashrc" ]] && source "$HOME/.bashrc" ;;
+esac
 # )))
 
 # echo "In ~/.bash_profile: PATH at the end of ~/.bash_profile: "

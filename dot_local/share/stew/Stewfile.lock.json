@@ -1,0 +1,16 @@
+{
+	"os": "linux",
+	"arch": "amd64",
+	"packages": [
+		{
+			"source": "github",
+			"owner": "tlinden",
+			"repo": "rpnc",
+			"tag": "v2.1.7",
+			"asset": "rpnc-linux-amd64-v2.1.7",
+			"binary": "rpnc",
+			"url": "https://api.github.com/repos/TLINDEN/rpnc/releases/assets/299866468",
+			"binaryHash": "39f79f064ff0e4e9654b235d07f15bf1b9d55e31ad2820c23649a02188e5a8d7"
+		}
+	]
+}
