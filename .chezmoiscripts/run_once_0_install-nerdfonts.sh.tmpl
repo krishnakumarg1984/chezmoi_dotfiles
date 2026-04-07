@@ -4,13 +4,24 @@
 
 set -eu
 
+# Fallback check: skip if Victor Mono Nerd Font is already installed
+# Guard Clause: fc-list check before running the installer. This makes the script truly idempotent.
+nerd_font_name="VictorMono"
+
+if fc-list :family | grep -iq "$nerd_font_name Nerd Font"; then
+    echo "--- $nerd_font_name Nerd Font is already installed. Skipping. ---"
+    exit 0
+fi
+
 echo ""
 echo "--- Installing nerdfonts ---"
 
-nerd_font_name="VictorMono"
 
 echo "--- Installing nerdfont $nerd_font_name ---"
-echo "Y" | nerd_font_name=$nerd_font_name bash <(curl -fsSL https://raw.githubusercontent.com/monoira/nefoin/main/install.sh) >/dev/null 2>&1
+nerd_font_name=$nerd_font_name bash <(curl -fsSL https://raw.githubusercontent.com/monoira/nefoin/main/install.sh) >/dev/null 2>&1
+
+fc-cache -f >/dev/null 2>&1  # to ensure the system immediately recognizes without a logout/reboot.
+
 echo "--- Finished installing nerdfont $nerd_font_name ---"
 
 echo "--- Finished Installing nerdfonts ---"

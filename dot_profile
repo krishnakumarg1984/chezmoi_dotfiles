@@ -588,6 +588,11 @@ export GIT_PAGER
 # )))
 # )))
 
+# ------------------- GnuPG Environment ------------------ (((
+GNUPGHOME="$_xdg_data_home/gnupg"
+export GNUPGHOME
+# )))
+
 # ------------------- Go Environment ------------------ (((
 # Set GOCACHE, GOMODCACHE, and GOPATH to user-specific directories
 if _has "go"; then
