@@ -21,7 +21,7 @@ return {
     "JetBrains Mono NL",
     "JetBrains Mono",
   }),
-  font_size = 20,
+  font_size = 19,
   line_height = 1.0,
   use_dead_keys = false,
   color_scheme = "DoomOne",

@@ -1,8 +1,8 @@
 # vim: ft=bash:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=130:syntax=sh:ft=sh
 # shellcheck shell=bash
 # shellcheck disable=SC1091
-# Usually runs for every interactive non-login bash shell
-# While interactive, non-login bash shells do not explicitly source ~/.bash_profile, they still inherit the environment from their parent process (which may be a login shell).
+# ~/.bashrc usually runs for every interactive non-login bash shell
+# Although interactive non-login bash shells do not explicitly source ~/.bash_profile, they still inherit their environment from their parent process (which may be a login shell).
 
 # echo "start bashrc"
 
@@ -11,18 +11,18 @@
 readonly __CUSTOM_BASHRC_SOURCED=1
 # )))
 
-# Short-circuit sourcing of ~/.bashrc for non-interactive shells
+# Short-circuit the sourcing of ~/.bashrc for non-interactive shells
 [[ $- == *i* ]] || return
 
 # Define local xdg basedir variables (((
-_xdg_config_home="$HOME/.config" && mkdir -p "$_xdg_config_home"
-_xdg_localdir="$HOME/.local" && mkdir -p "$_xdg_localdir"
-_xdg_cache_home="$_xdg_localdir/cache" && mkdir -p "$_xdg_cache_home"
-_xdg_data_home="$_xdg_localdir/share" && mkdir -p "$_xdg_data_home"
-_xdg_state_home="$_xdg_localdir/state" && mkdir -p "$_xdg_state_home"
+_xdg_config_home="$HOME/.config" && [ ! -d "$_xdg_config_home" ] && mkdir -p "$_xdg_config_home"
+_xdg_localdir="$HOME/.local" && [ ! -d "$_xdg_localdir" ] && mkdir -p "$_xdg_localdir"
+_xdg_cache_home="$HOME/.cache" && [ ! -d "$_xdg_cache_home" ] && mkdir -p "$_xdg_cache_home"
+_xdg_data_home="$_xdg_localdir/share" && [ ! -d "$_xdg_data_home" ] && mkdir -p "$_xdg_data_home"
+_xdg_state_home="$_xdg_localdir/state" && [ ! -d "$_xdg_state_home" ] && mkdir -p "$_xdg_state_home"
 # )))
 
-# Source some useful POSIX functions (eg idempotent environment variable manager) (((
+# Source some useful POSIX functions (e.g. idempotent environment variable manager) (((
 if [[ -r "$_xdg_config_home/sh/sh_functions.sh" ]]; then
   source "$_xdg_config_home/sh/sh_functions.sh" 2>/dev/null || true
 fi
@@ -34,11 +34,9 @@ fi
 
 ###############################################################################
 # FIGNORE — Bash-only filename completion filter
-#
 # Notes:
 # - Matches suffixes only (no globs, no directories)
-# - Affects TAB completion, not globbing
-# - Safe to source in .bashrc / .bash_profile
+# - Affects Tab completion, not globbing
 ###############################################################################
 
 # Editor backups and autosaves
@@ -90,7 +88,12 @@ export FIGNORE='~:#:.swp:.swo:.swn:.swm:.swl:.viminfo:.DS_Store:.bak:.backup:.ol
 
 # Set bash-specific environment variables (((
 # To remove all but the last identical command, and commands that start with a space
-export HISTCONTROL="erasedups:ignorespace"
+# echo "before HISTCONTROL"
+HISTCONTROL=ignoreboth:erasedups
+# ignorespace → lets you hide sensitive commands (just prefix with a space)
+# ignoredups → avoids consecutive duplicates
+# erasedups → removes older duplicates entirely
+# echo "after HISTCONTROL"
 # export BASH_COMPLETION_USER_FILE="$_xdg_config_home/bash_completion/bash_completion"
 # )))
 

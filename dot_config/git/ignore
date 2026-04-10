@@ -1,33 +1,41 @@
-# vim: ft=gitconfig
+# vim: ft=gitconfig:foldmarker=(((,))):fdm=marker:foldlevel=0:tw=145
 
-# Logs and databases #
+# Logs and databases (((
 # ######################
+*.accdb
+# *.db
+*.db-shm
+*.db-wal
+*.dbf
 *.log
+*.mdb
+*.pdb
 *.sqlite
 *.sqlite3
+# )))
 
-# Compiled source #
+# Compiled sources (((
 ###################
 *.com
 *.dll
 *.exe
 *.o
 *.so
+# )))
 
-# RSA keys, just in case
+# RSA keys, just in case (((
 *rsa*
+# )))
 
-.ccls-cache/
-Desktop.ini
-
-## Node
+# Node (((
 npm-debug.log
+# )))
 
-## Linux
+# Linux (((
 # temporary files which can be created if a process still has a handle open of a deleted file
 .fuse_hidden*
 
-# KDE directory preferences
+# Metadata left by Dolphin file manager, which comes with KDE Plasma
 .directory
 
 # Linux trash folder which might appear on any partition or disk
@@ -36,15 +44,27 @@ npm-debug.log
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
+# Log files created by default by the nohup command
+nohup.out
 
-## Mac
+# )))
+
+# ArchLinuxPackages (((
+*.tar.*
+*.log
+*.log.*
+*.sig
+
+pkg/
+# )))
+
+# macOS (((
 .DS_Store
+.localized
+__MACOSX/
 .AppleDouble
 .LSOverride
-
-# Icon must end with two \r
-Icon
-Icon?
+Icon[]
 
 # Thumbnails
 ._*
@@ -64,9 +84,14 @@ Icon?
 Network Trash Folder
 Temporary Items
 .apdisk
+# )))
 
+# macOS Patch (((
+# iCloud generated files
+*.icloud
+# )))
 
-## Windows
+# Windows (((
 # Windows thumbnail cache files
 Thumbs.db
 Thumbs.db:encryptable
@@ -83,7 +108,6 @@ ehthumbs_vista.db
 $RECYCLE.BIN/
 
 # Windows Installer files
-*.cab
 *.msi
 *.msix
 *.msm
@@ -91,10 +115,442 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+# )))
 
+# Anjuta Local configuration folder and symbol database (((
+/.anjuta/
+/.anjuta_sym_db.db
+# )))
 
-## WebStorm ###
-# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and WebStorm
+# Ansible (((
+*.retry
+.ansible/
+# )))
+
+# AnsibleTower (((
+# Ansible runtime and backups
+*.original
+*.bkp
+*.*~
+
+# Tower runtime roles
+roles/**
+!roles/requirements.yml
+
+# Avoid plain-text passwords
+*pwd*
+*pass*
+*password*
+
+# )))
+
+# Archives (((
+
+### Mostly from https://en.wikipedia.org/wiki/List_of_archive_formats
+
+## Archiving only
+# The traditional archive format on Unix-like systems, now used mainly for the creation of static libraries.
+*.a
+*.ar
+# RPM files consist of metadata concatenated with (usually) a cpio archive. Newer RPM systems also support other archives, as cpio is becoming obsolete. cpio is also used with initramfs.
+*.cpio
+
+# A self-extracting archive that uses the Bourne shell (sh).
+*.shar
+# A system for storing multiple files. LBR archives typically contained files processed by SQ, or the archive itself was compressed with SQ. LBR archives that were compressed with SQ ended with the extension .LQR
+*.LBR
+# A library format used primarily on the Commodore 64 and 128 lines of computers. This bears no resemblance to the DOS LBR format. While library files were quick to implement (a number of programs exist to work with them) they are crippled in that they cannot grow with use: once a file has been created it cannot be amended (files added, changed or deleted) without recreating the entire file.
+*.lbr
+# An archive format used by Mozilla for storing binary diffs. Used in conjunction with bzip2.
+*.mar
+
+# It's better to unpack these files and commit the raw source because
+# git has its own built in compression methods.
+*.7z
+# Mac OS X, restoration on different platforms is possible although not immediate 	Yes 	Based on 7z. Preserves Spotlight metadata, resource forks, owner/group information, dates and other data which would be otherwise lost with compression.
+*.s7z
+# Old archive versions only 	Proprietary format
+*.ace
+# A format that compresses and doubly encrypt the data (AES256 and CAS256) avoiding brute force attacks, also hide files in an AFA file. It has two ways to safeguard data integrity and subsequent repair of the file if has an error (repair with AstroA2P (online) or Astrotite (offline)).
+*.afa
+# A mainly Korean format designed for very large archives.
+*.alz
+*.arc
+# Originally DOS, now multiple
+*.arj
+# Open archive format, used by B1 Free Archiver (http://dev.b1.org/standard/archive-format.html)
+*.b1
+# Binary Archive with external header
+*.ba
+# Proprietary format from the ZipTV Compression Components
+*.bh
+# Originally DOS, now DOS and Windows 	Created by Yaakov Gringeler; released last in 2003 (Compressia 1.0.0.1 beta), now apparently defunct. Free trial of 30 days lets user create and extract archives; after that it is possible to extract, but not to create.
+*.car
+# Open source file format.
+*.cfs
+# Compact Pro archive, a common archiver used on Mac platforms until about Mac OS 7.5.x. Competed with StuffIt; now obsolete.
+*.cpt
+# Windows, Unix-like, Mac OS X Open source file format. Files are compressed individually with either gzip, bzip2 or lzo.
+*.dar
+# ??
+# DiskDoubler 	Mac OS 			obsolete
+*.dd
+*.dgc
+# Apple Disk Image upports "Internet-enabled" disk images, which, once downloaded, are automatically decompressed, mounted, have the contents extracted, and thrown away. Currently, Safari is the only browser that supports this form of extraction; however, the images can be manually extracted as well. This format can also be password-protected or encrypted with 128-bit or 256-bit AES encryption.
+*.dmg
+# Enterprise Java Archive archive
+*.ear
+# ETSoft compressed archive
+*.egg
+# The predecessor of DGCA.
+*.gca
+# Originally DOS 	Yes, but may be covered by patents 	DOS era format; uses arithmetic/Markov coding
+*.ha
+# MS Windows 	HKI
+*.hki
+# Produced by ICEOWS program. Excels at text file compression.
+*.ice
+*.jar
+# Open sourced archiver with compression using the PAQ family of algorithms and optional encryption.
+*.kgb
+# Originally DOS, now multiple 	Multiple 	Yes 	The standard format on Amiga.
+*.lzh
+*.lha
+# Archiver originally used on The Amiga. Now copied by Microsoft to use in their .cab and .chm files.
+*.lzx
+# file format from NoGate Consultings, a rival from ARC-Compressor.
+*.pak
+# A disk image archive format that supports several compression methods as well as splitting the archive into smaller pieces.
+*.partimg
+# An experimental open source packager (http://mattmahoney.net/dc)
+*.paq*
+# Open source archiver supporting authenticated encryption, volume spanning, customizable object level and volume level integrity checks (form CRCs to SHA-512 and Whirlpool hashes), fast deflate based compression
+*.pea
+# The format from the PIM - a freeware compression tool by Ilia Muraviev. It uses an LZP-based compression algorithm with set of filters for executable, image and audio files.
+*.pim
+# PackIt 	Mac OS 			obsolete
+*.pit
+# Used for data in games written using the Quadruple D library for Delphi. Uses byte pair compression.
+*.qda
+# A proprietary archive format, second in popularity to .zip files.
+*.rar
+# The format from a commercial archiving package. Odd among commercial packages in that they focus on incorporating experimental algorithms with the highest possible compression (at the expense of speed and memory), such as PAQ, PPMD and PPMZ (PPMD with unlimited-length strings), as well as a proprietary algorithms.
+*.rk
+# Self Dissolving ARChive 	Commodore 64, Commodore 128 	Commodore 64, Commodore 128 	Yes 	SDAs refer to Self Dissolving ARC files, and are based on the Commodore 64 and Commodore 128 versions of ARC, originally written by Chris Smeets. While the files share the same extension, they are not compatible between platforms. That is, an SDA created on a Commodore 64 but run on a Commodore 128 in Commodore 128 mode will crash the machine, and vice versa. The intended successor to SDA is SFX.
+*.sda
+# A pre-Mac OS X Self-Extracting Archive format. StuffIt, Compact Pro, Disk Doubler and others could create .sea files, though the StuffIt versions were the most common.
+*.sea
+# Scifer Archive with internal header
+*.sen
+# Commodore 64, Commodore 128 	SFX is a Self Extracting Archive which uses the LHArc compression algorithm. It was originally developed by Chris Smeets on the Commodore platform, and runs primarily using the CS-DOS extension for the Commodore 128. Unlike its predecessor SDA, SFX files will run on both the Commodore 64 and Commodore 128 regardless of which machine they were created on.
+*.sfx
+# An archive format designed for the Apple II series of computers. The canonical implementation is ShrinkIt, which can operate on disk images as well as files. Preferred compression algorithm is a combination of RLE and 12-bit LZW. Archives can be manipulated with the command-line NuLib tool, or the Windows-based CiderPress.
+*.shk
+# A compression format common on Apple Macintosh computers. The free StuffIt Expander is available for Windows and OS X.
+*.sit
+# The replacement for the .sit format that supports more compression methods, UNIX file permissions, long file names, very large files, more encryption options, data specific compressors (JPEG, Zip, PDF, 24-bit image, MP3). The free StuffIt Expander is available for Windows and OS X.
+*.sitx
+# A royalty-free compressing format
+*.sqx
+*.zip
+*.gz
+*.gzip
+*.tgz
+*.bzip
+*.bzip2
+*.bz2
+*.xz
+*.lzma
+# The Microsoft Windows native archive format, which is also used by many commercial installers such as InstallShield and WISE.
+*.cab
+*.tar.Z
+*.tar.bz2
+*.tbz2
+*.tar.lzma
+*.tlz
+# UltraCompressor 2.3 was developed to act as an alternative to the then popular PKZIP application. The main feature of the application is its ability to create large archives. This means that compressed archives with the UC2 file extension can hold almost 1 million files.
+*.uc
+*.uc0
+*.uc2
+*.ucn
+*.ur2
+*.ue2
+# Based on PAQ, RZM, CSC, CCM, and 7zip. The format consists of a PAQ, RZM, CSC, or CCM compressed file and a manifest with compression settings stored in a 7z archive.
+*.uca
+# A high compression rate archive format originally for DOS.
+*.uha
+# Web Application archive (Java-based web app)
+*.war
+# File-based disk image format developed to deploy Microsoft Windows.
+*.wim
+*.xar
+*.zst
+*.tzst
+# Native format of the Open Source KiriKiri Visual Novel engine. Uses combination of block splitting and zlib compression. The filenames and pathes are stored in UTF-16 format. For integrity check, the Adler-32 hashsum is used. For many commercial games, the files are encrypted (and decoded on runtime) via so-called "cxdec" module, which implements xor-based encryption.
+*.xp3
+# Yamazaki zipper archive. Compression format used in DeepFreezer archiver utility created by Yamazaki Satoshi. Read and write support exists in TUGZip, IZArc and ZipZag
+*.yz1
+*.zipx
+# application/x-zoo 	zoo 	Multiple 	Multiple 	Yes
+*.zoo
+# Journaling (append-only) archive format with rollback capability. Supports deduplication and incremental update based on last-modified dates. Multi-threaded. Compresses in LZ77, BWT, and context mixing formats. Open source.
+*.zpaq
+# Archiver with a compression algorithm based on the Burrows-Wheeler transform method.
+*.zz
+
+# Packing-only formats
+# An archive format originally used mainly for archiving and distribution of the exact, nearly-exact, or custom-modified contents of an optical storage medium such as a CD-ROM or DVD-ROM. However, it can be used to archive the contents of other storage media, selected partitions, folders, and/or files. The resulting archive is typically optimized for convenient rendering to (re-)writable CD or DVD media.
+*.iso
+# A common archive format used on Unix-like systems. Generally used in conjunction with compressors such as gzip, bzip2, compress or xz to create .tar.gz, .tar.bz2, .tar.Z or tar.xz files.
+*.tar
+
+# Package management formats
+*.xpi
+*.gem
+*.deb
+*.rpm
+*.txz
+# )))
+
+# Backups (((
+*.backup
+*.bak
+*.gho
+*.old
+*.ori
+*.orig
+*.temp
+*.tmp
+# )))
+
+# Bazaar (((
+# ######
+.bzr/
+.bzrignore
+# )))
+
+# Bricx Command Center IDE (((
+# http://bricxcc.sourceforge.net
+*.sym
+# )))
+
+# CVS (((
+/CVS/*
+**/CVS/*
+.cvsignore
+*/.cvsignore
+# )))
+
+# Calabash / Cucumber (((
+rerun/
+reports/
+screenshots/
+# screenshot*.png
+test-servers/
+
+# bundler
+.bundle
+vendor
+# )))
+
+# Cloud9 IDE - http://c9.io (((
+.c9revisions
+.c9
+# )))
+
+# Codekit (((
+# General CodeKit files to ignore
+config.codekit
+config.codekit3
+/min
+# )))
+
+# CodeKit Patch (((
+*/codekit-config.json
+.codekit-cache
+# )))
+
+# Cursor IDE (((
+.cursorignore
+.cursorindexingignore
+# )))
+
+# Dart editor (((
+# .project
+.buildlog
+# )))
+
+# Dreamweaver (((
+# DW Dreamweaver added files
+_notes
+_compareTemp
+# configs/
+dwsync.xml
+dw_php_codehinting.config
+*.mno
+# )))
+
+# Dropbox (((
+# Dropbox settings and caches
+.dropbox
+.dropbox.attr
+.dropbox.cache
+# )))
+
+# Eclipse (((
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# External tool builders
+.externalToolBuilders/
+
+# Locally stored "Eclipse launch configurations"
+*.launch
+
+# PyDev specific (Python IDE for Eclipse)
+*.pydevproject
+
+# CDT-specific (C/C++ Development Tooling)
+.cproject
+
+# CDT- autotools
+.autotools
+
+# Java annotation processor (APT)
+.factorypath
+
+# PDT-specific (PHP Development Tools)
+.buildpath
+
+# sbteclipse plugin
+.target
+
+# Tern plugin
+.tern-project
+
+# TeXlipse plugin
+.texlipse
+
+# STS (Spring Tool Suite)
+.springBeans
+
+# Code Recommenders
+.recommenders/
+
+# Annotation Processing
+.apt_generated/
+.apt_generated_tests/
+
+# Scala IDE specific (Scala & Java development for Eclipse)
+.cache-main
+.scala_dependencies
+.worksheet
+
+# Uncomment this line if you wish to ignore the project description file.
+# Typically, this file would be tracked if it contains build/dependency configurations:
+#.project
+# )))
+
+# Eclipse Patch (((
+# Eclipse Core
+/.project
+qtcreator/
+
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+# Annotation Processing
+.apt_generated
+
+.sts4-cache/
+# )))
+
+# EiffelStudio (((
+# The compilation directory
+EIFGENs
+# )))
+
+# Emacs (((
+# -*- mode: gitignore; -*-
+# *~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# Org-mode
+.org-id-locations
+*_archive
+
+# flymake-mode
+*_flymake.*
+
+# eshell files
+/eshell/history
+/eshell/lastdir
+
+# elpa packages
+/elpa/
+
+# reftex files
+*.rel
+
+# AUCTeX auto folder
+/auto/
+
+# cask packages
+.cask/
+dist/
+
+# Flycheck
+flycheck_*.el
+
+# server auth directory
+/server/
+
+# projectiles files
+.projectile
+
+# directory configuration
+.dir-locals.el
+
+# network security
+/network-security.data
+
+# undo-tree
+*.~undo-tree~
+# )))
+
+# Ensime (((
+.ensime
+.ensime_cache/
+.ensime_lucene/
+# )))
+
+# Espresso (((
+*.esproj
+# )))
+
+# Flexbuilder (((
+# bin/
+bin-debug/
+bin-release/
+# )))
+
+# JetBrains (((
+# Covers JetBrains IDEs: IntelliJ, GoLand, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff
@@ -127,6 +583,9 @@ $RECYCLE.BIN/
 # When using Gradle or Maven with auto-import, you should exclude module files,
 # since they will be recreated, and may cause churn.  Uncomment if using
 # auto-import.
+# .idea/artifacts
+# .idea/compiler.xml
+# .idea/jarRepositories.xml
 # .idea/modules.xml
 # .idea/*.iml
 # .idea/modules
@@ -164,7 +623,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-# Editor-based Rest Client
+# Editor-based HTTP Client
 .idea/httpRequests
 http-client.private.env.json
 
@@ -175,27 +634,28 @@ http-client.private.env.json
 .idea/.cache/.Apifox_Helper
 .idea/ApifoxUploaderProjectSetting.xml
 
-# KDevelop4
+# Github Copilot persisted session migrations, see: https://github.com/microsoft/copilot-intellij-feedback/issues/712#issuecomment-3322062215
+.idea/**/copilot.data.migration.*.xml
+# )))
+
+# KDevelop4 (((
 *.kdev4
 .kdev4/
+# )))
 
-# Swap Files #
+# Swap Files # (((
 .*.kate-swp
 .swp.*
+# )))
 
-# Lazarus compiler-generated binaries (safe to delete)
-*.exe
-*.dll
-*.so
+# Lazarus compiler-generated binaries (safe to delete) (((
 *.dylib
 *.lrs
 *.res
 *.compiled
 *.dbg
 *.ppu
-*.o
 *.or
-*.a
 
 # Lazarus autogenerated files (duplicated info)
 # *.rst
@@ -207,13 +667,16 @@ http-client.private.env.json
 
 # Lazarus backups and unit output folders.
 # These can be changed by user in Lazarus/project options.
-backup/
+# backup/
 *.bak
-lib/
+# lib/
+# )))
 
-# Application bundle for Mac OS
+# Application bundle for macOS (((
 *.app/
+# )))
 
+# lefthook.dev (((
 # https://lefthook.dev/configuration/#config-file-name
 /.lefthook-local.json
 /.lefthook-local.toml
@@ -230,12 +693,11 @@ lib/
 
 # https://lefthook.dev/configuration/source_dir_local.html
 /.lefthook-local/
+# )))
 
-# LibreOffice locks
+# LibreOffice locks (((
 .~lock.*#
-
-# Log files created by default by the nohup command
-nohup.out
+# )))
 
 # Ignore LyX backup and autosave files
 # http://www.lyx.org/
@@ -284,12 +746,7 @@ Sessionx.vim
 # Coc configuration directory
 .vim
 
-
-## General
-log/
-*.log
-
-## vscode
+# vscode (((
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -299,58 +756,9 @@ log/
 
 # Local History for Visual Studio Code
 .history/
-*.app
+# *.app
 .snapshots/*
-
-# Anjuta Local configuration folder and symbol database
-/.anjuta/
-/.anjuta_sym_db.db
-
-# Ansible
-*.retry
-.ansible/
-
-# Bazaar
-# ######
-.bzr/
-.bzrignore
-
-# Bricx Command Center IDE
-# http://bricxcc.sourceforge.net
-*.sym
-
-# CVS
-/CVS/*
-**/CVS/*
-.cvsignore
-*/.cvsignore
-
-# Calabash / Cucumber
-rerun/
-reports/
-screenshots/
-# screenshot*.png
-test-servers/
-
-# bundler
-.bundle
-vendor
-
-# Cloud9 IDE - http://c9.io
-.c9revisions
-.c9
-
-# General CodeKit files to ignore
-config.codekit
-config.codekit3
-/min
-
-# Cursor IDE
-.cursorignore
-.cursorindexingignore
-
-# Dart editor
-.buildlog
+# )))
 
 ## Ignore tags created by etags, ctags, gtags (GNU global) and cscope
 TAGS
@@ -374,70 +782,6 @@ cscope.po.out
 ## Private key
 *.ppk
 
-
-## Backups
-*.backup
-*.bak
-*.gho
-*.old
-*.ori
-*.orig
-*.temp
-*.tmp
-
-## Archives
-# It's better to unpack these files and commit the raw source because
-# git has its own built in compression methods.
-*.7z
-*.jar
-*.rar
-*.zip
-*.gz
-*.gzip
-*.tgz
-*.bzip
-*.bzip2
-*.bz2
-*.xz
-*.lzma
-*.cab
-*.xar
-*.zst
-*.tzst
-
-# Packing-only formats
-*.iso
-*.tar
-
-# Package management formats
-*.dmg
-*.xpi
-*.gem
-*.egg
-*.deb
-*.rpm
-*.msi
-*.msm
-*.msp
-*.txz
-
-
-## Diffs
-*.patch
-*.diff
-
-# DW Dreamweaver added files
-_notes
-_compareTemp
-# configs/
-dwsync.xml
-dw_php_codehinting.config
-*.mno
-
-# Dropbox settings and caches
-.dropbox
-.dropbox.attr
-.dropbox.cache
 
 ## Images
 # JPEG
@@ -622,145 +966,6 @@ profile_default/
 ipython_config.py
 
 
-### Eclipse ###
-.metadata
-bin/
-tmp/
-*.tmp
-*.swp
-*~.nib
-local.properties
-.settings/
-.loadpath
-.recommenders
-
-# External tool builders
-.externalToolBuilders/
-
-# Locally stored "Eclipse launch configurations"
-*.launch
-
-# PyDev specific (Python IDE for Eclipse)
-*.pydevproject
-
-# CDT-specific (C/C++ Development Tooling)
-.cproject
-
-# CDT- autotools
-.autotools
-
-# Java annotation processor (APT)
-.factorypath
-
-# PDT-specific (PHP Development Tools)
-.buildpath
-
-# sbteclipse plugin
-.target
-
-# Tern plugin
-.tern-project
-
-# TeXlipse plugin
-.texlipse
-
-# STS (Spring Tool Suite)
-.springBeans
-
-# Code Recommenders
-.recommenders/
-
-# Annotation Processing
-.apt_generated/
-
-# Scala IDE specific (Scala & Java development for Eclipse)
-.cache-main
-.scala_dependencies
-.worksheet
-
-### Eclipse Patch ###
-# Eclipse Core
-/.project
-qtcreator/
-
-# EiffelStudio compilation directory
-EIFGENs
-
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
-
-# Annotation Processing
-.apt_generated
-
-.sts4-cache/
-
-
-### Emacs ###
-# -*- mode: gitignore; -*-
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-auto-save-list
-tramp
-.\#*
-
-# Org-mode
-.org-id-locations
-*_archive
-
-# flymake-mode
-*_flymake.*
-
-# eshell files
-/eshell/history
-/eshell/lastdir
-
-# elpa packages
-/elpa/
-
-# reftex files
-*.rel
-
-# AUCTeX auto folder
-/auto/
-
-# cask packages
-.cask/
-dist/
-
-# Flycheck
-flycheck_*.el
-
-# server auth directory
-/server/
-
-# projectiles files
-.projectile
-
-# directory configuration
-.dir-locals.el
-
-# network security
-/network-security.data
-
-# undo-tree
-*.~undo-tree~
-
-# Ensime specific
-.ensime
-.ensime_cache/
-.ensime_lucene/
-
-# Espresso
-*.esproj
-
-# Flexbuilder
-bin-debug/
-bin-release/
-
-
 ### SublimeText ###
 # Cache files for Sublime Text
 *.tmlanguage.cache
@@ -880,7 +1085,7 @@ StyleCopReport.xml
 *.tmp
 *.tmp_proj
 *_wpftmp.csproj
-*.log
+# *.log
 *.vspscc
 *.vssscc
 .builds
@@ -1021,7 +1226,6 @@ _pkginfo.txt
 # Others
 ClientBin/
 ~$*
-*~
 *.dbmdl
 *.dbproj.schemaview
 *.jfm
@@ -1181,7 +1385,7 @@ local.properties
 proguard/
 
 # Log Files
-*.log
+# *.log
 
 # Android Studio
 /*/build/
@@ -1192,7 +1396,7 @@ proguard/
 captures/
 .navigation/
 *.ipr
-*~
+# *~
 *.swp
 *.swo
 
@@ -1240,7 +1444,7 @@ obj/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db
+# Thumbs.db
 
 # Legacy Eclipse project files
 .classpath
@@ -1253,7 +1457,6 @@ Thumbs.db
 
 # Package Files #
 *.war
-*.ear
 
 # virtual machine crash logs (Reference: http://www.java.com/en/download/help/error_hotspot.xml)
 hs_err_pid*
@@ -1310,7 +1513,7 @@ local.properties
 proguard/
 
 # Log Files
-*.log
+# *.log
 
 # Android Studio Navigation editor temp files
 .navigation/
@@ -1560,3 +1763,5 @@ cppcheck_results.txt
 .clang-tidy
 .reframe_completion
 .mise.toml
+
+.ccls-cache/
