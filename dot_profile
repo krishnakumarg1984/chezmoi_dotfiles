@@ -625,6 +625,11 @@ MINIKUBE_HOME="$_xdg_data_home/minikube"
 export MINIKUBE_HOME
 # )))
 
+# ------------------- Neovim Environment ------------------- (((
+# NVIM_APPNAME="astronvim_config"
+# export NVIM_APPNAME
+# )))
+
 # ------------------- Nodejs Environment ------------------- (((
 # ------------------- Node.js REPL History ------------------- (((
 # Set NODE_REPL_HISTORY to a custom location for persistent REPL history
