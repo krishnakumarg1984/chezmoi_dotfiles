@@ -38,7 +38,7 @@ case "$0" in
 esac
 # )))
 
-# Global helper: command existence check (((
+# _has() command existence check function (((
 # Defined once to reduce repeated forks
 _has() { command -v "$1" >/dev/null 2>&1; }
 # )))
@@ -263,6 +263,10 @@ unset _luarocks_config_file
 update_env_var PATH --append --check dir "$_xdg_data_home/luarocks/bin"
 # )))
 
+# Append doom emacs bin directory to PATH (((
+update_env_var PATH --append --check dir "$_xdg_config_home/emacs/bin"
+# )))
+
 # Homebrew configuration (((
 
 # Set HOMEBREW_PREFIX if it is not already set and the custom directory exists (((
@@ -290,7 +294,7 @@ fi
 # fi
 # )))
 
-# mise > pixi > luarocks > mason > brew (for third party package manager tools)
+# mise > pixi > luarocks > mason > doom-emacs > brew (for third party package manager tools)
 
 # )))
 

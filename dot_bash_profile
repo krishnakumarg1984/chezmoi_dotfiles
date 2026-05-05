@@ -4,20 +4,24 @@
 # per-user, AFTER /etc/profile
 # Intentionally minimal: aliases, functions, options for interactive bash shells are in ~/.bashrc
 
-# Prevent accidental sourcing in non-Bash shells
+# Prevent accidental sourcing in non-Bash shells (((
 [[ -n "$BASH_VERSION" ]] || { return 0 2>/dev/null || exit 0; }  # return if sourced, exit if executed
+# )))
 
 # Prevent double-sourcing of ~/.bash_profile (((
 [[ -n "$__BASH_PROFILE_LOADED" ]] && { return 0 2>/dev/null || exit 0; }
 readonly __BASH_PROFILE_LOADED=1
 # )))
 
-[[ -n "$BASH_PROFILE_DEBUG" ]] && echo "Start of ~/.bash_profile"
+# Optional debug message (start executing contents of ~/.bash_profile) (((
+[[ -n "$BASH_PROFILE_DEBUG" ]] && echo "Start executing contents of ~/.bash_profile"
+# )))
 
-# Now source ~/.profile (which contains common settings across shells e.g. environment variables)
+# Now source ~/.profile (which contains common settings across shells e.g. environment variables) (((
 [[ -r "$HOME/.profile" ]] && source "$HOME/.profile" # && echo "Success in sourcing ~/.profile!"
+# )))
 
-# ((( Source ~/.bashrc (if present) to have aliases/functions etc defined for login shell sessions also
+# Source ~/.bashrc (if present) to have aliases/functions etc in login shell sessions also (((
 # Most bash settings are in ~/.bashrc file to consolidate settings in one place ~/.bashrc
 # https://superuser.com/questions/183870/difference-between-bashrc-and-bash-profile/183980
 case $- in
@@ -25,4 +29,6 @@ case $- in
 esac
 # )))
 
+# Optional debug message (End of ~/.bash_profile) (((
 [[ -n "$BASH_PROFILE_DEBUG" ]] && echo "End of ~/.bash_profile"
+# )))
