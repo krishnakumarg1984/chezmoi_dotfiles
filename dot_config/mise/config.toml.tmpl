@@ -2,186 +2,274 @@
 MISE_ENV_FILE = ".env"
 
 [tools]
-node = "latest"
-rust = { version = "latest", profile = "minimal" }
-# rust = { version = "nightly", profile = "minimal" }
-act = "latest"
-actionlint = "latest"
-age = "latest"
-bat = "latest"
-bat-extras = "latest"
-# biome = "latest"
-bottom = "latest"
-btop = "latest"
-bun = "latest"
-cargo-binstall = "latest"
-ccache = "latest"
-checkmake = "latest"
-chezmoi = "latest"
-cosign = "latest"
-# cpz = "latest"
-delta = "latest"
-difftastic = "latest"
-direnv = "latest"
-dive = "latest"
-dua = "latest"
-duf = "latest"
-dust = "latest"
-dyff = "latest"
-# emacs = "latest"
-eza = "latest"
-fastfetch = "latest"
-fd = "latest"
-# fx = "latest"
-fzf = "latest"
-gdu = "latest"
-gh = "latest"
-git-cliff = "latest"
-gitui = "latest"
-glow = "latest"
-go = "latest"
-hadolint = "latest"
-harper-ls = "latest"
-# java = "temurin-jre-25" # problems installing java as on Dec 02, 2025. Moving java to pixi global
-# java = "latest"         # problems installing java as on Dec 02, 2025. Moving java to pixi global
-jless = "latest"
-# jq = "latest"
-lazydocker = "latest"
-lazygit = "latest"
-# lua = "latest"
-lua-language-server = "latest"
-# make = "latest"
-markdownlint-cli2 = "latest"
-marksman = "latest"
-meson = "latest"
-micromamba = "latest"
-neovim = "latest"
-# neovim = "nightly"
-ninja = "latest"
-# oxlint = "latest"
-pandoc = "latest"
-pipx = "latest"
-ripgrep = "latest"
-ripgrep-all = "latest"
-# rmz = "latest"
-ruby = "latest"
-ruff = "latest"
-shellcheck = "latest"
-shfmt = "latest"
-starship = "latest"
-stylua = "latest"
-taplo = "latest"
-tinytex = "latest"
-tlrc = "latest"
-tree-sitter = "latest"
-usage = "latest"
-uv = "latest"
-viddy = "latest"
-yamlfmt = "latest"
-yamllint = "latest"
-zellij = "latest"
-# python = "latest"
-# tombi = "latest"
-"cargo:binsider" = "latest"
-"cargo:bookokrat" = "latest"
-"cargo:brush" = { version = "latest", locked = true }
-"cargo:cargo-cache" = "latest"
-"cargo:cargo-update" = "latest"
-"cargo:carl" = "latest"
-"cargo:erdtree" = "latest"
-"cargo:https://github.com/kyu08/fzf-make" = { version = "latest", locked = true }
-"cargo:helix-calc" = "latest"
-# "cargo:https://github.com/kruseio/hygg" = { version = "latest", locked = true }
-# "cargo:hygg" = "latest"
-# "cargo:hygg" = { version = "latest", locked = true }
-"cargo:macchina" = "latest"
-"cargo:mcat" = "latest"
-"cargo:mdsf" = "latest"
-"cargo:metapac" = "latest"
-"cargo:neocmakelsp" = "latest"
-"cargo:procs" = "latest"
-"cargo:rpn-cli" = "latest"  # Huw Walters version
-# "cargo:rumdl" = "latest"
-"cargo:rnr" = "latest"
-"cargo:shellharden" = "latest"
-# "cargo:shuntcalc" = "latest"
-"cargo:tex-fmt" = "latest"
-"cargo:topgrade" = "latest"
-# "gem:xrpn" = "latest"
-"gem:t-rex" = "latest"
-"github:exercism/cli" = "latest"
-"github:ayoisaiah/f2" = "latest"   # is a golang utility
-"github:Han8931/gorae" = "latest"
-"github:marcopaganini/rpn" = { version = "latest",  asset_pattern = "rpn_*_linux_386.tar.gz",  rename_exe = "gorpn" }
-"github:shenwei356/rush" = "latest"
-"github:ArshErgon/shuntcalc" = { version = "latest", rename_exe = "shuntcalc" }
-"github:gurgeous/vectro" = "latest"
-"gitlab:ImaginaryInfinity/squiid-calculator/squiid" = "latest"
-"go:github.com/marwanhawari/stew" = "latest"
-# "go:github.com/marcopaganini/rpn" = "latest"
-"npm:awk-language-server" = "latest"
-"npm:bash-language-server" = "latest"
-"npm:basics-language-server" = "latest"
-"npm:commitlint" = "latest"
-"npm:gh-actions-language-server" = "latest"
-"npm:textlint" = "latest"
-"npm:vim-language-server" = "latest"
-"npm:vscode-json-languageservice" = "latest"
-"npm:yaml-language-server" = "latest"
-"pipx:autopep8" = "latest"
-"pipx:autotools-language-server" = "latest"
-"pipx:bandit" = "latest"
-"pipx:basedpyright" = "latest"
-"pipx:beautysh" = "latest"
-"pipx:clang-format" = "latest"
-"pipx:cmakelint" = "latest"
-# "pipx:codespell" = "latest"
-"pipx:cpplint" = "latest"
-# "pipx:dexa" = "latest"
-"pipx:engineering-calculator" = "latest"
-"pipx:git-delete-merged-branches" = "latest"
-"pipx:jupytext" = "latest"
-"pipx:lue-reader" = "latest"
-"pipx:mbake" = "latest"
-"pipx:mdformat" = "latest"
-"pipx:mypy" = "latest"
-"pipx:pymarkdownlnt" = "latest"
-"pipx:pydantic-rpn" = "latest"
-"pipx:pyproject-fmt" = "latest"
-"pipx:pystacker" = "latest"
-"pipx:pytest" = "latest"
-"pipx:refurb" = "latest"
-"pipx:renux" = "latest"
-"pipx:reorder-python-imports" = "latest"
-"pipx:rpn-calc" = "latest"
-# "pipx:rpnChilada" = "latest"
-"pipx:rpnpy" = "latest"
-"pipx:textlsp" = "latest"
-# "pipx:trash-cli" = "latest"  # problematic as of Jan 18 2026
-"pipx:usort" = "latest"
-"pipx:vulture" = "latest"
-"pipx:yamlfix" = "latest"
-# "pipx:docformatter" = "latest"
-# "pipx:pyrefly" = "latest"
-# "pipx:ty" = "latest"
-# "pipx:zuban" = "latest"
+node = "latest"                                     # Node.js JavaScript runtime
+rust = { version = "latest", profile = "minimal" }  # Rust language. https://mise.en.dev/lang/rust.html
+
+bat = "latest"                  # A cat(1) clone with wings. https://github.com/sharkdp/bat
+bat-extras = "latest"           # Bash scripts that integrate bat with various command line tools. https://github.com/eth-p/bat-extras
+bottom = "latest"               # Yet another cross-platform graphical process/system monitor. https://github.com/ClementTsang/bottom
+bun = "latest"                  # Bun is a fast JavaScript all-in-one toolkit. https://mise.en.dev/lang/bun.html
+cargo-binstall = "latest"       # Yet another cross-platform graphical process/system monitor. https://github.com/ClementTsang/bottom
+difftastic = "latest"           # A structural diff that understands syntax. https://github.com/Wilfred/difftastic
+dua = "latest"                  # View disk space usage and delete unwanted data, fast. https://github.com/Byron/dua-cli
+duf = "latest"                  # Disk Usage/Free Utility - a better 'df' alternative. https://github.com/muesli/duf
+dust = "latest"                 # A more intuitive version of du in rust. https://github.com/bootandy/dust
+dyff = "latest"                 # A diff tool for YAML files, and sometimes JSON. https://github.com/homeport/dyff
+eza = "latest"                  # A modern, maintained replacement for ls. https://github.com/eza-community/eza
+fastfetch = "latest"            # An actively maintained, feature-rich and performance oriented, neofetch like system information tool. https://github.com/fastfetch-cli/fastfetch
+fd = "latest"                   # A simple, fast and user-friendly alternative to 'find'. https://github.com/sharkdp/fd
+fzf = "latest"                  # A command-line fuzzy finder. https://github.com/junegunn/fzf
+gdu = "latest"                  # Fast disk usage analyzer with console interface written in Go. https://github.com/dundee/gdu
+gh = "latest"                   # GitHub’s official command line tool. https://github.com/cli/cli
+glow = "latest"                 # Render markdown on the CLI, with pizzazz. https://github.com/charmbracelet/glow
+go = "latest"                   # go lang (Builtin plugin). https://mise.en.dev/lang/go.html
+jless = "latest"                # jless is a command-line JSON viewer designed for reading, exploring, and searching through JSON data. https://github.com/PaulJuliusMartinez/jless
+lua-language-server = "latest"  # A language server that offers Lua language support - programmed in Lua. https://github.com/LuaLS/lua-language-server
+micromamba = "latest"           # Lightweight conda-compatible package manager. https://github.com/mamba-org/micromamba-releases
+neovim = "latest"               # Vim-fork focused on extensibility and usability. https://github.com/mise-plugins/vfox-neovim
+pandoc = "latest"               # Universal markup converter. https://github.com/jgm/pandoc
+ripgrep = "latest"              # ripgrep recursively searches directories for a regex pattern while respecting your gitignore. https://github.com/BurntSushi/ripgrep
+ripgrep-all = "latest"          # rga: ripgrep, but also search in PDFs, E-Books, Office documents, zip, tar.gz, etc. https://github.com/phiresky/ripgrep-all
+ruby = "latest"                 # Ruby language. https://mise.en.dev/lang/ruby.html
+ruff = "latest"                 # An extremely fast Python linter and code formatter, written in Rust. https://github.com/astral-sh/ruff
+rush = "latest"                 # A cross-platform command-line tool for executing jobs in parallel. https://github.com/shenwei356/rush
+shellcheck = "latest"           # ShellCheck, a static analysis tool for shell scripts. https://github.com/koalaman/shellcheck
+shfmt = "latest"                # A shell parser, formatter, and interpreter with bash support; includes shfmt. https://github.com/mvdan/sh
+starship = "latest"             # The minimal, blazing-fast, and infinitely customizable prompt for any shell. https://github.com/starship/starship
+stylua = "latest"               # A Lua code formatter. https://github.com/JohnnyMorganz/StyLua
+taplo = "latest"                # A TOML toolkit written in Rust. https://github.com/tamasfe/taplo
+tinytex = "latest"              # A lightweight, cross-platform, portable, and easy-to-maintain LaTeX distribution based on TeX Live. https://github.com/mise-plugins/mise-tinytex
+tlrc = "latest"                 # A tldr client written in Rust. https://github.com/tldr-pages/tlrc
+topgrade = "latest"             # Upgrade all the things. https://github.com/topgrade-rs/topgrade
+tree-sitter = "latest"          # An incremental parsing system for programming tools. https://github.com/tree-sitter/tree-sitter
+usage = "latest"                # A specification for CLIs. https://github.com/jdx/usage
+uv = "latest"                   # An extremely fast Python package installer and resolver, written in Rust. https://github.com/astral-sh/uv
+viddy = "latest"                # A modern watch command. Time machine and pager etc. https://github.com/sachaos/viddy
+zellij = "latest"               # A terminal workspace with batteries included. https://github.com/zellij-org/zellij
+
+"cargo:bookokrat" = "latest"                              # A terminal-based EPUB/PDF Books reader. https://github.com/bugzmanov/bookokrat
+"cargo:brush" = { version = "latest", locked = true }     # Rust-implemented shell focused on POSIX and bash compatibility. https://github.com/reubeno/brush
+"cargo:cargo-cache" = "latest"                            # Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively. https://github.com/matthiaskrgr/cargo-cache
+"cargo:cargo-update" = "latest"                           # A cargo subcommand for checking and applying updates to installed executables. https://github.com/nabijaczleweli/cargo-update
+"cargo:diskus" = "latest"                                 # A minimal, fast alternative to 'du -sh'. https://github.com/sharkdp/diskus
+"cargo:erdtree" = "latest"                                # erdtree (erd) is a cross-platform, multi-threaded, and general purpose filesystem and disk usage utility that is aware of .gitignore and hidden file rules. https://github.com/solidiquis/erdtree
+"cargo:fzf-make" = { version = "latest", locked = true }  # A command line tool that executes commands using fuzzy finder with preview window for make, npm, pnpm, yarn, just and task. https://github.com/kyu08/fzf-make
+"cargo:mcat" = "latest"                                   # Terminal image, video, and Markdown viewer. https://github.com/Skardyy/mcat
+"cargo:procs" = "latest"                                  # A modern replacement for ps. https://github.com/dalance/procs
+
+"github:ayoisaiah/f2" = "latest"  # F2 is a cross-platform command-line tool for batch renaming files and directories quickly and safely. Written in Go! https://github.com/ayoisaiah/f2
+ 
 
 {{- if ne .chezmoi.hostname "blend" }}
-zig = "latest"
-# "cargo:prosemd-lsp" = "latest" # compiles from source on linux arm64 as of Jul 2025
+# zig = "latest"               # A general-purpose programming language and toolchain for maintaining robust, optimal and reusable software. https://mise.en.dev/lang/zig.html
+# "cargo:prosemd-lsp" = "latest" # compiles from source on linux arm64 as of Jul 2025. An experimental proofreading and linting language server for markdown files. https://github.com/kitten/prosemd-lsp
 {{- end }}
 
 {{- if eq .chezmoi.hostname "blend" }}
-typst = "latest"
-tinymist = "latest"
-typstyle = "latest"
-"cargo:fclones" = "latest"
-"cargo:https://github.com/antonWetzel/prettypst" = { version = "latest", locked = true }
-"cargo:presenterm" = "latest"
-"pipx:ansible-dev-tools" = { version = "latest", uvx_args = "--with-executables-from ansible-builder,ansible-core,ansible-creator,ansible-dev-environment,ansible-lint,ansible-sign,molecule,ansible-navigator" }
-# "cargo:codebook" = "latest"
-# "cargo:unmake" = "latest"
+typst = "latest"               # A new markup-based typesetting system that is powerful and easy to learn. https://github.com/typst/typst
+# tinymist = "latest"          # Tinymist is an integrated language service for Typst.. https://github.com/Myriad-Dreamin/tinymist
+# typstyle = "latest"          # Beautiful and reliable typst code formatter. https://github.com/Enter-tainer/typstyle
+
+"cargo:fclones" = "latest"     # Finds and removes duplicate files. https://github.com/pkolaczk/fclones
+"cargo:presenterm" = "latest"  # A terminal slideshow presentation tool. https://github.com/mfontanini/presenterm
+
+# "pipx:ansible-dev-tools" = { version = "latest", uvx_args = "--with-executables-from ansible-builder,ansible-core,ansible-creator,ansible-dev-environment,ansible-lint,ansible-sign,molecule,ansible-navigator" }  # Ansible automation developer tools. https://github.com/ansible/ansible-dev-tools
+
+# "github:exercism/cli" = "latest"   # A Go based command line tool for exercism.org. https://github.com/exercism/cli
+
+# "cargo:https://github.com/antonWetzel/prettypst" = { version = "latest", locked = true }  # Formatter for Typst. https://github.com/antonWetzel/prettypst
+# "cargo:codebook-lsp" = "latest"  # A code-aware spell checker with language server implementation, installable via cargo install. https://github.com/blopker/codebook
+# "cargo:unmake" = "latest"  # A makefile linter. https://github.com/mcandre/unmake
 {{- end }}
+
+{{- if eq .chezmoi.hostname "doesnotexist" }}
+# To install in future
+# --------------------
+# act = "latest"                # Run GitHub Actions locally. https://github.com/nektos/act
+# actionlint = "latest"         # Static checker for GitHub Actions workflow files. https://github.com/rhysd/actionlint
+# age = "latest"                # A simple, modern and secure encryption tool (and Go library) with small explicit keys, no config options, and UNIX-style composability. https://github.com/FiloSottile/age
+# biome = "latest"              # A toolchain for web projects, aimed to provide functionalities to maintain them. Biome offers formatter and linter, usable via CLI and LSP. https://github.com/biomejs/biome
+# ccache = "latest"             # A fast compiler cache. https://github.com/ccache/ccache
+# checkmake = "latest"          # Linter/analyzer for Makefiles. https://github.com/checkmake/checkmake
+# chezmoi = "latest"            # Manage your dotfiles across multiple diverse machines, securely. https://github.com/twpayne/chezmoi
+# clang-format = "latest"       # Format C/C++/Java/JavaScript/JSON/Objective-C/Protobuf/C# code. https://github.com/clang-format
+# cosign = "latest"             # Code signing and transparency for containers and binaries. https://github.com/sigstore/cosign
+# cpz = "latest"                # A zippy alternative to cp, a tool to copy files and directories. https://github.com/SUPERCILEX/fuc/cpz.  Needs "progress" to be marked as a feature while installing through here.
+# delta = "latest"              # A syntax-highlighting pager for git, diff, and grep output. https://github.com/dandavison/delta
+# direnv = "latest"             # Unclutter your .profile. https://github.com/direnv/direnv
+# dive = "latest"               # A tool for exploring each layer in a docker image. https://github.com/wagoodman/dive
+# fx = "latest"                 # Command-line tool and terminal JSON viewer. https://github.com/antonmedv/fx
+# git-cliff = "latest"          # A highly customizable Changelog Generator that follows Conventional Commit specifications. https://github.com/orhun/git-cliff
+# gitui = "latest"              # Blazing fast terminal-ui for git written in rust. https://github.com/extrawurst/gitui
+# hadolint = "latest"           # Dockerfile linter, validate inline bash, written in Haskell. https://github.com/hadolint/hadolint
+# harper-ls = "latest"          # Language Server Protocol frontend for Harper. https://github.com/Automattic/harper/harper-ls
+# java = "latest"               # Problems installing java as on Dec 02, 2025. Moving java to pixi global
+# java = "temurin-jre-25"       # Problems installing java as on Dec 02, 2025. Moving java to pixi global
+# jq = "latest"                 # Command-line JSON processor. https://github.com/jqlang/jq
+# lazydocker = "latest"         # The lazier way to manage everything docker. https://github.com/jesseduffield/lazydocker
+# lazygit = "latest"            # Simple terminal UI for git commands. https://github.com/jesseduffield/lazygit
+# lua = "latest"                # Lua language. https://github.com/mise-plugins/vfox-lua
+# make = "latest"               # GNU Make is a tool which controls the generation of executables and other non-source files of a program from the program's source files. https://github.com/make
+# markdownlint-cli2 = "latest"  # A fast, flexible, configuration-based command-line interface for linting Markdown/CommonMark files with the markdownlint library. https://www.npmjs.com/package/markdownlint-cli2
+# marksman = "latest"           # Write Markdown with code assist and intelligence in the comfort of your favourite editor. https://github.com/artempyanykh/marksman
+# meson = "latest"              # Meson is an open source build system meant to be both extremely fast, and, even more importantly, as user friendly as possible. https://pypi.org/project/meson
+# mprocs = "latest"             # Run multiple commands in parallel. https://github.com/pvolok/mprocs
+# neovim = "nightly"            # Vim-fork focused on extensibility and usability. https://github.com/mise-plugins/vfox-neovim
+# ninja = "latest"              # A small build system with a focus on speed. https://github.com/ninja-build/ninja
+# oxlint = "latest"             # This is the linter for oxc.. https://www.npmjs.com/package/oxlint
+# pipx = "latest"               # https://github.com/pypa/pipx
+# python = "latest"             # Python language. https://mise.en.dev/lang/python.html
+# rmz = "latest"                # A zippy alternative to rm, a tool to remove files and directories. https://github.com/SUPERCILEX/fuc/rmz
+# tombi = "latest"              # TOML Formatter / Linter / Language Server. https://github.com/tombi-toml/tombi
+# yamlfmt = "latest"            # An extensible command line tool or library to format yaml files. https://github.com/google/yamlfmt
+# yamllint = "latest"           # A linter for YAML files. https://pypi.org/project/yamllint
+
+# "cargo:binsider" = "latest"                           # Analyze ELF binaries like a boss. https://github.com/orhun/binsider
+# "cargo:carl" = "latest"                               # A colorful commandline calendar with ical support. Similar to `cal`, but with features. https://codeberg.org/birger/carl
+# "cargo:helix-calc" = "latest"                         # Reverse Polish Notation calculator in a terminal app. https://github.com/chbug/hc
+# "cargo:hygg" = { version = "latest", locked = true }  # Simplifying the way you read. Minimalistic Vim-like TUI document reader. https://github.com/kruseio/hygg
+# "cargo:macchina" = "latest"                           # A system information fetcher with an emphasis on performance. https://github.com/Macchina-CLI/macchina
+# "cargo:mdsf" = "latest"                               # Format, and lint, markdown code snippets using your favorite tools. https://github.com/hougesen/mdsf
+# "cargo:metapac" = "latest"                            # Multi-backend declarative package manager. https://github.com/ripytide/metapac
+# "cargo:neocmakelsp" = "latest"                        # The Lsp for cmake. https://github.com/neocmakelsp/neocmakelsp
+# "cargo:rpn-cli" = "latest"                            # Command line reverse Polish notation calculator. Huw Walters version. https://docs.rs/crate/rpn-cli/1.8.0/source/
+# "cargo:rumdl" = "latest"                              # A fast Markdown linter written in Rust (Ru(st) MarkDown Linter). https://github.com/rvben/rumdl
+# "cargo:rnr" = "latest"                                # RnR is a command-line tool to rename multiple files and directories that supports regular expressions. https://github.com/ismaelgv/rnr
+# "cargo:shellharden" = "latest" 	                      # The corrective bash syntax highlighter. https://github.com/anordal/shellharden/
+# "cargo:shuntcalc" = "latest"                          # A smart CLI calculator with variables, REPL, and step-by-step RPN evaluation using the Shunting Yard algorithm. https://github.com/ArshErgon/shuntcalc
+# "cargo:tex-fmt" = "latest"                            # LaTeX formatter written in Rust. https://github.com/WGUNDERWOOD/tex-fmt
+# "cargo:verso-reader" = "latest"                       # A terminal EPUB reader with vim navigation, a Kindle-style library, and Markdown highlight export. https://github.com/romankhadka/verso
+
+# "gem:xrpn" = "latest"  # The eXtended RPN (Reverse Polish Notation) programming language. https://github.com/isene/XRPN
+# "gem:t-rex" = "latest"  # Terminal Rpn calculator EXperiment. https://github.com/isene/t-rex
+
+# "github:Han8931/gorae" = "latest"                                                                                      # Gorae (고래, whale) is a terminal-first TUI knowledge base for PDFs, EPUBs, and Markdown—fast browsing, solid metadata, instant full-text search, bidirectional links, and a built-in AI assistant—built as a Vim/CLI-friendly alternative to Zotero, Mendeley, Notion, and Obsidian. https://github.com/Han8931/gorae
+# "github:marcopaganini/rpn" = { version = "latest",  asset_pattern = "rpn_*_linux_386.tar.gz",  rename_exe = "gorpn" }  # A CLI RPN calculator in Go. 
+# "github:ArshErgon/shuntcalc" = { version = "latest", rename_exe = "shuntcalc" }                                        # A smart terminal calculator with variables, REPL, and step-by-step RPN evaluation using the Shunting Yard algorithm — written in Rust. https://github.com/ArshErgon/shuntcalc
+# "github:gurgeous/vectro" = "latest"  # rpn calculator for your terminal. https://github.com/gurgeous/vectro
+
+# "gitlab:ImaginaryInfinity/squiid-calculator/squiid" = "latest"  # Advanced calculator written in Rust, featuring a terminal user interface supporting both RPN and algebraic input. https://gitlab.com/ImaginaryInfinity/squiid-calculator/squiid
+
+# "go:github.com/marcopaganini/rpn" = "latest"  # A CLI RPN calculator in Go. https://github.com/marcopaganini/rpn
+# "go:github.com/marwanhawari/stew" = "latest"  # An independent package manager for compiled binaries. https://github.com/marwanhawari/stew
+
+# "npm:awk-language-server" = "latest"           # Language Server for AWK and associated VSCode client extension. https://github.com/Beaglefoot/awk-language-server
+# "npm:bash-language-server" = "latest"          # A language server for Bash. https://github.com/bash-lsp/bash-language-server
+# "npm:basics-language-server" = "latest"        # Buffer, path, and snippet completions. https://github.com/antonk52/basics-language-server
+# "npm:commitlint" = "latest"                    # Lint commit messages. https://github.com/conventional-changelog/commitlint
+# "npm:gh-actions-language-server" = "latest"    # Github Actions Language Server. https://github.com/lttb/gh-actions-language-server
+# "npm:textlint" = "latest"                      # textlint is the pluggable linter for natural language text. https://github.com/textlint/textlint
+# "npm:vim-language-server" = "latest"           # VImScript language server, LSP for vim script. https://github.com/iamcco/vim-language-server
+# "npm:vscode-json-languageservice" = "latest"   # JSON language service extracted from VSCode to be reused, e.g in the Monaco editor. https://github.com/microsoft/vscode-json-languageservice
+# "npm:yaml-language-server" = "latest"          # Language Server for YAML Files. https://github.com/redhat-developer/yaml-language-server
+
+# "pipx:autopep8" = "latest"                    # A tool that automatically formats Python code to conform to the PEP 8 style guide. https://github.com/hhatto/autopep8
+# "pipx:autotools-language-server" = "latest"   # Autotools language server, support configure.ac, Makefile.am, Makefile. https://github.com/Freed-Wu/autotools-language-server
+# "pipx:bandit" = "latest"                      # Bandit is a tool designed to find common security issues in Python code. https://github.com/PyCQA/bandit
+# "pipx:basedpyright" = "latest"                # pyright fork with various type checking improvements, improved vscode support and pylance features built into the language server. https://github.com/detachhead/basedpyright
+# "pipx:beautysh" = "latest"                    # A Bash beautifier for the masses. https://github.com/lovesegfault/beautysh
+# "pipx:cmakelint" = "latest"                   # Check for coding style issues in CMake files. https://github.com/cmake-lint/cmake-lint
+# "pipx:codespell" = "latest"                   # Check code for common misspellings. https://github.com/codespell-project/codespell
+# "pipx:cpplint" = "latest"                     # Static code checker for C++. https://github.com/cpplint/cpplint
+# "pipx:dexa" = "latest"                        # The ultimate terminal RPN calculator. https://gitlab.com/nummertopia/dexa
+# "pipx:docformatter" = "latest"                # Formats docstrings to follow PEP 257. https://github.com/PyCQA/docformatter
+# "pipx:engineering-calculator" = "latest"      # Engineering RPN Calculator. https://github.com/kenkundert/ec
+# "pipx:esc-calc"                               # Friendly, extensible TUI RPN calculator https://github.com/sobjornstad/esc
+# "pipx:git-delete-merged-branches" = "latest"  # Command-line tool to delete merged Git branches. https://github.com/hartwork/git-delete-merged-branches
+# "pipx:jupytext" = "latest"                    # Jupyter Notebooks as Markdown Documents, Julia, Python or R scripts. https://github.com/mwouts/jupytext
+# "pipx:lue-reader" = "latest"                  # Terminal eBook Reader with Audiobook-Quality Text-to-Speech — Supports EPUB, PDF, DOCX, HTML, RTF, TXT, and MD. https://github.com/superstarryeyes/lue
+# "pipx:mbake" = "latest"                       # mbake is a Makefile formatter and linter. https://github.com/EbodShojaei/bake
+# "pipx:mdformat" = "latest"                    # CommonMark compliant Markdown formatter. https://github.com/hukkin/mdformat
+# "pipx:mypy" = "latest"                        # Optional static typing for Python. https://github.com/python/mypy
+# "pipx:pydantic-rpn" = "latest"                # A delightful Python library for Reverse Polish Notation with Pydantic integration. https://github.com/rsp2k/pydantic-rpn
+# "pipx:pymarkdownlnt" = "latest"               # A GitHub Flavored Markdown compliant Markdown linter. https://github.com/jackdewinter/pymarkdown
+# "pipx:pyproject-fmt" = "latest"               # Format Python TOML configurations. https://github.com/tox-dev/toml-fmt
+# "pipx:pystacker" = "latest"                   # Stacker is a command-line calculator that uses reverse Polish notation (RPN) for mathematical calculations and features an RPN-based scripting language. https://github.com/remokasu/stacker
+# "pipx:pytest" = "latest"                      # The pytest framework makes it easy to write small tests, yet scales to support complex functional testing. https://github.com/pytest-dev/pytest
+# "pipx:refurb" = "latest"                      # A tool for refurbishing and modernizing Python codebases. https://github.com/dosisod/refurb
+# "pipx:renux" = "latest"                       # A terminal-based bulk file renamer with a TUI. https://github.com/andrianllmm/renux
+# "pipx:reorder-python-imports" = "latest"      # Rewrites source to reorder python imports. https://github.com/asottile/reorder-python-imports
+# "pipx:rpn-calc" = "latest"                    # Command line calculator with reverse polish notation. https://github.com/Allain18/pol
+# "pipx:rpnChilada" = "latest"                  # RPN command-line calculator. https://github.com/ConceptJunkie/rpn/
+# "pipx:rpnpy" = "latest"                       # A reverse-Polish notation calculator for Python. https://github.com/terrycojones/rpnpy
+# "pipx:textlsp" = "latest"                     # Language server for text spell and grammar check with various tools. https://github.com/hangyav/textLSP
+# "pipx:trash-cli" = "latest"                   # Problematic with mise pipx backend as of Jan 18 2026.  Command line interface to the freedesktop.org trashcan. https://github.com/andreafrancia/trash-cli
+# "pipx:usort" = "latest"                       # Safe, minimal import sorting for Python projects. https://github.com/facebook/usort
+# "pipx:vulture" = "latest"                     # Find dead Python code. https://github.com/jendrikseipp/vulture
+# "pipx:yamlfix" = "latest"                     # A simple opinionated yaml formatter that keeps your comments! https://github.com/lyz-code/yamlfix
+# "pipx:pyrefly" = "latest"                     # A fast type checker and language server for Python. https://github.com/facebook/pyrefly
+# "pipx:ty" = "latest"                          # An extremely fast Python type checker and language server, written in Rust. https://github.com/astral-sh/ty
+# "pipx:zuban" = "latest"  # Python Type Checker / Language Server. https://github.com/zubanls/zuban
+
+# ======================================================================================================================
+# THE ULTIMATE CLI FILE RENAMER MASTER COMPARISON (FINAL EDITION - MAY 2026)
+# ======================================================================================================================
+# Legend: [Y]=Yes, [N]=No, [M]=Manual/Via Regex, [E]=Elite Support, [S]=Stable/Basic, [!]=Specialty, [D]=Default
+# ======================================================================================================================
+
+# TOOL        | LANG  | ARCH    | OS SUPPORT | DRY-RUN | UNDO SYS  | NAT-SORT | METADATA  | DETOX   | GIT-AWARE  | CONFLICTS  |
+# ------------|-------|---------|------------|---------|-----------|----------|-----------|---------|------------|------------|
+# f2          | Go    | x86/ARM | W/M/L/B/A  | [D]     | [Y] Int.  | [Y] Flag | [E] Full  | [M]     | [Y] Native | [E] Auto   |
+# renux       | Py    | x86/ARM | W/M/L/B    | [Y]     | [E] Hist. | [Y]      | [S] Basic | [E] TUI | [N]        | [E] Auto   |
+# renamex     | Rust  | x86/ARM | W/M/L/B    | [D]     | [Y] Log   | [N]      | [N]       | [E]     | [N]        | [S] Guard  |
+# nomino      | Rust  | x86/ARM | W/M/L/B    | [Y]     | [N]       | [D]      | [N]       | [M]     | [N]        | [S] Report |
+# rnr         | Rust  | x86/ARM | W/M/L/B    | [D]     | [Y] Dump  | [N]      | [N]       | [E]     | [N]        | [S] Report |
+# brename     | Go    | x86/ARM | W/M/L/B    | [Y]     | [Y] Log   | [Y]      | [N]       | [M]     | [N]        | [S] Guard  |
+# qmv         | C     | x86     | L/M/B      | [Y]     | [N]       | [M]      | [N]       | [M]     | [N]        | [E] Valid  |
+# detox       | C     | x86     | L/M/B      | [Y]     | [N]       | [N]      | [N]       | [E]     | [N]        | [S] Skip   |
+# edir        | Py/Rs | x86/ARM | L/M/B      | [Y]     | [N]       | [M]      | [N]       | [M]     | [E] Native | [S] Manual |
+# massren     | Go    | x86     | W/M/L/B    | [Y]     | [N]       | [M]      | [N]       | [M]     | [N]        | [S] Manual |
+# pipe-rename | Rust  | x86/ARM | L/M/B      | [Y]     | [N]       | [M]      | [N]       | [M]     | [N]        | [S] Manual |
+# mmv         | Go    | x86/ARM | W/M/L/B    | [N]     | [N]       | [N]      | [N]       | [N]     | [N]        | [S] Skip   |
+# sd          | Rust  | x86/ARM | W/M/L/B    | [Y]     | [N]      | [N]      | [N]       | [N]     | [N]        | [N/A]      |
+# brnt        | Rust  | x86     | L/M        | [Y]     | [N]       | [Y]      | [N]       | [M]     | [N]        | [S] Report |
+# rename      | Perl  | x86     | L/M/B      | [Y]     | [N]       | [N]      | [N]       | [M]     | [N]        | [S] Skip   |
+
+# ======================================================================================================================
+# TECHNICAL DEEP-DIVE & PROJECT HEALTH
+# ======================================================================================================================
+
+# TOOL    | RECURSION | DEPTH-CTRL | HIDDEN-FILES | VCS-IGNORE | JSON-OUT | TEST-COV | MAINTAIN | COMM-HEALTH | RELEASES |
+# --------|-----------|------------|--------------|------------|----------|----------|----------|-------------|----------|
+# f2      | [Y]       | [E] Full   | [Y] Flag     | [Y] Native | [N]      | ~85%     | Elite    | Very High   | Monthly  |
+# renux   | [Y]       | [M] TUI    | [Y] Flag     | [N]        | [Y]      | ~65%     | High     | Rising      | Monthly  |
+# renamex | [Y]       | [S] Basic  | [Y]          | [N]        | [N]      | ~75%     | Stable   | Stable      | Periodic |
+# nomino  | [Y]       | [S] Basic  | [N]          | [N]        | [E] Full | ~80%     | High     | High        | Frequent |
+# rnr     | [Y]       | [S] Basic  | [N]          | [N]        | [N]      | ~70%     | Stable   | Stable      | Periodic |
+# brename | [Y]       | [S] Basic  | [Y] Flag     | [N]        | [N]      | ~75%     | Stable   | Moderate    | Stable   |
+# qmv     | [N]       | [N/A]      | [Y]          | [N]        | [N]      | Minimal  | Legacy   | Low         | None     |
+# detox   | [Y]       | [S] Basic  | [Y]          | [N]        | [N]      | Minimal  | Mature   | Low         | None     |
+# edir    | [Y]       | [S] Basic  | [Y]          | [E] Native | [N]      | Basic    | Moderate | Niche       | Rare     |
+# sd      | [N]       | [N/A]      | [N]          | [N]        | [N]      | ~80%     | High     | High        | Frequent |
+
+# ======================================================================================================================
+# REMARKS & SPECIAL ABILITIES
+# ======================================================================================================================
+# f2      : Can rename based on EXIF camera model, GPS data, and ID3 audio tags. Built-in 'undo' is elite.
+# nomino  : Fastest tool for 1M+ files. JSON mapping allows auditing renames before/after in other tools.
+# rnr     : Best 'to-ascii' transliteration. Safest way to fix filenames for cross-platform (Win/Linux) use.
+# brename : Designed for CI/CD pipelines. Non-interactive focus with strong overwrite protections.
+# qmv     : Part of renameutils. Unique side-by-side editing: Left col = Old Name, Right col = New Name.
+# detox   : The "Hammer". Specifically fixes spaces, brackets, and shell-unsafe chars recursively.
+# edir    : Detects .git folders and automatically uses 'git mv'. Critical for project history preservation.
+# mmv     : Uses positional wildcards (e.g., #1, #2) instead of regex. Very easy for simple batch moves.
+# sd      : Not a renamer per se, but the world's fastest regex replacement tool. Used in shell pipelines.
+
+# ======================================================================================================================
+# FINAL RECOMMENDATION SUMMARY (EXPANDED)
+# ======================================================================================================================
+# THE KING       : f2. If you only install one tool, make it this. Best safety, best metadata, best maintenance.
+# THE ENGINE     : nomino. If you are a developer handling massive migrations, use this for speed and JSON logging.
+# THE CLEANER    : renamex. The modern Rust successor to detox. Use for high-performance normalization of messy files.
+# THE TUI        : renux. Best for users who want a visual, interactive interface with live-preview transformations.
+# THE SURGEON    : qmv. If you need 100% manual accuracy without learning regex, the side-by-side editor is king.
+# THE REPO-FRIEND: edir. If you work in Git, this is the only tool that won't break your 'git blame' history.
+# THE VAULT      : rnr. Best for archival work; its dump-file undo system is the most robust for large-scale reverts.
+# THE PIPELINE   : sd. Use when you need a high-speed Rust-based regex replacement engine within shell pipelines.
+# ======================================================================================================================
+
+{{- end }}
+
 
 [settings]
 auto_install = true

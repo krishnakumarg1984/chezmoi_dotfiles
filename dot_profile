@@ -371,9 +371,11 @@ fi
 unset _lesskeyin_file
 # )))
 
-# history file used by less (((
-LESSHISTFILE="$_xdg_state_home/lesshistory.txt"
+# History file used by less (((
+_less_hist_dir="$_xdg_state_home/less" && [ ! -d "$_less_hist_dir" ] && mkdir -p "$_less_hist_dir"
+LESSHISTFILE="$_less_hist_dir/lesshistory.txt"
 export LESSHISTFILE
+unset _less_hist_dir
 # )))
 
 # )))
