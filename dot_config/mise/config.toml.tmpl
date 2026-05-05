@@ -47,15 +47,14 @@ uv = "latest"                   # An extremely fast Python package installer and
 viddy = "latest"                # A modern watch command. Time machine and pager etc. https://github.com/sachaos/viddy
 zellij = "latest"               # A terminal workspace with batteries included. https://github.com/zellij-org/zellij
 
-"cargo:bookokrat" = "latest"                              # A terminal-based EPUB/PDF Books reader. https://github.com/bugzmanov/bookokrat
-"cargo:brush" = { version = "latest", locked = true }     # Rust-implemented shell focused on POSIX and bash compatibility. https://github.com/reubeno/brush
-"cargo:cargo-cache" = "latest"                            # Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively. https://github.com/matthiaskrgr/cargo-cache
-"cargo:cargo-update" = "latest"                           # A cargo subcommand for checking and applying updates to installed executables. https://github.com/nabijaczleweli/cargo-update
-"cargo:diskus" = "latest"                                 # A minimal, fast alternative to 'du -sh'. https://github.com/sharkdp/diskus
-"cargo:erdtree" = "latest"                                # erdtree (erd) is a cross-platform, multi-threaded, and general purpose filesystem and disk usage utility that is aware of .gitignore and hidden file rules. https://github.com/solidiquis/erdtree
-"cargo:fzf-make" = { version = "latest", locked = true }  # A command line tool that executes commands using fuzzy finder with preview window for make, npm, pnpm, yarn, just and task. https://github.com/kyu08/fzf-make
-"cargo:mcat" = "latest"                                   # Terminal image, video, and Markdown viewer. https://github.com/Skardyy/mcat
-"cargo:procs" = "latest"                                  # A modern replacement for ps. https://github.com/dalance/procs
+"cargo:bookokrat" = "latest"                                # A terminal-based EPUB/PDF Books reader. https://github.com/bugzmanov/bookokrat
+"cargo:brush" = { version = "latest", locked = true }       # Rust-implemented shell focused on POSIX and bash compatibility. https://github.com/reubeno/brush
+"cargo:cargo-cache" = "latest"                              # Manage cargo cache ($CARGO_HOME or ~/.cargo/), show sizes and remove directories selectively. https://github.com/matthiaskrgr/cargo-cache
+"cargo:cargo-update" = "latest"                             # A cargo subcommand for checking and applying updates to installed executables. https://github.com/nabijaczleweli/cargo-update
+"cargo:diskus" = "latest"                                   # A minimal, fast alternative to 'du -sh'. https://github.com/sharkdp/diskus
+"cargo:erdtree" = "latest"                                  # A cross-platform, multi-threaded, and general purpose filesystem and disk usage utility that is aware of .gitignore and hidden file rules. https://github.com/solidiquis/erdtree
+"cargo:mcat" = "latest"                                     # Terminal image, video, and Markdown viewer. https://github.com/Skardyy/mcat
+"cargo:procs" = "latest"                                    # A modern replacement for ps. https://github.com/dalance/procs
 
 "github:ayoisaiah/f2" = "latest"  # F2 is a cross-platform command-line tool for batch renaming files and directories quickly and safely. Written in Go! https://github.com/ayoisaiah/f2
  
@@ -124,21 +123,22 @@ typst = "latest"               # A new markup-based typesetting system that is p
 # yamlfmt = "latest"            # An extensible command line tool or library to format yaml files. https://github.com/google/yamlfmt
 # yamllint = "latest"           # A linter for YAML files. https://pypi.org/project/yamllint
 
-# "cargo:binsider" = "latest"                           # Analyze ELF binaries like a boss. https://github.com/orhun/binsider
-# "cargo:carl" = "latest"                               # A colorful commandline calendar with ical support. Similar to `cal`, but with features. https://codeberg.org/birger/carl
-# "cargo:helix-calc" = "latest"                         # Reverse Polish Notation calculator in a terminal app. https://github.com/chbug/hc
-# "cargo:hygg" = { version = "latest", locked = true }  # Simplifying the way you read. Minimalistic Vim-like TUI document reader. https://github.com/kruseio/hygg
-# "cargo:macchina" = "latest"                           # A system information fetcher with an emphasis on performance. https://github.com/Macchina-CLI/macchina
-# "cargo:mdsf" = "latest"                               # Format, and lint, markdown code snippets using your favorite tools. https://github.com/hougesen/mdsf
-# "cargo:metapac" = "latest"                            # Multi-backend declarative package manager. https://github.com/ripytide/metapac
-# "cargo:neocmakelsp" = "latest"                        # The Lsp for cmake. https://github.com/neocmakelsp/neocmakelsp
-# "cargo:rpn-cli" = "latest"                            # Command line reverse Polish notation calculator. Huw Walters version. https://docs.rs/crate/rpn-cli/1.8.0/source/
-# "cargo:rumdl" = "latest"                              # A fast Markdown linter written in Rust (Ru(st) MarkDown Linter). https://github.com/rvben/rumdl
-# "cargo:rnr" = "latest"                                # RnR is a command-line tool to rename multiple files and directories that supports regular expressions. https://github.com/ismaelgv/rnr
-# "cargo:shellharden" = "latest" 	                      # The corrective bash syntax highlighter. https://github.com/anordal/shellharden/
-# "cargo:shuntcalc" = "latest"                          # A smart CLI calculator with variables, REPL, and step-by-step RPN evaluation using the Shunting Yard algorithm. https://github.com/ArshErgon/shuntcalc
-# "cargo:tex-fmt" = "latest"                            # LaTeX formatter written in Rust. https://github.com/WGUNDERWOOD/tex-fmt
-# "cargo:verso-reader" = "latest"                       # A terminal EPUB reader with vim navigation, a Kindle-style library, and Markdown highlight export. https://github.com/romankhadka/verso
+# "cargo:binsider" = "latest"                               # Analyze ELF binaries like a boss. https://github.com/orhun/binsider
+# "cargo:carl" = "latest"                                   # A colorful commandline calendar with ical support. Similar to `cal`, but with features. https://codeberg.org/birger/carl
+# "cargo:fzf-make" = { version = "latest", locked = true }  # Problematic as of May 2026. A command line tool that executes commands using fuzzy finder with preview window for make, npm, pnpm, yarn, just and task. https://github.com/kyu08/fzf-make
+# "cargo:helix-calc" = "latest"                             # Reverse Polish Notation calculator in a terminal app. https://github.com/chbug/hc
+# "cargo:hygg" = { version = "latest", locked = true }      # Simplifying the way you read. Minimalistic Vim-like TUI document reader. https://github.com/kruseio/hygg
+# "cargo:macchina" = "latest"                               # A system information fetcher with an emphasis on performance. https://github.com/Macchina-CLI/macchina
+# "cargo:mdsf" = "latest"                                   # Format, and lint, markdown code snippets using your favorite tools. https://github.com/hougesen/mdsf
+# "cargo:metapac" = "latest"                                # Multi-backend declarative package manager. https://github.com/ripytide/metapac
+# "cargo:neocmakelsp" = "latest"                            # The Lsp for cmake. https://github.com/neocmakelsp/neocmakelsp
+# "cargo:rnr" = "latest"                                    # RnR is a command-line tool to rename multiple files and directories that supports regular expressions. https://github.com/ismaelgv/rnr
+# "cargo:rpn-cli" = "latest"                                # Command line reverse Polish notation calculator. Huw Walters version. https://docs.rs/crate/rpn-cli/1.8.0/source/
+# "cargo:rumdl" = "latest"                                  # A fast Markdown linter written in Rust (Ru(st) MarkDown Linter). https://github.com/rvben/rumdl
+# "cargo:shellharden" = "latest" 	                          # The corrective bash syntax highlighter. https://github.com/anordal/shellharden/
+# "cargo:shuntcalc" = "latest"                              # A smart CLI calculator with variables, REPL, and step-by-step RPN evaluation using the Shunting Yard algorithm. https://github.com/ArshErgon/shuntcalc
+# "cargo:tex-fmt" = "latest"                                # LaTeX formatter written in Rust. https://github.com/WGUNDERWOOD/tex-fmt
+# "cargo:verso-reader" = "latest"                           # A terminal EPUB reader with vim navigation, a Kindle-style library, and Markdown highlight export. https://github.com/romankhadka/verso
 
 # "gem:xrpn" = "latest"  # The eXtended RPN (Reverse Polish Notation) programming language. https://github.com/isene/XRPN
 # "gem:t-rex" = "latest"  # Terminal Rpn calculator EXperiment. https://github.com/isene/t-rex
