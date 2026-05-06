@@ -1,0 +1,8 @@
+# vim:ft=ruby:
+
+brew "action-validator"
+brew "nasa-sw-vnv/core/ikos"
+
+brew "speedtest-cli"  # Command-line interface for https://speedtest.net bandwidth tests
+brew "dotnet"         # .NET framework
+brew "podman"         # significantly slow to build with webi brew

@@ -1,0 +1,6 @@
+actionlint
+checkmake
+chezmoi
+eget
+gh
+shfmt

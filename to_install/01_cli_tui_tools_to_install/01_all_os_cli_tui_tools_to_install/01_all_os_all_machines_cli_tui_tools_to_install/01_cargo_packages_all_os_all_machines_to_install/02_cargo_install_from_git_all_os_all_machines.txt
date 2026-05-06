@@ -1,0 +1,2 @@
+cargo binstall -y --git 'https://github.com/feel-ix-343/markdown-oxide' markdown-oxide
+cargo binstall -y --git 'https://github.com/MordechaiHadad/bob.git' bob

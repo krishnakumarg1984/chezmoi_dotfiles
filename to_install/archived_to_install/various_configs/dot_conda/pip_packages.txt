@@ -1,0 +1,4 @@
+blacktex
+neovim-remote
+safeeyes
+vimiv

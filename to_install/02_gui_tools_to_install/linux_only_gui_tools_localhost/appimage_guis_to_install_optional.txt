@@ -1,0 +1,2 @@
+wget https://github.com/quickemu-project/quickgui/releases && chmod +x quickgui-1.2.10+1-linux.AppImage
+https://museeks.io/

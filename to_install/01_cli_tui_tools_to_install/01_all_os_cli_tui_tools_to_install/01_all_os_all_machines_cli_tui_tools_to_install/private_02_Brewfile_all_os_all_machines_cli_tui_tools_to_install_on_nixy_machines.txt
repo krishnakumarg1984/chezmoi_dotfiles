@@ -1,0 +1,19 @@
+# vim: ft=ruby:noundofile
+
+tap "homebrew/bundle"
+# tap "umlx5h/tap" # for gtrash
+
+# brew "neovim"     # Ambitious Vim-fork focused on extensibility & agility. Written in C.
+brew "7-zip"        # 7-Zip is a file archiver with a high compression ratio. Written in C++
+brew "aliae"        # Cross shell and platform alias management. Written in GoLang
+brew "cpufetch"     # CPU architecture fetching tool. Written in C
+brew "gomi"         # Your UNIX rm command with a safety net! Written in GoLang
+brew "hadolint"     # Smarter Dockerfile linter to validate best practices. Written in Hashell
+brew "helm"         # Kubernetes package manager. Written in GoLang
+brew "helmfile"     # Deploy Kubernetes Helm Charts. Written in GoLang
+brew "kind"         # Run local Kubernetes cluster in Docker. Fast to install with webi brew
+brew "kubecolor"    # Colorize your kubectl output. Written in GoLang
+brew "lazyjournal"  # Logs (journalctl, file system, Docker, Podman & Kubernetes pods). Written in GoLang
+brew "mise"         # Polyglot runtime manager (asdf rust clone). Written in Rust
+brew "tenv"         # OpenTofu / Terraform / Terragrunt / Atmos version manager. Written in GoLang
+brew "zip"          # Compression and file packaging/archive utility. Written in C

@@ -1,0 +1,9 @@
+cargo-cache
+cargo-update
+csvlens
+erdtree
+prosemd-lsp
+ruplacer
+tex-fmt
+tlrc
+topgrade

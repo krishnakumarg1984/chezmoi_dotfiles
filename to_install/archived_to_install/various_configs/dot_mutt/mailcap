@@ -1,0 +1,220 @@
+# ~/dotfiles/email_stuff/.mutt/mailcap
+#
+# this uses the view_attachment script found in ~/dotfiles/email_stuff/.mutt/view_attachment.sh
+#
+# text/plain; bat %s ; copiousoutput
+text/plain; tmux split-window -v view %s && sleep 1
+text/plain; cat %s ; copiousoutput
+# text/plain; iconv -f gbk -t utf-8 %s; test=echo "%{charset}" | grep -ic "gb2312"; copiousoutput;
+# text/plain; gnome-terminal -- vim %s & sleep 2; copiousoutput
+
+#
+text/calendar; mutt-ics; copiousoutput
+application/ics; mutt-ics; copiousoutput
+video/*; mplayer '%s'; test=test -n "$DISPLAY"
+# MS Excel
+# this will use the default xls spreadsheet handler from open
+application/excel; excel2text %s; copiousoutput
+application/excel; mutt_bgrun qvpview %s; test=RunningX
+application/msexcel; mutt_bgrun qvpview %s; test=RunningX
+application/msexcel; excel2text %s; copiousoutput
+application/vnd.ms-excel; mutt_bgrun qvpview %s; test=RunningX
+application/vnd.ms-excel; mutt_bgrun libreoffice --nologo '%s'; test=test -n "$DISPLAY"
+application/vnd.ms-excel;                                                  xls2csv '%s'; copiousoutput
+application/vnd.ms-excel; excel2text %s; copiousoutput
+application/x-excel; mutt_bgrun qvpview %s; test=RunningX
+application/x-excel; excel2text %s; copiousoutput
+application/x-msexcel; mutt_bgrun qvpview %s; test=RunningX
+application/x-msexcel; excel2text %s; copiousoutput
+application/ms-Excel; mutt_bgrun qvpview %s; test=RunningX
+application/ms-Excel; excel2text %s; copiousoutput
+# application/x-msexcel; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s doc
+# application/ms-exc; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s doc
+# application/excel; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s doc
+# application/msexcel; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s doc
+# application/vnd.ms-exc; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s doc
+# application/vnd.ms-excel; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s doc
+application/vnd.ms-excel; libreoffice %s &>/dev/null
+
+# MS Word
+application/vnd.openxmlformats-officedocument.wordprocessingml.document; pandoc --from docx --to markdown-smart %s; copiousoutput
+application/msword; antiword %s; copiousoutput;
+application/msword; mutt_bgrun qvpview %s; test=RunningX
+application/msword; word2text %s; copiousoutput
+application/ms-word; catdoc %s; copiousoutput
+application/vnd.msword; mutt_bgrun qvpview %s; test=RunningX
+application/vnd.msword; word2text %s; copiousoutput
+application/msword; libreoffice %s &>/dev/null
+# application/msword; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s doc
+
+# MS Word documents
+# application/msword; ~/dotfiles/office/view-attachment.sh %s "-" '/Applications/LibreOffice.app'
+# application/vnd.ms-excel; ~/dotfiles/office/view-attachment.sh %s "-" '/Applications/LibreOffice.app'
+# application/vnd.openxmlformats-officedocument.presentationml.presentation; ~/dotfiles/office/view-attachment.sh %s "-" '/Applications/LibreOffice.app'
+# application/vnd.oasis.opendocument.text; ~/dotfiles/office/view-attachment.sh %s "-" '/Applications/LibreOffice.app'
+
+# docx
+# application/vnd.openxmlformats-officedocument.wordprocessingml.document; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s doc
+# xlsx
+# application/vnd.openxmlformats-officedocument.spreadsheetml.sheet; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s doc
+
+# PDF
+application/pdf; pdftotext -nopgbrk -q -eol unix -layout %s -; copiousoutput;
+application/pdf; zathura %s &>/dev/null description="PDF Document" ; test=test -n "$DISPLAY" ; nametemplate=%s.pdf
+application/pdf ; pdftotext %s -          ; description="PDF Document" ; nametemplate=%s.pdf     ; copiousoutput
+application/pdf;mupdf %s
+image/pdf ; imv %s &> /dev/null ; description="PDF Image" ; test=test "$DISPLAY" ; nametemplate=%s.pdf
+image/pdf;mupdf %s
+# application/pdf; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s pdf
+# application/pdf; mutt_bgrun acroread +useFrontEndProgram %s; test=RunningX
+
+
+# HTML
+text/html; w3m -I %{charset} -F -dump -T text/html -cols 80 '%s'; copiousoutput; description=HTML Document; nametemplate=%s.html ;  test=type w3m >/dev/null
+text/html; w3m -I %{charset} -F -dump -T text/html -cols 80 '%s'; copiousoutput; description=HTML Document; nametemplate=%s.html ;  test=type w3m >/dev/null
+text/html; w3m -F -dump -T text/html -cols 80 %s description="HTML Document" ; nametemplate=%s.html ; copiousoutput; test=type w3m >/dev/null
+text/html; w3m -I %{charset} -F -T text/html %s description="HTML Document" ; nametemplate=%s.html ; copiousoutput
+text/html; html2text -width 70; copiousoutput; description=HTML Text; test=type html2text >/dev/null
+text/html; elinks -dump %s -eval 'set document.codepage.assume = "%{charset}"' -eval 'set document.dump.width = 100'; nametemplate=%s.html; copiousoutput
+text/html; lynx -assume_charset=%{charset} -display_charset=utf-8 -dump %s; nametemplate=%s.html; copiousoutput
+text/html; mv %s %s.html && firefox %s.html > /dev/null; needsterminal;
+text/html; pandoc -f html -t markdown; copiousoutput; description=HTML Text; test=type pandoc >/dev/null
+text/html; uconv --add-signature -f %{charset} -t UTF-8 %s | sponge %s && firefox -new-tab %s & sleep 5 ; description="HTML Document" ; test=test -n "$DISPLAY" ; nametemplate=%s.html
+# text/html; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s html
+
+
+application/vnd.oasis.opendocument.text; pandoc --from odt --to markdown %s; copiousoutput
+application/vnd.oasis.opendocument.text; libreoffice %s &>/dev/null
+application/vnd.oasis.opendocument.text; odt2txt '%s'; copiousoutput
+
+application/vnd.oasis.opendocument.spreadsheet; libreoffice %s &>/dev/null
+application/vnd.oasis.opendocument.spreadsheet; mutt_bgrun libreoffice --nologo '%s'; test=test -n "$DISPLAY"
+application/vnd.oasis.opendocument.spreadsheet; odt2txt '%s'; copiousoutput
+
+application/vnd.oasis.opendocument.presentation; mutt_bgrun libreoffice --nologo '%s'; test=test -n "$DISPLAY"
+application/vnd.oasis.opendocument.presentation; odt2txt '%s'; copiousoutput
+
+# Powerpoint
+application/vnd.openxmlformats-officedocument.presentationml.presentation;libreoffice %s &>/dev/null
+application/ppt; mutt_bgrun qvpview %s; test=RunningX
+application/ppt; ppt2text %s; copiousoutput
+application/vnd.ms-powerpoint; mutt_bgrun qvpview %s; test=RunningX
+application/vnd.ms-powerpoint; ppt2text %s; copiousoutput
+application/x-mspowerpoint; mutt_bgrun qvpview %s; test=RunningX
+application/x-mspowerpoint; ppt2text %s; copiousoutput
+# application/ppt; dotfiles/email_stuff/.mutt_bgrun qvpview %s; test=RunningX
+# application/vnd.ms-powerpoint;dotfiles/email_stuff/.mutt_bgrun qvpview %s; test=RunningX
+# application/x-mspowerpoint;dotfiles/email_stuff/.mutt_bgrun qvpview %s; test=RunningX
+
+application/postscript;ps2ascii %s  2>/dev/null; copiousoutput
+# application/postscript; dotfiles/email_stuff/.mutt_bgrun ghostview %s; test=RunningX
+application/postscript; mutt_bgrun ghostview %s; test=RunningX
+
+application/rtf; unrtf --text %s; copiousoutput;
+application/rtf; catdoc %s; copiousoutput
+application/rtf; rtf2text %s; copiousoutput
+# application/rtf; dotfiles/email_stuff/.mutt_bgrun qvpview %s; test=RunningX
+application/ms-rtf;rtfreader %s; copiousoutput
+application/rtf;rtfreader %s; copiousoutput
+
+# application/ms-tnef; tnef -w %s
+application/ms-tnef; tnef2txt %s; copiousoutput
+
+# text/m; less %s
+# text/*; cat; copiousoutput; edit=$VISUAL %s
+text/* ; nvim -Rc Goyo '%s' ; edit=nvim -c Goyo '%s' ; compose=nvim -c Goyo '%s' ; needsterminal
+
+# Images
+image/bmp; feh -F -Z %s &>/dev/null
+image/gif; feh -F -Z %s &>/dev/null
+image/jpeg; feh -F -Z %s &>/dev/null
+image/JPG; feh -F -Z %s &>/dev/null
+image/libm; feh -F -Z %s &>/dev/null
+image/png; feh -F -Z %s &>/dev/null
+image/tiff; feh -F -Z %s &>/dev/null
+image/x-png; feh -F -Z %s &>/dev/null
+image/*; LESSQUIET=1 lesspipe.sh '%s'; copiousoutput
+image/*;display %s 2>&1 >/dev/null
+image/png;display %s 2>&1 >/dev/null
+image/tiff;display %s 2>&1 >/dev/null
+image/x-png;display %s 2>&1 >/dev/null
+image/x-portable-anymap;display %s 2>&1 >/dev/null
+image/x-portable-bitmap;display %s 2>&1 >/dev/null
+image/x-portable-graymap;display %s 2>&1 >/dev/null
+image/x-portable-pixmap;display %s 2>&1 >/dev/null
+image/x-xpixmap;display %s 2>&1 >/dev/null
+image/x-xwindowdump;display %s 2>&1 >/dev/null
+image/gif ; imv %s &> /dev/null ; description="GIF Image" ; test=test "$DISPLAY" ; nametemplate=%s.gif
+image/jpeg ; imv %s &> /dev/null ; description="JPEG Image" ; test=test "$DISPLAY" ; nametemplate=%s.jpeg
+image/pjpeg ; imv %s &> /dev/null ; description="JPEG Image" ; test=test "$DISPLAY" ; nametemplate=%s.jpeg
+image/tiff ; imv %s &> /dev/null ; description="TIFF Image" ; test=test "$DISPLAY" ; nametemplate=%s.tiff
+image/x-portable-bitmap ; imv %s &> /dev/null ; description="PBM Image" ; test=test "$DISPLAY" ; nametemplate=%s.pbm
+image/x-portable-graymap ; imv %s &> /dev/null ; description="PGM Image" ; test=test "$DISPLAY" ; nametemplate=%s.pgm
+image/x-portable-pixmap ; imv %s &> /dev/null ; description="PPM Image" ; test=test "$DISPLAY" ; nametemplate=%s.ppm
+image/x-xbitmap ; imv %s &> /dev/null ; description="XBM Image" ; test=test "$DISPLAY" ; nametemplate=%s.xbm
+image/x-xpixmap ; imv %s &> /dev/null ; description="XPM Image" ; test=test "$DISPLAY" ; nametemplate=%s.xpm
+image/bmp ; imv %s &> /dev/null ; description="BMP Image" ; test=test "$DISPLAY" ; nametemplate=%s.bmp
+image/x-bmp ; imv %s &> /dev/null ; description="BMP Image" ; test=test "$DISPLAY" ; nametemplate=%s.bmp
+image/x-ms-bmp ; imv %s &> /dev/null ; description="BMP Image" ; test=test "$DISPLAY" ; nametemplate=%s.bmp
+image/x-rgb ; imv %s &> /dev/null ; description="RGB Image" ; test=test "$DISPLAY" ; nametemplate=%s.rgb
+image/targa ; imv %s &> /dev/null ; description="TARGA Image" ; test=test "$DISPLAY" ; nametemplate=%s.tga
+image/fits ; imv %s &> /dev/null ; description="FITS Image" ; test=test "$DISPLAY" ; nametemplate=%s.fits
+image/png ; imv %s &> /dev/null ; description="PNG Image" ; test=test "$DISPLAY" ; nametemplate=%s.png
+image/pm ; imv %s &> /dev/null ; description="PM Image" ; test=test "$DISPLAY" ; nametemplate=%s.pm
+# image/jpeg; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s img
+# image/pjpeg; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s img
+# image/png; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s img
+# image/gif; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s img
+
+
+# image/*; ~/.config/dotfiles/email_stuff/.mutt/muttimage.sh %s ; copiousoutput
+# image/*; dotfiles/email_stuff/.mutt_bgrun xv %s; test=RunningX
+# image/*; ~/dotfiles/email_stuff/.mutt/muttimage.sh %s ; copiousoutput
+
+message/rfc822; cat; copiousoutput; edit=$VISUAL %s
+
+# Unidentified.
+application/octet-stream; mutt.octet.filter -x %s; test=RunningX
+application/octet-stream; mutt.octet.filter -v %s
+application/octet-stream; mutt.octet.filter %s; copiousoutput
+# application/octet-stream; ~/dotfiles/email_stuff/.mutt/view_attachment.sh %s "-" #
+application/octet-stream; mutt_octet_view -x %s; test=RunningX
+application/octet-stream; mutt_octet_view -v %s
+application/octet-stream; mutt_octet_view %s; copiousoutput
+
+text/x-vcard; mutt.vcard.filter; copiousoutput
+text/lyx; lyx %s
+text/x-lyx; lyx2txt %s 2>/dev/null; copiousoutput
+
+application/x-tar; tar -tf - ; copiousoutput;
+application/x-tar-gz; gunzip -c %s | tar -tf - ; copiousoutput
+audio/basic;play %s
+audio/midi;playmidi %s
+audio/mp3;freeamp %s
+audio/mpeg;freeamp %s
+audio/wav;play %s
+audio/x-wav; play %s
+audio/x-basic;play %s
+audio/x-midi;playmidi %s
+audio/x-mp3;freeamp %s
+audio/x-mpeg;freeamp %s
+audio/x-mpegurl;freeamp %s
+audio/*; LESSQUIET=1 lesspipe.sh '%s'; copiousoutput
+audio/*; mutt_bgrun xdg-open 2>/dev/null '%s'; description="Audio"; test=test -n "$DISPLAY"
+# audio/*; mutt_bgrun vlc 2>/dev/null '%s'; description="Audio"; test=test -n "$DISPLAY"
+audio/*; mediainfo --Full '%s'; copiousoutput
+
+text/sgml; sgml2txt %s; copiousoutput
+video/mpeg;xine -s %s 2>&1 >/dev/null
+video/quicktime;xanim +Ae +Zpe +Ae +Ss2 %s 2>&1 > /dev/null
+video/x-msvideo;xine -s %s 2>&1 >/dev/null
+video/*; mutt_bgrun xdg-open 2>/dev/null '%s'; description="Video"; test=test -n "$DISPLAY"
+# video/*; mutt_bgrun vlc 2>/dev/null '%s'; description="Audio"; test=test -n "$DISPLAY"
+video/*; mediainfo --Full '%s'; copiousoutput
+
+
+x-content/*;                       mutt_bgrun xdg-open 2>/dev/null '%s'; test=test -n "$DISPLAY"
+x-content/*;                       LESSQUIET=1 lesspipe.sh '%s'; copiousoutput
+
+x-epoc/*;                          mutt_bgrun xdg-open 2>/dev/null '%s'; test=test -n "$DISPLAY"
+x-epoc/*;                          LESSQUIET=1 lesspipe.sh '%s'; copiousoutput

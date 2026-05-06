@@ -1,0 +1,396 @@
+https://github.com/Nukesor/pueue
+https://github.com/ewosborne/concur
+https://github.com/baalimago/repeater
+https://github.com/binpash/pash
+https://github.com/jkool702/forkrun
+https://github.com/aaronriekenberg/rust-parallel
+https://github.com/shenwei356/rush
+
+https://github.com/bgeron/diff-pdf-visually
+
+https://github.com/freref/fancy-cat  PDF reader for terminal emulators using the Kitty image protocol
+https://github.com/jtheoof/swappy
+https://sr.ht/~emersion/grim/
+https://github.com/emersion/slurp
+
+https://github.com/gabm/Satty
+https://pixelitor.sourceforge.io/index.html
+
+https://apps.gnome.org/en-GB/Obfuscate/
+
+http://grafx2.chez.com/
+https://drawpile.net/
+
+ast-grep https://github.com/ast-grep/ast-grep
+gron https://github.com/tomnomnom/gron
+atop
+auto-cpufreq
+bash-preexec
+bashate
+blz4
+boilerplate https://github.com/gruntwork-io/boilerplate
+brightd
+brightnessctl
+btop++
+cocogitto https://github.com/cocogitto/cocogitto
+colossal-cave-adventures
+cppman
+cricket-cli (cricket-rs, https://codeberg.org/mskian/go-cricket-score)
+cronie
+dar
+deb-get
+deborphan
+difftastic
+dirsync https://github.com/tkhyn/dirsync/
+doggo https://github.com/mr-karan/doggo
+duf
+enhancd
+f2/nomino
+fbcat
+fcron
+fdupes
+font-manager
+gitversion gittools/gitversion (mise)
+gokey https://github.com/cloudflare/gokey
+grex
+helmwave https://docs.helmwave.app/0.41.x/
+hexyl https://github.com/sharkdp/hexyl
+hk https://hk.jdx.dev/
+htmlq https://github.com/mgdm/htmlq
+https://github.com/2mol/pboy
+https://github.com/d99kris/nchat
+https://github.com/emmanuel-marty/lz4ultra
+https://github.com/jichu4n/jfbview
+https://github.com/koenw/resh
+https://github.com/lindenb/makefile2graph
+https://github.com/mcmilk/7-Zip-zstd
+https://github.com/orhun/menyoki
+https://github.com/riquito/tuc
+https://github.com/woelper/oculante
+https://telebit.cloud/
+https://www.nongnu.org/fbi-improved/
+hygg ebook reader rust
+hypnotix
+joern
+kwok https://github.com/kubernetes-sigs/kwok
+lazydocker
+lzip
+mainline
+manpages-dev
+matlab-support
+mdbook-linkcheck https://github.com/Michael-F-Bryan/mdbook-linkcheck
+moreutils
+nuspell
+pdfcrop
+pdftk
+pkgtop
+pplatex
+prospect-mail
+pycp
+pyresparser
+qdirstat
+recollgui
+remake
+remmina
+reptyr
+sampler https://github.com/sqshq/sampler
+sdcv
+sdparm
+sops https://github.com/getsops/sops
+tzwatch
+usbview
+uuid-dev
+visidata
+viu
+wl-clipboard
+wthrr
+yazi
+
+https://github.com/liquidcarbon/puppy
+https://portable-linux-apps.github.io/ (https://github.com/ivan-hc/AppMan)
+
+terminal file managers
+----------------------
+rfm (https://github.com/dsxmachina/rfm)
+felix (https://github.com/kyoheiu/felix)
+fm (https://github.com/qkzk/fm)
+joshuto (https://github.com/kamiyaa/joshuto)
+
+trash can tools
+---------------
+
+2rm (https://github.com/hudson-newey/2rm)
+careful_rm (https://github.com/MikeDacre/careful_rm)
+conceal (https://github.com/TD-Sky/conceal)
+crap (https://github.com/icyphox/crap)
+crossrm (https://github.com/NotWoods/crossrm)
+drm (https://github.com/lylex/drm)
+eliminate (https://github.com/terkelg/eliminate)
+fuc (https://github.com/SUPERCILEX/fuc). https://alexsaveau.dev/blog/projects/performance/files/fuc/fast-unix-commands
+garbage (https://git.sr.ht/~mzhang/garbage)
+go-trash (https://github.com/Redh00k-k/go-trash)
+gt (https://github.com/celediel/gt)
+gtrash (https://github.com/umlx5h/gtrash)
+poi (https://github.com/mtwtkman/poi)
+rcb (https://github.com/Isfand/rcb)
+rem (https://github.com/quackduck/rem)
+rip2 (https://github.com/MilesCranmer/rip2). Not freedesktop compliant
+rm (https://github.com/ginokent/rm)
+rm (https://github.com/hitzhangjie/rm)
+rm-protection (https://github.com/alanzchen/rm-protection)
+rmd (https://github.com/FilippoRanza/rmd)
+rmfr (https://github.com/shinnn/rmfr)
+rmt.rs (https://github.com/AmineZouitine/rmt.rs)
+rmtrash (https://github.com/eli-sr/rmtrash)
+rmtrash (https://github.com/PhrozenByte/rmtrash)
+rmw (https://github.com/theimpossibleastronaut/rmw)
+rmx (https://github.com/ismoilovdevml/rmx)
+roxide (https://github.com/abhinandh-s/roxide)
+rrecycle (https://github.com/emmalexandria/rrecycle)
+safe-shell-rm (https://github.com/kaelzhang/shell-safe-rm)
+saferm (https://github.com/softpano/saferm)
+sfrm (https://gitlab.com/magmast/sfrm)
+skrub-cli (https://github.com/dawsbot/skrub-cli)
+softrm (https://github.com/danielmanesku/softrm)
+srm (https://github.com/WestleyR/srm)
+tra.sh (https://github.com/indexerrowaty/tra.sh)
+trash (https://github.com/orf/trash)
+Trash-CLI (https://github.com/cross-codes/Trash-CLI)
+trash-d (https://github.com/rushsteve1/trash-d)
+trash-fs (https://github.com/sheepla/trash-fs)
+trash.sh (https://github.com/qqAys/trash.sh)
+trash_dumper (https://github.com/myyrakle/trash_dumper)
+trashbhuwan (https://github.com/tribhuwan-kumar/trashbhuwan)
+trashbox (https://github.com/DivergentClouds/trashbox
+trashcan (https://github.com/FreeSlave/trashcan)
+trasher (https://github.com/ClementNerma/Trasher)
+trashy (https://github.com/oberblastmeister/trashy)
+trm (https://github.com/Anirudh-S-Kumar/trm)
+vaporise (https://github.com/devraza/vaporise)
+
+Coreutils replacements
+----------------------
+bcmr (https://github.com/Bengerthelorf/bcmr)
+
+Task managers
+-------------
+toru (https://git.aaronmanning.net/aaronmanning/toru)
+
+Other replacements
+------------------
+
+see (https://github.com/guilhermeprokisch/see)
+
+miller (https://github.com/johnkerl/miller)
+choose (https://github.com/theryangeary/choose)
+ruplacer (https://github.com/your-tools/ruplacer)
+
+edir (https://github.com/bulletmark/edir) for cp/rm/mv
+ripunzip (https://github.com/google/ripunzip)
+
+btail (https://github.com/galalen/btail)
+ov (https://github.com/noborus/ov)
+
+encpipe (https://github.com/jedisct1/encpipe)
+kryptor (https://www.kryptor.co.uk/). https://github.com/samuel-lucas6/Kryptor
+rage (https://github.com/str4d/rage)
+horcrux (https://github.com/jesseduffield/horcrux)
+
+pa (https://github.com/biox/pa)
+
+ananicy (https://github.com/RogueScholar/ananicy)
+
+broot (https://dystroy.org/broot/)
+
+(https://github.com/sindresorhus/fkill-cli)
+
+(https://github.com/denisidoro/navi)
+
+(https://github.com/XuehaiPan/nvitop)
+
+(https://github.com/ocrmypdf/OCRmyPDF)
+
+(https://www.openpaper.work/en/)
+
+(https://github.com/sharkdp/pastel)
+
+(https://github.com/peco/peco)
+
+(https://github.com/jazzband/Watson)
+
+Other package managers
+----------------------
+https://github.com/babarot/afx
+
+Other GUI tools
+---------------
+aescrypt (https://github.com/paulej/AESCrypt)
+cerebro (https://github.com/cerebroapp/cerebro)
+deskreen (https://deskreen.com/lang-en)
+extension-manager for Gnome (https://github.com/mjakeman/extension-manager)
+fontpreview (https://github.com/sdushantha/fontpreview)
+kooha (https://github.com/SeaDve/Kooha)
+koreader (http://koreader.rocks/)
+https://scarpetta.eu/pdfmixtool/
+https://rnote.flxzt.net/
+https://github.com/Genymobile/scrcpy
+https://github.com/linuxmint/sticky
+https://github.com/benbusby/whoogle-search
+
+Math Calculators
+----------------
+
+bcal (https://github.com/jarun/bcal)
+fend (https://printfn.github.io/fend/documentation/)
+hypercalc (http://www.mrob.com/pub/perl/hypercalc.html)
+calc (https://github.com/coriolinus/calc)
+calc (https://github.com/lcn2/calc)
+calcpy (https://github.com/idanpa/calcpy)
+clac (https://github.com/soveran/clac)
+cpc (https://github.com/probablykasper/cpc)
+daisy (https://git.betalupi.com/Mark/daisy)
+ec (https://git.sr.ht/~subsetpark/ec)
+eva (https://github.com/oppiliappan/eva)
+Genius (https://www.jirka.org/genius.html)
+hip32 (https://github.com/leonmavr/HIP35)
+kalc (https://github.com/bgkillas/kalc)
+Kalker (https://kalker.xyz/)
+mucalc (https://marlam.de/mucalc/)
+orpie (https://github.com/pelzlpj/orpie)
+pcalc (https://github.com/alt-romes/programmer-calculator)
+quich (https://github.com/Usbac/quich)
+rcalc (https://github.com/gelvinp/rcalc)
+spigot (https://www.chiark.greenend.org.uk/~sgtatham/spigot/)
+squiid (https://gitlab.com/ImaginaryInfinity/squiid-calculator/squiid)
+
+Calendars
+---------
+
+calcure (https://anufrievroman.gitbook.io/calcure)
+calcurse (https://calcurse.org/)
+kal (https://github.com/xyproto/kal)
+khal (https://github.com/pimutils/khal)
+
+Checksum calculators
+--------------------
+cksum
+https://github.com/rhash/RHash
+md5sum
+https://github.com/jonelo/jacksum/
+sha3sum (https://codeberg.org/maandree/sha3sum)
+
+https://github.com/OCamlPro/dirdiff
+https://github.com/rtfpessoa/diff2html-cli
+https://github.com/homeport/dyff
+https://github.com/mookid/diffr
+https://github.com/ymattw/ydiff
+https://diffoscope.org/
+https://github.com/jeffkaufman/icdiff
+https://github.com/dandavison/delta
+https://github.com/so-fancy/diff-so-fancy
+https://github.com/Wilfred/difftastic
+
+https://github.com/sharkdp/diskus
+https://www.linuxlinks.com/alternatives-popular-cli-tools-cloc/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-cmp/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-compress/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-cp/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-cron/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-curl/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-cut/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-date/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-dd/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-df/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-dig/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-fdisk/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-find/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-ftp/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-grep/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-hexdump/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-history/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-jq/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-kill/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-less/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-locate/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-lsof/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-make/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-man/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-mv/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-ping/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-ps/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-psql/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-rename/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-rm/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-sed/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-split/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-ssh/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-sudo/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-sysctl/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-talk/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-tar/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-touch/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-traceroute/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-tree/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-uname/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-uptime/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-watch/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-wget/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-whois/
+https://www.linuxlinks.com/alternatives-popular-cli-tools-xargs/
+https://www.linuxlinks.com/alternatives.popular-cli-tools-uniq/
+https://www.linuxlinks.com/best-replacements-du/
+https://www.linuxlinks.com/CompressionTools/
+https://www.linuxlinks.com/navigationtools/
+
+https://lirantal.github.io/dockly/
+https://feh.finalrewind.org/
+https://musikcube.com/
+https://xwmx.github.io/nb/
+https://systeroid.cli.rs/
+https://termshark.io/
+https://xithrius.github.io/twitch-tui/
+https://weechat.org/
+
+https://documen.tician.de/pudb/
+https://github.com/wustho/baca
+https://github.com/imsnif/bandwhich
+https://github.com/xgi/castero
+https://github.com/cdown/clipmenu
+https://github.com/quackduck/devzat
+https://github.com/wagoodman/dive
+https://github.com/Byron/dua-cli
+https://github.com/joouha/euporie
+https://github.com/cyrus-and/gdb-dashboard
+https://github.com/hugsy/gef
+https://github.com/allinurl/goaccess
+https://github.com/TaKO8Ki/gobang
+https://github.com/tulir/gomuks
+https://github.com/orhun/gpg-tui
+https://github.com/nadrad/h-m-m
+https://github.com/aome510/hackernews-TUI
+https://github.com/aome510/hackernews-TUI
+https://github.com/kimono-koans/httm
+https://github.com/blacknon/hwatch
+https://github.com/iptraf-ng/iptraf-ng
+https://github.com/derailed/k9s
+https://github.com/matterhorn-chat/matterhorn
+https://github.com/pablolec/neoss
+https://github.com/markqvist/nomadnet
+https://github.com/Cvaniak/NoteSH
+https://github.com/facebook/pathpicker
+https://github.com/madeofpendletonwool/PinePods
+https://github.com/agersant/polaris
+https://github.com/dalance/procs
+https://github.com/mrusme/reader
+https://github.com/maaslalani/slides
+https://github.com/kraanzu/smassh
+https://github.com/samtay/so
+https://github.com/aome510/spotify-player
+https://github.com/tramhao/termusic
+https://github.com/achannarasappa/ticker
+https://github.com/tarkah/tickrs
+https://github.com/ihabunek/toot
+https://github.com/ariasmn/ugm
+https://github.com/Genivia/ugrep
+https://github.com/akavel/up
+https://github.com/schachmat/wego

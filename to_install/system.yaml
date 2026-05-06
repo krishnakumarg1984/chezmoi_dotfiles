@@ -1,0 +1,157 @@
+---
+repo: https://pkg-repo.blendos.co
+arch-repo: https://geo.mirror.pkgbuild.com
+impl: https://github.com/blend-os/tracks/raw/main
+track: default-gnome
+aur-packages:
+  # - 2ping
+  # - cisco-anyconnect
+  # - code-translucent
+  # - cpu-x
+  # - docker-rootless-extras
+  # - downgrade
+  # - evdi-git
+  # - gftp
+  # - gnome-monitor-config-git
+  # - icaclient
+  # - musikcube-bin
+  # - onedriver-git
+  # - openconnect-sso
+  # - pkgtop
+  # - powershell-bin
+  # - programmer-calculator
+  # - qt5ct-kde
+  # - quickemu-rs
+  # - rr-bin
+  # - sioyek-git
+  # - slack-desktop
+  # - swtpm-git
+  # - teams-for-linux-bin
+  # - teams-for-linux-wayland-hook
+  # - virt-manager-git
+  # - wdisplays
+  # - wlr-randr-git
+  # - zoom
+  - ansible-dev-environment
+  - auto-xrandr
+  - brightness-xrandr
+  - bws-bin
+  - cisco-secure-client
+  - direnv
+  - display-visor
+  - displaylink
+  - displayset
+  - evdi
+  - lastpass
+  - musikcube-bin
+  - qt6ct-kde
+  - quickemu-git
+  - quickgui-bin
+  - rres-bin
+  - setcustomres
+  - tlrc-bin
+  - virtualbox-ext-oracle
+  - visual-studio-code-bin
+  - volumeboost
+  - xlayoutdisplay
+  - zrandr
+  # - dummy comment to prevent mangling by the formatter
+packages:
+  # - apptainer
+  # - arch-wiki-docs
+  # - clamav
+  # - cups
+  # - cups-pdf
+  # - debuginfod
+  # - docker
+  # - docker-buildx
+  # - docker-compose
+  # - ed
+  # - fuse-overlayfs
+  # - gcc-fortran
+  # - gdb
+  # - libc++
+  # - libsixel
+  # - linux-headers
+  # - linux-lts
+  # - linux-lts-headers
+  # - lld
+  # - lsb-release
+  # - openmp
+  # - patchelf
+  # - python-pip
+  # - python-pipenv
+  # - python-pyyaml
+  # - python-requests
+  # - qemu-full
+  # - samba
+  # - smbclient
+  # - termusic
+  # - udisks2
+  # - vim
+  # - virtualbox-host-modules-arch
+  - 7zip
+  - age
+  - arandr
+  - autorandr
+  - bash-completion
+  - bat
+  - bc
+  - bitwarden-cli
+  - clang
+  - cpio
+  - exfat-utils
+  - fd
+  - fwupd
+  - gnome-terminal
+  - gnome-tweaks
+  - gparted
+  - inetutils
+  - neovim
+  - openbsd-netcat
+  - pcmanfm-qt
+  - pkgfile
+  - podman-docker
+  - qemu-desktop
+  - qemu-img
+  - qemu-tools
+  - remake
+  - ripgrep
+  - rpmextract
+  - spice-gtk
+  - spice-vdagent
+  - swtpm
+  - tree
+  - vi
+  - virtualbox
+  - virtualbox-ext-vnc
+  - virtualbox-guest-iso
+  - virtualbox-host-dkms
+  - wezterm
+  - wl-clipboard
+  - xorg-xhost
+  - xorg-xrandr
+  - zathura-pdf-mupdf
+  - zip
+commands:
+  # - 'mandb --create'
+  # - 'pkgfile -u'
+  - locale-gen  # needs the locale to be configured in /etc/locale.gen prior to running this
+  - touch /etc/containers/nodocker
+  - usermod --append --groups lpadmin,vboxusers krishnakumar
+  - 'echo "krishnakumar ALL=(ALL) NOPASSWD: /usr/bin/podman" >> /etc/sudoers'
+services:
+  # - clamav-freshclam.service
+  # - cups.socket
+  # - docker.service
+  # - docker.socket
+  - displaylink
+  - pkgfile-update.timer
+  - sshd.service
+  - systemd-modules-load.service
+  - vpnagentd
+  # - dummy comment to prevent mangling by the formatter
+user-services:  # https://blendos.co/guides/using-podman/#apps-that-use-docker
+  - podman
+  - podman.socket
+  # - dummy comment to prevent mangling by the formatter

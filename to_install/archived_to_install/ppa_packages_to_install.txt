@@ -1,0 +1,5 @@
+analizo
+docker-ce
+docker-ce-cli
+mainline
+y-ppa-manager

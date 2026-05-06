@@ -1,0 +1,1162 @@
+# vim: ft=neomuttrc
+
+color attach_headers brightmagenta default " There is no indication that the signature belongs to the owner."
+color attach_headers brightyellow default "--]$"
+color attach_headers brightgreen default "Autoview"
+color attach_headers brightred default "BAD signature from.*"
+color attach_headers brightgreen default "Good signature from.*"
+color attach_headers brightred default "Note: This key has expired!"
+color attach_headers brightmagenta default "Problem signature from.*"
+color attach_headers green default "Size: [0-9\.]+[KM]"
+color attach_headers green default "Type: [a-z]+/[a-z0-9\-]+"
+color attach_headers brightmagenta default "WARNING: This key is not certified with a trusted signature!"
+color attach_headers brightyellow default "^\\[--"
+color attach_headers brightmagenta default "can't handle these multiple signatures"
+color attach_headers brightmagenta default "invalid node with packet of type"
+color attach_headers brightmagenta default "signature verification suppressed"
+
+color attachment brightcolor165 color235 # attachment headers
+# color attachment brightwhite black
+# color attachment color109 color234
+# color attachment color117 color234
+# color attachment color174 color237 #Add-ons to the message
+# color attachment color228 default
+# color attachment color254 color0
+# color attachment color254 color234
+# color attachment color37 color230
+# color attachment color37 color232
+# color attachment color37 default
+# color attachment color6 color235
+# color attachment color6 default
+# color attachment cyan default
+# color attachment green default
+# color attachment yellow color0
+# color attachment yellow default
+
+color body color136 color0 " [;:]-*[})>{(<|]" # :-) etc...
+color body brightred default "'[^ ]+ [^ ]+'"
+color body brightred default "'[^ ]+'"
+color body color33 color0 "( *[-+=#*~_]){6,}"
+color body brightcolor39 color233 "((@(([0-9a-z-]+\\.)*[0-9a-z-]+\\.?|#[0-9]+|\\[[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\]),)*@(([0-9a-z-]+\\.)*[0-9a-z-]+\\.?|#[0-9]+|\\[[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\.[0-9]?[0-9]?[0-9]\\]):)?[0-9a-z_.+%$-]+@(([0-9a-z-]+\\.)*[0-9a-z-]+\\.?|#[0-9]+|\\[[0-2]?[0-9]?[0-9]\\.[0-2]?[0-9]?[0-9]\\.[0-2]?[0-9]?[0-9]\\.[0-2]?[0-9]?[0-9]\\])"
+color body brightblue default "(0?[1-9]|[12][0-9]|3[012])[.] ?(0?[1-9]|1[012])[.] ?(19|20)([0-9][0-9])"
+color body brightblue default "(0[0-9]|1[012])[.]([012][0-9]|3[01])[.]"
+color body brightred green "(0x *)?\([0-9a-f]{4} ?\){10}"
+color body brightred green "(0x *)?\([0-9a-f]{4} ?\){5}"
+color body white red "(1 ?)?\\(800\\) ?[-0-9]+( ext ?[0-9]+)?"
+color body white red "(1 ?)?\\(800\\) ?[-0-9]+( x[0-9]+)?"
+color body color160 color233 "(BAD signature)"
+color body yellow red "(D ?- ?)?[0-9]\{5\} *[A-Za-zÃ¤Ã¶Ã¼ÃŸÃ„Ã–Ãœ]+"
+color body color39 color233 "(Good signature)"
+color body black green "(H(oe|Ã¶)rsaal|Raum|Seminarraum|SR|Zimmer) ?[0-9]+"
+color body brightgreen default "([.,0-9]+ *- *)?[.,0-9]+ ?(%|percent|prozent)"
+# color body brightwhite red "([0-3][0-9]/)?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/201[0-9]"
+color body black yellow "([0-9]*[,.])?[1-9][0-9]? *(cents?|pfennig)"
+color body brightcyan default "([0-9]+ *([-]|bis) *)?[0-9]+ *(sekunden|minuten|stunden|tage?|wochen|monate?|jahre?)"
+color body brightcyan default "([0-9]+ *([-]|until) *)?[0-9]+ *(seconds?|minutes?|hours?|days?|weeks?|months?|years?)"
+color body brightwhite green "([012][0-9]|3[01][.]?) *[-+/] *([012][0-9]|3[01][.]?) *(jan|feb|mrz|apr|mai|jun|jul|aug|sep|okt|nov|dez)[a-z]*( *(19|20)[0-9][0-9])?"
+color body brightblue default "([1-9]|1[012])[/]([1-9]|[012][0-9]|3[01])[/](19|20)?[0-9][0-9]"
+color body brightcolor39 color233 "([a-z][a-z0-9+-]*://(((([a-z0-9_.!~*'();:&=+$,-]|%[0-9a-f][0-9a-f])*@)?((([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?|[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(:[0-9]+)?)|([a-z0-9_.!~*'()$,;:@&=+-]|%[0-9a-f][0-9a-f])+)(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?(#([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?|(www|ftp)\\.(([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?(:[0-9]+)?(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?(#([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?)[^].,:;!)? \t\r\n<>\"]"
+# color body color160 color0 "([a-z][a-z0-9+-]*://(((([a-z0-9_.!~*'();:&=+$,-]|%[0-9a-f][0-9a-f])*@)?((([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?|[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(:[0-9]+)?)|([a-z0-9_.!~*'()$,;:@&=+-]|%[0-9a-f][0-9a-f])+)(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?(#([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?|(www|ftp)\\.(([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?(:[0-9]+)?(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?(#([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?)[^].,:;!)? \t\r\n<>\"]"
+# color body color160 color234 "([a-z][a-z0-9+-]*://(((([a-z0-9_.!~*'();:&=+$,-]|%[0-9a-f][0-9a-f])*@)?((([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?|[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(:[0-9]+)?)|([a-z0-9_.!~*'()$,;:@&=+-]|%[0-9a-f][0-9a-f])+)(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?(#([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?|(www|ftp)\\.(([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?(:[0-9]+)?(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?(#([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?)[^].,:;!)? \t\r\n<>\"]"
+# color body magenta default "([a-z][a-z0-9+-]*://(((([a-z0-9_.!~*'();:&=+$,-]|%[0-9a-f][0-9a-f])*@)?((([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?|[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(:[0-9]+)?)|([a-z0-9_.!~*'()$,;:@&=+-]|%[0-9a-f][0-9a-f])+)(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?(#([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?|(www|ftp)\\.(([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?(:[0-9]+)?(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?(#([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?)[^].,:;!)? \t\r\n<>\"]"
+# color body red black "([a-z][a-z0-9+-]*://(((([a-z0-9_.!~*'();:&=+$,-]|%[0-9a-f][0-9a-f])*@)?((([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?|[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+)(:[0-9]+)?)|([a-z0-9_.!~*'()$,;:@&=+-]|%[0-9a-f][0-9a-f])+)(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*(/([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*(;([a-z0-9_.!~*'():@&=+$,-]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?(#([a-z0-9_.!~*'();/?:@&=+$,-]|%[0-9a-f][0-9a-f])*)?|(www|ftp)\\.(([a-z0-9]([a-z0-9-]*[a-z0-9])?)\\.)*([a-z]([a-z0-9-]*[a-z0-9])?)\\.?(:[0-9]+)?(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*(/([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*(;([-a-z0-9_.!~*'():@&=+$,]|%[0-9a-f][0-9a-f])*)*)*)?(\\?([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?(#([-a-z0-9_.!~*'();/?:@&=+$,]|%[0-9a-f][0-9a-f])*)?)[^].,:;!)? \t\r\n<>\"]"
+color body color33 color0 "(^|[[:space:][:punct:]])/[^/]+/([[:space:][:punct:]]|$)"
+color body color33 color0 "(^|[[:space:][:punct:]])\\*[^*]+\\*([[:space:][:punct:]]|$)"
+color body color33 color0 "(^|[[:space:][:punct:]])_[^_]+_([[:space:][:punct:]]|$)"
+color body black brightgreen "(ab|von|zwischen) *[012]?[0-9]([.:][0-5][0-9])?(h|uhr)? *(-|bis|und) *[012]?[0-9]([.:][0-5][0-9])?)?( *(h|uhr))?"
+color body black yellow "(dm|euro?s?|\$\$\$)\> *[1-9][0-9]*([.,][0-9]*-?-?)?"
+color body black yellow "(dm|â‚¬|euro?|mark) *[0-9][0-9.,]*(--?|[0-9][0-9])?"
+color body cyan default "(finger|ftp|hkps?|https?|imap|irc|news|telnet)://[^ >]*"
+# color body color174 color237 "(finger|ftp|http|https|news|telnet)://[^ >]*"
+color body brightblue black "(https?|ftp)://[\-\.,/%~_:?&=\#a-zA-Z0-9]+" # URL
+# color body brightwhite green "(jan|feb|mrz|apr|mai|jun|jul|aug|sep|okt|nov|dez)[a-z]* ?[ 0-9][0-9][.]?[-+][0-9][0-9][.]?"
+color body brightyellow default "(open)pgp:? *\(0x\)?[0-9a-f]{8,16}"
+# color body brightyellow blue "(sven ?guckes)"
+# color body brightyellow blue "(sveng|guckes)"
+color body black green "(tele)?(cell|fax|fon|mobil|phone|private|tel)[.: ]+[+]?[-. 0-9/()]{4,}[0-9]"
+color body brightyellow default "-----BEGIN PGP PUBLIC KEY BLOCK-----"
+color body brightyellow default "-----BEGIN PGP SIGNATURE-----"
+color body brightyellow default "-----END PGP PUBLIC KEY BLOCK-----"
+color body brightyellow default "-----END PGP SIGNATURE-----"
+color body brightmagenta default "--[a-z][-a-z]+"
+color body white blue ".* joined your .*"
+color body white red ".* unsubscribed from .*"
+color body brightmagenta white "030[-./ 0-9]+[0-9]"
+color body brightmagenta default "08[-/]15"
+color body white red "1-?800[-0-9]+"
+color body white blue "192[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}"
+color body brightyellow default "</?[^ ]+>"
+color body color174 color237 "<URL:[^ ]*>"
+# color body cyan default "<URL:[^ ]*>"
+# color body blue red "<[Bb][Gg]>"
+color body color230 color0 "<[Gg]>" # <g>
+color body color230 color0 "<[Bb][Gg]>" # <bg>
+# color body blue red "<[Gg]>"
+color body white magenta "=[0-9A-F][0-9A-F]"
+color body brightmagenta default "DE[0-9][0-9] [0-9][0-9]{4} [0-9]+"
+color body brightred green "DSA key [0-9a-f]{16}\>"
+color body brightred green "DSA key [0-9a-f]{8}\>"
+color body brightyellow green "RSA key [0-9a-f]{16}\>"
+color body brightyellow green "RSA key [0-9a-f]{8}\>"
+color body red white "[!?]{3,}"
+color body brightyellow default "[(][cr][)]"
+color body brightred default "[*]([-[:alnum:]Ã¤Ã¶Ã¼ÃŸ] ?)+[*]"
+# color body color245 color0 "[*]?((N)?ACK|CU|LOL|SCNR|BRB|BTW|CWYL|\
+# color body color245 color234 "[*]?((N)?ACK|CU|LOL|SCNR|BRB|BTW|CWYL|\
+color body color245 color0 "[*]?((N)?ACK|CU|LOL|SCNR|BRB|BTW|CWYL|\ |FWIW|vbg|GD&R|HTH|HTHBE|IMHO|IMNSHO|\ |IRL|RTFM|ROTFL|ROFL|YMMV)[*]?"
+color body brightred default "[*][-[:alnum:]]+[*]"
+color body black green "[+](3[0123469]|4[013456789])[- 0-9]+[0-9]"
+color body brightmagenta white "[+]49[- .]+30[-./ 0-9]+[0-9]"
+color body white magenta "[-+]?[0-9][., 0-9]*(dm|dollar|euro?s?|â‚¬)"
+color body green default "[-]([-r][-w][-x]){3}"
+color body color174 color237 "[-a-z_0-9.%$]+@[-a-z_0-9.]+\\.[-a-z][-a-z]+"
+# color body color208 color234 "[-a-z_0-9.%$]+@[-a-z_0-9.]+\\.[-a-z][-a-z]+"
+color body brightcyan default "[0-9]+ *(sekunden?|minuten?|stunden?|tage?|wochen?|monate?|jahre?n?)"
+color body black yellow "[0-9]+[,.][0-9]* *pf/min"
+color body black yellow "[0-9][0-9.,]*( *--? *[0-9][0-9,.]*)? *(dm|dollar|â‚¬|euro?|mark)"
+color body black green "[0-9][0-9][.][0-9]{6}"
+color body brightblue default "[012][0-9]([- ]+[012][0-9])?(h|uhr)"
+color body green default "[1-9][0-9.,]*--?[1-9][0-9.,]* *(dm|â‚¬|euro?|mark)"
+color body color234 color214 "[;:]-*[)>(<lt;|]"
+# color body brightcyan black "[ ]?[*][^*]*[*][ ]" # more emoticon?
+# color body brightcyan black "[ ][*][^*]*[*][ ]?" # more emoticon?
+color body color245 color0 "[ ]?[*][^*]*[*][ ]" # more emoticon?
+color body color245 color0 "[ ][*][^*]*[*][ ]?" # more emoticon?
+# color body color245 color234 "[ ]?[*][^*]*[*][ ]" # more emoticon?
+# color body color245 color234 "[ ][*][^*]*[*][ ]?" # more emoticon?
+# color body brightcyan black "[;:][)(|]" # emoticons
+# color body brightcyan black "[;:][-o][)/(|]" # emoticons
+color body color245 color0 "[;:][)(|]" # emoticons
+color body color245 color0 "[;:][-o][)/(|]" # emoticons
+# color body color245 color234 "[;:][)(|]" # emoticons
+# color body color245 color234 "[;:][-o][)/(|]" # emoticons
+color body brightred black "[\-\.+_a-zA-Z0-9]+@[\-\.a-zA-Z0-9]+" # Email addresses
+# color body brightyellow blue "[^ ]+@guckes.net"
+color body brightyellow green "[ps]ub *[0-9]{4}[dr]/[0-9a-f]{16}"
+color body brightyellow green "[ps]ub *[0-9]{4}[dr]/[0-9a-f]{8}"
+color body brightmagenta default "[â€š][a-z]+[']"
+color body brightred default "\(/[-_.a-zA-Z0-9]+\)+/[-_.a-zA-Z0-9]+"
+color body brightred default "\(/[-_.a-zA-Z0-9]+\){2,}/"
+color body white red "\(19|20\)?[0-9][0-9]-(0[0-9]|1[012])-([012][0-9]|3[01])[-+]([012][0-9]|3[01])"
+color body green default "\([0-9]+.\)?[0-9]+m"
+color body brightred green "\([0-9a-f]{32}\)"
+color body brightred green "\([0-9a-f]{40}\)"
+color body brightred green "\([0-9a-f]{64}\)"
+color body blue default "\<(blau|blue)\>"
+color body yellow default "\<(braun|brown)\>"
+color body brightyellow default "\<(gelb|yellow)\>"
+color body cyan default "\<(hell|himmel)blau\>"
+color body magenta default "\<(lila|magenta)\>"
+color body red default "\<(rot|red)\>"
+color body white default "\<(weiÃŸ|white)\>"
+color body green default "\<grÃ¼n\>"
+color body brightgreen default "\<hellgrÃ¼n\>"
+color body black white "\<schwarz\>"
+color body white red "\\$[0-9]+[.,0-9]*"
+color body brightmagenta default "\\$[a-zA-Z][-_a-zA-Z]+"
+color body color229 color234 "\\*[- A-Za-z]+\\*"
+color body brightblue default "\\<(mon|tue|wed|thu|fri|sat|sun)\\>"
+color body brightyellow default "\\<[-_A-ZÃ„Ã–Ãœ']{3,}s?\\>"
+color body brightyellow default "\\<[-_A-ZÃ„Ã–Ãœ0-9']{3,}s?\\>"
+color body brightred default "\`[^ ]+\`"
+color body green black "\`[^\`]*\`" # Green text between ` and `
+color body white red "^ +[$]? *man \\w+"
+color body brightblue black "^# \.*" # Headings as bold blue
+color body brightblue default "^# example:"
+color body brightcyan black "^## \.*" # Subheadings as bold cyan
+color body brightgreen black "^### \.*" # Subsubheadings as bold green
+color body brightgreen default "^##[^#]+##$"
+color body brightgreen default "^##[^#]+$"
+color body brightgreen default "^#\+"
+color body yellow black "^(\t| )*(-|\\*) \.*" # List items as yellow
+# color body color174 color237 "^-----BEGIN PGP SIGNATURE-----"
+color body color174 color237 "^-----BEGIN PGP SIGNED MESSAGE-----"
+# color body color174 color237 "^-----END PGP SIGNATURE-----"
+color body color174 color237 "^-----END PGP SIGNED MESSAGE-----"
+# color body color214 color234 "^-.*PGP.*-*"
+color body brightyellow default "^= .* =$"
+color body brightgreen default "^==.*==$"
+color body color174 color237 "^Comment: .*"
+color body color174 color237 "^Version: GnuPG.*"
+color body red default "^[*] .*:$"
+color body color241 color233 "^gpg: "
+# color body color241 color234 "^gpg: "
+# color body color254 color0 "^gpg: "
+color body brightyellow red "^gpg: BAD signature from.*"
+color body color174 color237 "^gpg: Can't check signature.*"
+color body brightgreen black "^gpg: Good signature .*"
+color body color167 color234 "^gpg: Note: This key has expired!"
+color body color214 color234 "^gpg: There is no indication that the signature belongs to the owner."
+color body color214 color234 "^gpg: WARNING:.*$"
+color body color174 color237 "^gpg: can't check signature.*"
+color body color214 color234 "^gpg: can't handle these multiple signatures"
+color body color214 color234 "^gpg: invalid node with packet of type"
+color body color214 color234 "^gpg: signature verification suppressed"
+color body brightyellow green "^uid"
+color body black brightred "bad signature"
+color body black white "edward *snowden"
+color body brightred white "eintritt (ist)? *frei"
+color body brightred default "fingerprint: \([0-9A-F]{4} ? ?\){10}"
+color body brightred white "free of charge"
+color body brightred white "freier eintritt"
+color body brightmagenta brightred "good signature" # blinks! eek!
+color body black red "host down"
+color body brightgreen default "host is up"
+color body color174 color237 "mailto: *[^ ]+\(\\i?subject=[^ ]+\)?"
+color body color208 color234 "mailto:[-a-z_0-9.]+@[-a-z_0-9.]+"
+color body yellow default "mutt([-_]| *)?[01]\.[0-6]\.[0-9]*([-][0-9]*)?([.](debian|dsc|orig|tar|gz|xz))+"
+color body brightyellow default "public event"
+color body black green "registration required"
+color body brightyellow default "slrn(-| *)0\.[789]\.[0-8]\.[0-9]"
+color body black green "tel:[-+. 0-9/()]{4,}[0-9]"
+color body black brightred "this key has expired"
+color body black brightwhite "tl;?dr:.*"
+color body color174 color237 "www\\.[-.a-z0-9]+\\.[a-z][a-z][a-z]?([-_./~a-z0-9]+)?"
+color body black brightyellow "your submission did not make it"
+color body black white ' [,.!?] '
+color body white default ' â€” '
+color body green default '!='
+color body blue default '!important'
+color body green default '":[a-z]+ *[a-z]*"'
+color body brightmagenta default '#!/bin/sh'
+color body white green '#(if|ifdef|else|endif)\>'
+color body brightgreen default '#\<[-0-9a-z_]+\>'
+color body brightyellow magenta '#\<[a-z0-9]+\>'
+color body brightyellow magenta '#{29,}'
+color body white red '%%[^ ]+%%'
+color body green default '&&'
+color body black white '&(#39|euro|ndash|rsquo);'
+color body white blue '&([aou]uml|amp);'
+color body brightgreen default '((hardware|software) ?freedom ? day)'
+color body black white '((start|middle|end) *of *)?\<(spring|summer|autumn|winter)\>( (19|20)[0-9][0-9])?'
+color body black yellow '(0?[1-9]|[12][0-9]|3[012])[.] ?([-/] ?(0?[1-9]|[12][0-9]|3[012])[.] ?)?(0?[1-9]|1[012])[.]( *(19|20)[0-9][0-9])?\>'
+color body white brightmagenta '(0?[1-9]|[12][0-9]|3[01])[.]?[, ]*)(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]+( *(19|20)?[0-9][0-9])?'
+color body brightyellow green '(1024|2048|3072|4096|8192)[dr]/[0-9a-f]{8}'
+color body brightred default '(11|12|13)th'
+color body brightyellow magenta '(13|52)[.][0-9]+'
+color body cyan default '(19[6-9][0-9]|20[01][0-9])(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[01])'
+color body white red '(19|20)[0-9][0-9][-/ ](0[0-9]|1[012])[-/ ]([012][0-9]|3[01])'
+color body brightgreen default '(3d[- ]?(drucke?[nr]?|filament|printers?|zeug)|cnc ?mills|laser cutters)'
+color body brightred default '(480|640|768|1024|1080|1200|1600|1920)'
+color body brightyellow default '(<-+|<=+|=+>|-+>)'
+color body brightyellow default '(La)?TeX'
+color body brightcyan default '([+]49|0049)?0?30[- ]*[-0-9.]+'
+color body brightmagenta default '([+]49|0049)[- .]*[-0-9. ]+'
+color body brightcyan default '([+]49|0049)[- ]*\(0\)[-0-9. ]+'
+color body brightyellow default '([0-9]+[.,])?[0-9]+ *(kb|mb|gb|tb)(it)?( *(down|up))?'
+color body brightmagenta white '([0-9][.]+){2}[0-9]+([-][0-9])?'
+color body brightyellow default '([0-9a-f][0-9a-f]:){15}[0-9a-f][0-9a-f]'
+color body brightyellow green '([0-9a-f]{4} ?){4}'
+color body brightyellow default '([012]?[0-9] ?(am|pm)? ?- ? [012]?[0-9] ?(am|pm))'
+color body brightred default '([2-9]?(1st|2nd|3rd)|[1-9]?[4-9]th)'
+color body brightmagenta default '([A-Z][a-z]+){2,}'
+color body brightgreen default '([ENSW] *[0-9]+Â° *[0-9.]+â€² *)+'
+color body black magenta '(\+49)?01[567][-0-9()/. ]{7,}[0-9]'
+color body brightyellow blue '(\<Mo\>|\<Di\>|\<Mi\>|\<Do\>|\<Fr\>|\<Sa\>|\<So\>)\>'
+color body brightgreen default '(\<cp\>|\<dd\>|\<iw\>|\<ls\>|\<mv\>|\<rm\>|\<wc\>)'
+color body brightgreen default '(\<grep\>|\<mkdir\>|\<rmdir\>)'
+color body brightred default '(\\_|_/)'
+color body black brightgreen '(ab|am|an|bis|gegen|um) *([01][0-9]|2[0-4])([.:][0-5][0-9])( *(h|uhr))?"
+color body black brightgreen '(ab|am|an|bis|gegen|um) *([01][0-9]|2[0-4])([.:][0-5][0-9])?( *(h|uhr))"
+color body black brightgreen '(ab|am|an|bis|gegen|um) *([01][0-9]|2[0-4])([.:][0-5][0-9])?( *(h|uhr))?"
+color body brightgreen default '(airos|kathleen|openwrt|olsrd?|raspbian|ubiquity)s?'
+color body brightgreen default '(alsamixer|cdparanoia|mplayer|pulseaudio)'
+color body brightmagenta default '(am)? *[1-5][.] *(montag|dienstag|mittwoch|donnerstag|freitag|sonnabend|samstag|sonntag)( *(des|im) monats?)?'
+color body brightyellow magenta '(am|bis( zum)?|ca|gegen|nach|um) *[12]?[0-9] *(h|uhr)\>'
+color body brightyellow magenta '(am|bis( zum)?|ca|gegen|nach|um) *[12]?[0-9]:[0-5][0-9] *(h|uhr)?\>'
+color body black white '(anfang|mitte|ende) *(fr(ue|Ã¼)hling|sommer|herbst|winter)'
+color body black white '(anfang|mitte|ende) *(jan|feb|mar|mrz|apr|mai|may|jun|jul|aug|sep|oct|okt|nov|dec|dez)[a-z]*\>'
+color body brightgreen default '(aspell|ispell|urlview)'
+color body brightgreen default '(barcamp|lightning[- ]?talks?|unconference|linuxtreff)'
+color body black white '(base64|text/plain)'
+color body green default '(batman|datenbank|webmail)'
+color body brightyellow magenta '(belug|lugmoe|uplug|vimberlin)'
+color body brightred default '(biology|chemistry|engineering|mathematics|medicine|physics|philosophy|psychology)'
+color body black green '(bruegge|rodenbach|roeselare|ypern|kortrijk|ghent|watou|st.bernhard|westvleteren)'
+color body green default '(bus|straÃŸenbahn|tram) *m?[0-9]+'
+color body black white '(charset=(iso-8859-1|utf-8)?|(file)?name=|format=flowed|delsp)'
+color body brightgreen default '(coreboot|libreboot)'
+color body brightyellow default '(ctrl|ctl|shift)-[]_?@a-z\^]'
+color body green default '(dahlem|grunewald|moabit|schmargendorf)'
+color body magenta default '(diasproa|friendica|gnusocial)'
+color body brightmagenta default '(diesen|jeden|letzten|nÃ¤chsten|vorherigen) *(montag|dienstag|mittwoch|donnerstag|freitag|sonnabend|samstag|sonntag)'
+color body brightgreen default '(do ?it ?yourself|do ?it ?together)'
+color body brightmagenta default '(ecdsa|ed25519)'
+color body brightcyan default '(ein|zwei|drei|vier|fÃ¼nf|sechs|sieben|acht|neun|zehn|elf|zwÃ¶lf) *jahre?'
+color body brightgreen default '(enigmail|gpg|gnupg|mailvelope|(open)?pgp|openssl|pubring|secring)'
+color body blue default '(etx|lq|nlq|snr)'
+color body brightgreen default '(exim|postfix|qmail|sendmail)'
+color body brightcyan default '(ezmlm|listserv|mailman|majordomo|sympa)'
+color body white red '(freebsd|netbsd|openbsd|solaris)'
+color body brightcyan default '(gmail(.com)?|gmx(.de)?|web.de)'
+color body brightyellow blue '(gnu *)?hurd'
+color body white blue '(gnu *)general *public *license'
+color body brightyellow black '(heise(.de)?|linux ?magazin|pro ?linux)'
+color body green default '(hkp|web|mail) *server'
+color body brightcyan default '(hyperkitty|pipermail)'
+color body brightgreen default '(insmod|lsmod|modinfo|modprobe|rmmod)'
+color body brightyellow red '(jan|feb|mar|mrz|apr|mai|may|jun|jul|aug|sep|oct|okt|nov|dec|dez)[- ]?(jan|feb|mar|mrz|apr|mai|may|jun|jul|aug|sep|oct|okt|nov|dec|dez)'
+color body white brightred '(jan|feb|mar|mrz|apr|mai|may|jun|jul|aug|sep|oct|okt|nov|dec|dez)[a-z]+\> *(19|20)[0-9][0-9]'
+color body white default '(labview|matlab|scilab)'
+color body white magenta '(lat|lon): ?[0-9]+\.[0-9]+'
+color body brightgreen default '(libuv|gnulib)'
+color body white red '(linux *)?\<(arch|centos|debian|fedora|gentoo|redhat|(open)?suse|[lx]?ubuntu)\>( *linux)?'
+color body brightred default '(maschiene|vorraus)'
+color body brightred default '(md5|sha(1|224|256|384|512))(sum)?'
+color body brightmagenta default '(montag|dienstag|mittwoch|donnerstag|freitag|sonnabend|samstag|sonntag) *(morgen|(nach)mittag|abend)'
+color body brightmagenta default '(nutty|putty)'
+color body brightyellow default '(o_O|\\o/)'
+color body brightgreen default '(offene werkst(Ã¤|ae)tten|reparierinitiative)'
+color body brightyellow default '(prototypefund|snap!|turtlestitch)'
+color body black green '(public )?key (ID)? (0x)?[0-9a-f]{16}'
+color body black green '(public )?key (ID)? (0x)?[0-9a-f]{32}'
+color body black green '(public )?key (ID)? (0x)?[0-9a-f]{40}'
+color body black green '(public )?key (ID)? (0x)?[0-9a-f]{8}'
+color body black white '(seq|ttl|time)=[0-9.]+'
+color body black green '(software engineering|cloud technologies|system administration)'
+color body white blue '(udk|fu|hu|tu) *berlin'
+color body brightyellow default '(wdr|wr|wrt)(841|842|1043|2600|3500|3600|4300|4900)[dn]?( *v[0-9]([.][0-9])?)?'
+color body brightmagenta default '(~|ca|circa) *[0-9]+\>'
+color body brightyellow default '(Â©|â„¢)'
+color body brightyellow blue '(ÃƒÂ¤|ÃƒÂ¶|ÃƒÂ¼)'
+color body black white '-- (commit summary|file changes|patch links) --'
+color body brightred default '--- .* ping statistics ---'
+color body magenta default '--[-a-z]+'
+color body red default '-[A-Z_]+\>'
+color body brightblue default '/\*.*\*/'
+color body brightred default '/\<[-a-z0-9]+\>/'
+color body black brightyellow '/o\\'
+color body brightgreen default '0(15[12579]|16[023]|17[01236789])[- ][0-9]+'
+color body brightmagenta default '0x[0-9a-f]+\>'
+color body yellow red '1([01][0-9]|2[0-3])0 *(vienna|wien)'
+color body white blue '192.168.'
+color body yellow red '1[0-4][0-9][0-9][0-9] *berlin'
+color body brightred default '1st|2nd|3rd'
+color body brightyellow blue '20[01][0-9]-(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)-(0?[1-9]|[12][0-9]|3[01])'
+color body white magenta '3[0-4]c3'
+color body yellow red '8([01][0-9]|2[0-3])0 *graz'
+color body brightyellow default '802.11[abcgns]+'
+color body brightyellow default '802.3[af]+'
+color body black white '978[-0-9X]+'
+color body brightyellow default ':[a-z]+\>'
+color body brightred default '<3'
+color body brightred default '<[-[:alnum:]]+>'
+color body brightred default '>[-[:alnum:]]+<'
+color body brightgreen default '@\<[-0-9a-z_]+\>'
+color body brightred default 'Gesendet von iMutt auf meinem iPad Pro'
+color body brightred default 'Gesendet von meinem BlackBerry 10-Smartphone'
+color body white green 'Innen\>'
+color body brightblue default 'P[.] ?O[.] ?Box ?[0-9 ]+[0-9]'
+color body red white 'Patch [0-9]\.[0-9]\.[0-9]+'
+color body brightred default 'Re:'
+color body brightred default 'Sent from Outlook Mail for Windows 10 phone'
+color body brightred default 'Sent from a mobile device'
+color body brightred default 'Sent from my iPad'
+color body brightred default 'Sent from my iPhone'
+color body brightred default 'Sent with my iPhone'
+color body black yellow 'VR [0-9]+'
+color body brightred default 'Von Samsung-Tablet gesendet'
+color body brightred default 'Von meinem Samsung Galaxy Smartphone gesendet.'
+color body brightred default 'Von meinem Samsung GerÃ¤t gesendet.'
+color body brightred default 'Von meinem iPad gesendet'
+color body brightred default 'Von meinem iPhone gesendet'
+color body brightyellow default 'Wir freuen uns, Ihnen mitteilen zu kÃ¶nnen'
+color body brightred default '[*][*][-_a-z0-9]+[*][*]'
+color body brightyellow default '[*][*][^*]+[*][*]'
+color body brightyellow default '[*][-_a-z0-9]+[*]'
+color body yellow default '[*]\<[^* ]+ +[^* ]+\>[*]'
+color body brightmagenta default '[+][0-9][0-9]?[- 0-9]+'
+color body white green '[+][0-9]{4}'
+color body green default '[+][_a-z]+'
+color body brightred default '[-+~_.a-z0-9/]+[.](bmp|gif|jpe?g|png)\>'
+color body green default '[-._=+~/\*]{3,}'
+color body brightred default '[-][_a-z]+'
+color body brightgreen default '[-a-z0-9]+[.](funk|olsr)'
+color body brightgreen default '[-a-zÃ¤Ã¶Ã¼ÃŸ]+[._*]innen'
+color body brightred default '[.]\<[a-z]{2,}\>'
+color body brightred default '[.â€¦,;:!?]+$'
+color body green default '[0-9] *std[.]?'
+color body brightmagenta default '[0-9]([.][0-9])+[0-9]*([-+~.][0-9a-z]+)+'
+color body brightmagenta default '[0-9]+ *(hundert|tausend|millionen)'
+color body brightyellow default '[0-9]+ *(stueck|stÃ¼ck)'
+color body brightyellow magenta '[0-9]+ *[*] [*] [*]'
+color body brightyellow default '[0-9]+([.,][0-9]+)? *(Â°c?|k?g)\>'
+color body brightyellow default '[0-9]+([.,][0-9]+)?[- ]*(a|ah|ampere|mah|dbi|dbm|ma|v|volt|mvw|mw|w|k?wh|watt)\>'
+color body brightred default '[0-9]+,[0-9]+'
+color body white red '[0-9]+[.,0-9]* *USD'
+color body brightyellow blue '[0-9]+\.[0-9]K'
+color body white blue '[0-9]+er'
+color body yellow default '[0-9]+px'
+color body blue default '[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]'
+color body brightblue default '[0-9][0-9]?-?[0-9][0-9]?[.]? [A-Z][A-Za-z]* 20[0-1][0-9]'
+color body brightyellow default '[0-9][0-9]?[.]?(st|nd|rd|th)?( of)? *[A-Z][A-Za-z]* 20[0-1][0-9]'
+color body black white '[0-9]m[0-9]+[.][0-9.]+s'
+color body yellow default '[0-9]{1}[.][0-9]'
+color body red default '[0-9]{2}[.][0-9]'
+color body black yellow '[0-9]{3}/[0-9]{3}/[0-9]{5,}'
+color body magenta default '[0-9]{3}[.][0-9]'
+color body brightgreen default '[0-9a-f]{12}[.][.][0-9a-f]{12}'
+color body brightyellow default '[012]?[0-9]h? ?- ?[012]?[0-9] ?(h|uhr)?'
+color body yellow default '[:;]-?[()/O]'
+color body brightgreen default '[ACGT]\{4,\}'
+color body brightblue default '[NSEW] [0-9]*[.][0-9]*Â°?'
+color body brightgreen default '[^ ]+ *\(at\) *[^ ]+'
+color body green default '[^ ]+ ?(allee|damm|gasse|platz)\>( *([0-9/]+[a-z]?))?'
+color body green default '[^ ]+@[^ ]+'
+color body brightblue default '[^ ]+[.]buildinfo'
+color body green default '[^ ]+[.]dsc'
+color body brightyellow default '[^ ]+[.]tar[.]gz'
+color body yellow default '[^ ]+[.]tar[.]xz'
+color body brightmagenta default '[a-z0-9]+(_[a-z0-9]+)+'
+color body brightyellow blue '[a-z]+[(][0-7][)]'
+color body white green '[a-z][-_a-z0-9]+\+\+'
+color body brightgreen default '[a-zÃ¤Ã¶Ã¼ÃŸ]+[._*][a-zÃ¤Ã¶Ã¼ÃŸ]+'
+color body brightyellow magenta '[{(<](at|dot)[})>]'
+color body brightyellow default '[Â¹Â²Â³Â¼Â½]'
+color body brightyellow default '[â€žâ€œâ€"]+[^â€žâ€œâ€"]+[â€â€œ"]'
+color body magenta white '\$\(.*\)'
+color body brightgreen default '\([^)]+\)'
+color body brightyellow default '\([a-z]\)'
+color body yellow default '\(c\)'
+color body black yellow '\+1'
+color body green default '\+[A-Z_]+\>'
+color body white green '\+\+[a-z][-_a-z0-9]+'
+color body white blue '\<((1?[0-9]?[0-9]|2[0-4][0-9]|25[0-5])[.]){3}[a-z]\>'
+color body brightgreen default '\<((frei?e[rs]?|open) *(access|hardware|science|software|source|space|wissen)?)\>'
+color body brightyellow default '\<((tl|tp)(link)?)\>'
+color body magenta default '\<(/dev/)?(sd[abcd]|md[012])\>'
+color body brightred default '\<(0?[0-9]|1[012])([.:][0-5][0-9])? *(am|pm)?\>'
+color body brightred default '\<(0?[1-9]|1[0-9]|2[0-4])([.:][0-5][0-9])?([.:][0-5][0-9])?\>( *(h|uhr)?)\>'
+color body brightred default '\<(0?[1-9]|1[012])([.:][0-5][0-9])?([.:][0-5][0-9])?\>( *(am|pm)?)\>'
+color body brightyellow blue '\<(0?[1-9]|[12][0-9]|3[012])[.](0?[1-9]|1[012])[.]'
+color body brightyellow brightblue '\<(0?[1-9]|[12][0-9]|3[012])[.]-(0?[1-9]|[12][0-9]|3[012])[.](0?[1-9]|1[012])[.]'
+color body brightyellow blue '\<(0?[1-9]|[12][0-9]|3[01])[.](0?[1-9]|1[012])[.](19|20)?[0-9][0-9])'
+color body brightgreen default '\<(0xff|afra|balista|brmlab)\>'
+color body brightyellow green '\<(1024|2048|4096)( ?bit)?\>'
+color body black yellow '\<(19[5-9][0-9]|2[01][0-9])\>'
+color body brightgreen default '\<(31c3|32c3|33c3|bundesdatenschau|chemnitzer linux[- ]?tagen?)\>'
+color body brightgreen default '\<(Congress|Camp|ctf|crypto|install)part(y|ies)|jugend ?hackt|repair ?cafe|linuxtreff)\>'
+color body brightred default '\<(DE|EU|FR|UK)\>'
+color body brightred default '\<(XS|S|M|L|XL|XXL|XXXL)\>'
+color body black brightwhite '\<([-.a-z0-9])+[.](at|com|de|eu|net|org)\>'
+color body brightmagenta default '\<([-.a-z0-9])+[.]works'
+color body brightyellow default '\<([0-9]+.)?[0-9]+ *m?s\>'
+color body brightyellow default '\<([0-9]+.)?[0-9]+ *total>'
+color body brightyellow default '\<([0-9]+.)?[0-9]+[- ]*(bytes|kb|l|mi?b|gi?b(it)?|mb(it)?(/s)?|mbps|tib)\>'
+color body brightyellow default '\<([0-9]+.)?[0-9]+[- ]*(cm|km|m?l|m|m?m\^2|mÂ²|metern?|mm|nm|qm)\>'
+color body brightyellow default '\<([0-9]+.)?[0-9]+[- ]*(ghz|khz|mhz|hz)\>'
+color body brightyellow default '\<([0-9]+.)?[0-9]+[- ]*(mins?|minute(n|s)|hours|sek(unden)?)\>'
+color body magenta white '\<([0-9a-f]{1,4}:)*::[0-9]'
+color body magenta white '\<([0-9a-f]{1,4}:)*[0-9a-f]{1,4}::?[0-9a-f]{1,4}/(16|32|64|128)'
+color body brightcyan default '\<([01]?[0-9]|2[0-3])([.:][0-5][0-9])? ?(h|uhr)\>'
+color body black brightwhite '\<([a-z]+::)+[a-z]+\>'
+color body brightyellow default '\<([a-z_]+[(][)])'
+color body black magenta '\<(\
+# color body white blue '\<(\
+# color body brightgreen default '\<(abends?|mittags?|morgens|nachmittags?|nachts|vormittags?)\>'
+color body black yellow '\<(ab|am|an|bis|um) *[0123]?[0-9][.]( ?[1-9]|1[012])[.]( ?20[012][0-9])?'
+color body brightcyan default '\<(ab|um|bis ?zum|von) *(0?[1-9]|[12][0-9]|3[01])[.](0?[1-9]|1[12])[.]( *(19|20)?[0-9][0-9])?'
+color body brightcyan default '\<(ab|um|bis|von) *\<([01]?[0-9]|2[0-3])(:[0-5][0-9])? ?[-â€“]? ?([01]?[0-9]|2[0-3])([.:][0-5][0-9])?)( *(min|h|uhr))?\>'
+color body black brightgreen '\<(akamai|cloudfront|limewire)\>'
+color body white red '\<(alpine|crux(ex)?|knoppix|mandrake|slackware|tinycore)( *linux)'
+color body black brightgreen '\<(amazon|apple|dell|dropbox|ebay|evernote|facebook|google( ?drive)?|hewlett ?packard|instagram|lenovo|microsoft|netflix|slack|symantec|twitter|youtube|whatsapp|wikipedia)\>'
+color body red default '\<(amstetten|ansfelden|baden|bad|ischl|bludenz|bregenz)\>'
+color body white blue '\<(android|cyanogen|ios)\>'
+color body black brightwhite '\<(apache|wordpress)\>'
+color body brightgreen default '\<(ap|cat5(-kabel)?|dhcp|dsl|gre|ip|lan|mac|mesh|nat(44|66)|openvpn|poe|pptp|qos|ssid|tcp|vpn(03)?[abcd]?|vlan|wan|wifi|wlan)s?\>'
+color body magenta default '\<(arc4|b43|b43legacy|cfg80211|compat)\>'
+color body brightgreen default '\<(arduino|banana.pi|rasp(berry.)?pi|olimex|iot|reprap)s?\>'
+color body brightgreen default '\<(arm|powerpc|sparc64|x86)\>'
+color body black brightgreen '\<(asus|intel|thinkpad)\>'
+color body green default '\<(auto|block|inline|justify|visible)\>'
+color body brightgreen default '\<(awk|ctags|elinks|gcc|g(nu)?pg|irssi|less|notmuch)\>'
+color body brightgreen default '\<(backdoor|crypto(anarchy|currency|graphy|part(y|ies))?|encryption|fingerprint|passphrase|password|privacy|secret|security)\>'
+color body brightyellow default '\<(banana ?pi|nano(beam|bridge|station)|raspberry( pi)?( zero)?|ras?pis?)\>'
+color body brightyellow default '\<(bandbreite|beacon|client|cronjob|download|firmware|freifunk|fresnel(zone)|funkfeuer|interface|traffic|upload|upstream|wireless)\>'
+color body white red '\<(basel|bern|genf|z(ue|Ã¼)rich)\>'
+color body green default '\<(bash|chmod|lxqt|rsync|systemd)\>'
+color body brightgreen default '\<(bitbucket|github|sourceforge)\>'
+color body black brightgreen '\<(bitmessage|protonmail|ricochet|tutanota)\>'
+color body default brightgreen '\<(blackberry|ericsson|motorola|nokia|iphone|samsung)\>'
+color body brightgreen default '\<(blender|git|latex|mozilla|open ?street ?map)\>'
+color body brightmagenta default '\<(br0|eth[01]|lo|localhost|loopback|wlan[01])\>'
+color body white red '\<(brÃ¼ssel|dornbirn|dresden|eindhoven|essen|gÃ¶teborg|hattingen|oberhausen|prag)\>'
+color body brightgreen default '\<(bufreadpre)\>'
+color body brightyellow default '\<(c([+][+])?|go|lisp|lua|perl|python|ruby)\>'
+color body brightgreen default '\<(c-base|c3d2|cccb|chaos computer club|chaosdorf|chaostreff|chaotikum)s?'
+color body brightcyan default '\<(c\+\+|c\#|css|html|java(script)|python|ruby|tex)\>'
+color body magenta default '\<(cat|tac|sort|uniq|head|tail|ifconfig|iptables|uptime)\>'
+color body brightgreen default '\<(chaos communication congress|committer ?conf|congress ?everywhere|datenspuren|digitale ?woche? kiel)\>'
+color body black brightgreen '\<(chatsecure|facebook ?messenger|google ?hangouts|signal|skype|telegram|threema|whatsapp|wire)\>'
+color body brightgreen default '\<(chrome|firefox|internet ?explorer|safari)\>'
+color body brightgreen default '\<(cinnamon|gnome|kde|i3|lxde|mate|openbox|xfce)\>'
+color body magenta default '\<(club[- ]?mate|coffee|tea)\>'
+color body brightgreen default '\<(collectd|cron|dmesg|dnsmasq|iftop|imonc|iwconfig|iwinfo|netmon|ppp|tcpdump|vnstat|wireshark)\>'
+color body brightyellow magenta '\<(coverity|doxygen|travis|ubsan|valgrind)\>'
+color body brightyellow default '\<(cpe510|dlink)\>'
+color body magenta default '\<(crypto_blkcipher|gpio_button_hotplug|leds_gpio)\>'
+color body brightgreen default '\<(cuc|cul)\>'
+color body brightgreen default '\<(cursorbind|cursorline|cursorcolumn|esckeys|fileformats?|formatprg)\>'
+color body brightgreen default '\<(debconf|easterhegg|fosdem|freedom ?not ?fear|froscon|games ?camp|geekend|grazer ?linux-?tage)\>'
+color body brightgreen default '\<(debian|fedora|linux|mint|nixos|suse|tails|ubuntu)\>'
+# color body brightgreen default '\<(devlol|dezentrale|eigenbaukombinat|elok|)\>'
+color body brightgreen default '\<(dns|ftp|https?|imaps?|ntp|pops?|voip)\>'
+color body white blue '\<(doodle|dudle)\>'
+color body red default '\<(dornbirn|feldkirch|gmunden|graz|hallein|hall|hohenems)\>'
+color body black brightgreen '\<(e-?plus|o2|telef[oÃ³]nica|telekom|vodacom|vodafone)\>'
+color body brightgreen default '\<(eclipse|x?emacs|geanie|gedit|joe|jove|kate|kile|kwrite|lyx|mc(edit)?|nano|nedit|(neo)?vim|vi|xedit)\>'
+color body blue default '\<(ent|ver)schlÃ¼sseln\>'
+color body brightcyan default '\<(espeak|festival|mbrola)\>'
+color body brightgreen default '\<(fab.lab|fablab.berlin|fablabdd|f2a.space|fnordeingang|freies?.?labor)\>'
+color body brightgreen default '\<(fablab|(hacker|maker) *space)s?\>'
+color body brightgreen default '\<(firewire|sata|usb)\>'
+color body white red '\<(fluxbox|gnome|gtk[0-9]?|i3|icewm|kde|lxde|qt[45]|wayland|xfce|x11)\>'
+color body brightyellow default '\<(fritz(.box)|gl.inet|huawei|linksys|nexx|nsm5|tp ?link|ubiquiti)\>'
+color body brightmagenta default '\<(gateway|iface|inet|netmask|static)\>'
+color body brightgreen default '\<(geek|hacker|nerd|maker|tinkerer)s?\>'
+color body white red '\<(gnunet|nextcloud|onionshare|owncloud|retroshare|tribler)\>'
+color body brightgreen default '\<(hack ?around ?the ?clock|hack ?& ?make|hacken.open.air|hackover|hack ?your ?city|hillhacks)\>'
+color body brightgreen default '\<(hackerspaces?|makerspaces?|(repair|reparatur) ?caf[eÃ©]s?)\>'
+color body brightgreen default '\<(happylab|h.a.t.e.o.t.u.|in-berlin|individual ?network)\>'
+color body brightgreen default '\<(htop|iperf|iwlist|mtr|nslookup|ping|pstree|tree|top|tracert|traceroute)\>'
+color body brightred default '\<(i386|amd64|arm64|m68k)\>'
+color body red default '\<(innsbruck|judenburg|kapfenberg|klagenfurt|klosterneuburg)\>'
+color body brightred default '\<(intellectual property|p2p)\>'
+color body brightgreen default '\<(kieler ?linux ?tage|knoppixtage?|linux ?con)\>'
+color body red default '\<(knittelfeld|krems|kufstein|leoben|leonding|linz|lustenau)\>'
+color body brightgreen default '\<(kommandozeile|shell)\>'
+color body brightgreen default '\<(krautspace|linuxworks|metalab|nobreakspace|ok ?lab|openlab)'
+color body brightgreen default '\<(linux ?presentation ?day|linux ?days?|linuxtage?)\>'
+color body brightgreen default '\<(linuxwochen|minidebcamp|minidebconf|nerdnight|nook( ?2017)?|open ?commons)\>'
+color body magenta default '\<(lz4_compress|lz4_decompress|lzo_compress|lzo_decompress)\>'
+color body magenta default '\<(mac80211|tunnel4|x_tables|zram|zsmalloc)\>'
+color body black brightmagenta '\<(macos|windows)\>'
+color body white red '\<(maschiene|promt|sammstag|teh)\>'
+color body blue white '\<(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\>'
+color body brightcyan default '\<(montag|dienstag|mittwoch|donnerstag|freitag|sonnabend|samstag|sonntag)s?\>'
+color body blue white '\<(mo|di|mi|do|fr|so|sa|so)[-+/](mo|di|mi|do|fr|so|sa|so)\>'
+color body red default '\<(mÃ¶dling|perchtoldsdorf|salzburg|schwechat|steyr|stockerau)\>'
+color body brightgreen default '\<(open common kongress|openrheinruhr|open ?tech ?summit|sha ?2017|t-?dose)\>'
+color body brightgreen default '\<(progressbar|realraum|shackspace|stratum0?|sublab|technik.cafe|toppoint)\>'
+color body black white '\<(sasl|ssl)\>'
+color body brightgreen default '\<(sed|(open)?ssh(-agent)?|tmux|wget|zsh)\>'
+color body red default '\<(st..pÃ¶lten|ternitz|traiskirchen|traun|trofaiach|villach)\>'
+color body brightgreen default '\<(t(ue|Ã¼)bix|vcfb|vintage computing festival|where ?camp|world usability day)\>'
+color body white green '\<(tba|t[.]b[.]a[.]?)\>'
+color body brightyellow default '\<(vor)?gestern|heute|(ueber)?morgen|morgen *|(nach|vor)?mittag|abend)?\>'
+color body red default '\<(wels|wien|wiener.neustadt|wolfsberg)\>'
+color body black brightgreen '\<(wep|wpa([12])?|wps)\>'
+color body brightyellow default '\<(xt_comment|xt_conntrack|xt_CT|xt_id|xt_limit|xt_LOG)\>'
+color body brightyellow default '\<(xt_mac|xt_mark|xt_multiport|xt_nat|xt_REDIRECT)\>'
+color body brightyellow default '\<(xt_state|xt_TCPMSS|xt_tcpudp|xt_time|zram|zsmalloc)\>'
+color body brightmagenta default '\<-[a-z!?]\>'
+color body brightyellow default '\<0x[0-9a-f ]+\>'
+color body brightyellow magenta '\<201[0-9][.][12]\>'
+color body brightyellow magenta '\<CmS\>'
+color body brightred default '\<CoC\>'
+color body white red '\<DM\>'
+color body black white '\<FF\>'
+color body brightred default '\<No\>'
+color body brightyellow default '\<VM\>'
+color body brightgreen default '\<Yes\>'
+color body brightblue default '\<[-0-9a-f]{32,}\>'
+color body brightyellow default '\<[0-9]+ *(min|minuten?|stunden|tage|wochen|monate|jahre)\>'
+color body brightyellow default '\<[0-9]+([.,0-9]+)? *Â°?(C|F)\>'
+color body brightgreen default '\<[0-9]+(st|nd|rd|th)\>'
+color body white magenta '\<[0-9]+/[0-9]+\>'
+color body brightyellow default '\<[0-9]+[.,0-9]*[- ]*(Âµ|p|u)?(f|ohm)\>'
+color body brightyellow default '\<[0-9]+\+'
+color body brightmagenta default '\<[0-9]+h\>'
+color body brightyellow default '\<[0-9]+x\>'
+color body brightyellow default '\<[0-9][0-9]?[.]?(st|nd|rd|th)?( of)? \<(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\>'
+color body brightyellow blue '\<[0-9a-f]{7}\>'
+color body brightcyan default '\<[13][a-z0-9]{26,33}\>'
+color body black green '\<[A-ZÃ„Ã–Ãœ][^ ]+ *(Weg)\>( *[0-9]+(-[0-9]+)?[a-z]?)?'
+color body black green '\<[A-ZÃ„Ã–Ãœ][^ ]+ *(strasse|straÃŸe|str)\>( *[0-9]+([a-z])?)?( *[-/][0-9]+([a-z])?)?)?'
+color body black green '\<[A-ZÃ„Ã–Ãœ][^ ]+weg\>( *[0-9]+(-[0-9]+)?[a-z]?)?'
+color body white brightmagenta '\<[^ ]+ *(str[.]|straÃŸe)( *[0-9]+)?([-/][0-9]+)?'
+color body white magenta '\<[^ ]+&[^ ]+\>'
+color body brightyellow blue '\<[^ ]+[.]md\>'
+color body brightyellow magenta '\<[a-z0-9]+:[a-z0-9]+\>'
+color body brightred default '\<[a-z0-9]+[.]dll\>'
+color body brightmagenta default '\<[a-z][a-z0-9]+[-/]([0-9][.]+){2}[0-9]+([-][0-9])?'
+color body brightmagenta default '\<[a-zÃ¤Ã¶Ã¼ÃŸ]+(-[a-zÃ¤Ã¶Ã¼ÃŸ]+)+\>'
+color body white red '\<\w \w( +\w\>)+'
+color body brightyellow blue '\<cfp\>'
+color body green default '\<clients?\>'
+color body brightcyan default '\<crosspoint|kmail|pine\>'
+color body blue default '\<f([1-9]|1[012]|n)\>'
+color body brightcyan default '\<git *(add|bisect|branch|checkout|clone|commit|diff|fetch|grep|init|log|merge|mv|pull|push|rebase|reset|rm|show|status|tag)'
+color body brightgreen default '\<howto\>'
+color body brightblue default '\<iot\>'
+color body brightyellow blue '\<ipv?(4|6)\>'
+color body brightgreen default '\<layer[- ]?[1-7]\>'
+color body brightred default '\<neo(mutt|vim)\>'
+color body brightred default '\<s[.] *[0-9]+'
+color body brightred default '\<servers?\>'
+color body brightgreen default '\<std(in|out|err)\>'
+color body green default '\<u[1-9]\>'
+color body brightred default '\<usb ?(2|3)(.0)?'
+color body brightyellow blue '\<v(4|6)\>'
+# color body brightyellow default '\<v(ersion)??[0-9][.][0-9.]+'
+color body brightmagenta default '\<v[.]?[0-9]+[.][0-9]+[.][0-9]+'
+color body blue brightmagenta '\<win(do(ze|of)|zigweich)[- ]?(3[.]11|95|98|9x|nt|2k|2000|me|xp|7|10)?\>'
+color body black brightmagenta '\<windows[- ]?(3[.]11|95|98|9x|nt|2k|2000|me|xp|7|10)\>'
+color body black white '\[ +\]'
+color body brightred default '\[[0-9]?[0-9]\]'
+color body brightgreen default '\[[^]]+\]'
+color body white red '\[expires: 20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]\]'
+color body brightyellow default '\[tm\]'
+color body brightyellow default '\[x\]'
+color body magenta default '\\\$\{prefix\}'
+color body white blue '\\\<[a-z]+\>\(\{.*\}\)?'
+color body brightgreen default '\^(down|end|home|up)'
+color body black brightyellow '\^_?\^'
+color body brightyellow magenta '\{[bdDgGhnHNpqx;!=]+\}'
+color body green default '\|\|'
+color body brightblue default '^ *# '
+color body blue default '^ *% .*'
+color body yellow default '^ *\<(an|von|betreff|datum|verschickt|gesendet|antwort an|liste|grund):'
+color body yellow default '^ *\<(date|from|subject|cc|to|reply-to|newsgroups|organization):'
+color body green default '^! .*'
+color body green default '^# examples?:'
+color body black white '^(wann|wer|wo):'
+color body brightyellow default '^- add[a-z]*'
+color body brightyellow default '^- cha[a-z]*'
+color body brightyellow default '^- fix[a-z]*'
+color body brightyellow default '^- imp[a-z]*'
+color body brightyellow default '^- typ[a-z]*'
+color body yellow default '^-+ *forwarded message *-+'
+color body yellow default '^-+ *mail original *-+'
+color body yellow default '^-+ *original message *-+'
+color body yellow default '^-+ *original-nachricht *-+'
+color body yellow default '^-+ *ursprÃ¼ngliche (mitteilung|nachricht) *-+'
+color body yellow default '^-+ *weitergeleitete nachricht *-+'
+color body blue default '^-+<'
+color body white magenta '^==[1-9]{4,6}=='
+color body brightgreen default '^=[a-zA-Z0-9+\/]{4}$'
+color body brightgreen default '^> > [^>]*'
+color body brightblue default '^> [^>]*'
+color body black yellow '^Comment: .*"
+color body black yellow '^Version: .*"
+color body black white '^X-[-a-zA-Z0-9]:'
+color body brightwhite default '^[(]?[0-9]+[)] '
+color body white green '^[*][*][^*]*[*][*] *$'
+color body white red '^[> ]*[.*] *$'
+color body brightred default '^[^ ]+[.]diff'
+color body magenta default '^[^ ]+[.]patch'
+color body brightyellow red '^[a-zA-Z0-9+\/]{1,63}=+$'
+color body brightyellow red '^[a-zA-Z0-9+\/]{64}$'
+color body brightmagenta default '^[a-z_]+ [a-z_]+[:!]'
+color body brightyellow default '^[a-z_]+[:!] +'
+color body brightyellow default '^[a-z_]+[:!]$'
+color body brightyellow magenta '^[â€” ]{5,}$'
+color body green default '^\*[^:]+:\*'
+color body green default '^\+ .*'
+color body green default '^\+$'
+color body brightyellow blue '^\[.*\]$'
+color body brightgreen default '^â”ƒ .*'
+color body brightred default '_[-a-z0-9]+_'
+color body brightgreen default 'bitcoin'
+color body black brightwhite 'call for (lecture|maker|paper|talk|workshop)s?'
+color body brightgreen default 'creative commons'
+color body brightmagenta default 'crypto *(advent|engel|party|parties)'
+color body brightyellow magenta 'cybe+r+'
+color body black magenta 'cyber ?(security)'
+color body black magenta 'cyber[a-z]+'
+color body brightyellow blue 'depth: *[0-9]+'
+color body brightyellow magenta 'diesmal leider nicht'
+color body brightyellow default 'free *and *open ?source'
+color body brightblue default 'free ?code ?camp'
+color body brightgreen default 'geheimer *schlÃ¼ssel'
+color body magenta default 'https?://[^ ]+\.asc'
+color body white red 'https?:/[^/]'
+color body brightyellow blue 'in das Programm.*geschafft hat'
+color body brightblue default 'internet ?of ?things'
+color body brightgreen default 'kanal *[0-9]+'
+color body magenta default 'lib[-a-z0-9]+[0-9]'
+color body brightyellow magenta 'linux ?user ?group'
+color body brightyellow magenta 'lx(app|button|clipboard|input|launcher|lock|panel|polkit|session|shortcut|term)'
+color body red default 'mac ?os ?x?'
+color body brightred default 'mailto:[^ ]+(\?subject=[^ ]+)?'
+color body brightyellow magenta 'maker? ?faire ?(berlin|dortmund|friedrichshafen|hann?over|munich|mÃ¼nchen|newcastle|vienna|wien)'
+color body brightgreen default 'maker? ?faire'
+color body brightgreen default 'news:[a-z.]+\>'
+color body brightgreen default 'open (source)? ?\<(data|education|hardware|software)\>'
+color body black white 'p[.] *s[.]'
+color body green default 'postfach *[0-9 ]+'
+color body brightred default 'priv(ater)? *schlÃ¼ssel'
+color body brightred default 'private *key'
+color body brightgreen default 'pub(lic)? *key'
+color body brightmagenta default 'raid *[1-6]'
+color body brightgreen default 'rfc ?[0-9]+'
+color body brightred default 'sec(ret)? *key'
+color body brightred default 'seite *[0-9]+'
+color body brightyellow yellow 'signed: *[0-9]+'
+color body white brightgreen 'social event'
+color body brightmagenta default 'telnet'
+color body black brightwhite 'tor (exit)? nodes?'
+color body black white 'trappist(en)?'
+color body brightyellow magenta 'trust: *[0-9]+-, [0-9]+q, [0-9]+n, [0-9]+m, [0-9]+f, [0-9]+u'
+color body yellow red 'ubuntu( *[01][0-9][.](04|10))?( *lts)?'
+color body brightyellow red 'valid: *[0-9]+'
+color body green default 'web(seite|site|server|space)'
+color body black brightmagenta 'win(dows?)?(95(se)?|nt|2000|2k|xp)'
+color body cyan default 'www[.][-.a-z0-9]+[.][a-z]{2,}([-_./~a-z0-9]+)?'
+color body brightyellow cyan 'x86_64'
+color body white red 'zvr ?(nummer)?:? [0-9 ]+'
+color body brightgreen default '~/[^ ]+'
+color body brightred default '~/[^ ]+/'
+color body brightwhite magenta 'Â§+ *[0-9.]+( *abs[.]? *[0-9])?'
+color body brightred default 'Â».+Â«'
+color body brightyellow default 'â˜º'
+color body brightred default 'â€º.+â€¹'
+color body color231 default (^|[[:space:]])/[^[:space:]]+/([[:space:]]|$) # /italic/ text
+color body color231 default (^|[[:space:]])\\*[^[:space:]]+\\*([[:space:]]|$) # *bold* text
+color body color231 default (^|[[:space:]])_[^[:space:]]+_([[:space:]]|$) # _underlined_ text
+color body brightblue black (https?|ftp)://[\-\.,/%~_:?&=\#a-zA-Z0-9]+
+color body color181 default (https?|ftp)://[\-\.,/%~_:?&=\#a-zA-Z0-9]+
+color body color228 default (https?|ftp)://[\-\.,/%~_:?&=\#a-zA-Z0-9]+ # URLs
+color body yellow black (ht|f)tp://[-0-9A-Za-z_/.~:\#%@]*[0-9A-Za-z_/\#%]
+color body brightyellow black [-0-9A-Za-z_%.]+@[-0-9A-Za-z_.]*[A-Za-z]
+color body brightred black [\-\.+_a-zA-Z0-9]+@[\-\.a-zA-Z0-9]+
+color body red black [\-\.+_a-zA-Z0-9]+@[\-\.a-zA-Z0-9]+
+color body color231 default [\-\.+_a-zA-Z0-9]+@[\-\.a-zA-Z0-9]+ # email addresses
+# color body black brightgreen \
+
+# color body black red \
+# color body black white \
+# color body brightcyan default \
+# color body brightgreen default \
+# color body brightmagenta default \
+# color body brightred default \
+# color body brightyellow blue \
+# color body brightyellow default \
+# color body brightyellow red \
+# color body green default \
+# color body magenta default \
+# color body white blue \
+# color body white red \
+# color body yellow blue \
+# color body yellow red \
+# color body red black "(BAD signature)"
+# color body cyan black "(Good signature)"
+# color body brightyellow black "^gpg: "
+# color body black brightyellow '(public )?key (ID)? (0x)?[0-9a-f]{40}'
+# color body color160 color0 "(BAD signature)"
+# color body color37 color0 "(Good signature)"
+# color body color0 color0 "^gpg: Good signature .*"
+# color body color241 color160 "^gpg: BAD signature from.*"
+# color body color254 color160 "^gpg: BAD signature from.*"
+# color body color235 color233 "^gpg: Good signature .*"
+# color body color160 color234 "(BAD signature)"
+# color body color37 color234 "(Good signature)"
+# color body color167 color234 "^gpg: BAD signature from"
+# color body color167 color234 "^gpg: Can't.*$"
+# color body color234 color234 "^gpg: Good signature .*"
+# color body color142 color234 "^gpg: Good signature from"
+# color body color115 color236 "^gpg: BAD signature.*"
+# color body color188 color237 "^gpg: Good signature.*"
+# color body red default "(BAD signature)"
+# color body cyan default "(Good signature)"
+# color body brightyellow default "^gpg: "
+# color body brightblack default "^gpg: Good signature .*"
+# color body brightred default '\<(macos|windows)\>'
+# color body brightred default '^gpg:'
+# color body blue default (https?|ftp)://[\-\.,/%~_:?&=\#a-zA-Z0-9]+
+# color body black white '(public )?key (ID)? (0x)?[0-9a-f]{8}'
+# color body magenta white 'tl.dr'
+# color body black yellow '(ab|am|an|bis|gegen|um) *([01][0-9]|2[0-4])([.:][0-5][0-9])( *(h|uhr))?"
+# color body black yellow '(ab|am|an|bis|gegen|um) *([01][0-9]|2[0-4])([.:][0-5][0-9])?( *(h|uhr))"
+# color body black yellow '(ab|am|an|bis|gegen|um) *([01][0-9]|2[0-4])([.:][0-5][0-9])?( *(h|uhr))?"
+# color body blue yellow '\<win(do(ze|of)|zigweich)[- ]?(3[.]11|95|98|9x|nt|2k|2000|me|xp|7|10)?\>'
+
+color bold black default
+# color bold brightblack black
+# color bold color229 color234
+# color bold color235 color0
+# color bold color235 color234
+# color bold color255 color233
+# color bold green default # bold text
+
+color compose header color223 color234
+color compose security_both color142 color234
+color compose security_encrypt color175 color234
+color compose security_none color208 color234
+color compose security_sign color109 color234
+
+color error brightred default
+# color error color0 color9
+# color error color115 color236
+# color error color160 color234
+# color error color167 color234
+# color error color196 color235 # message line error text
+# color error color231 color160
+# color error color231 color212
+# color error color30 color232
+# color error color30 color234
+# color error color30 default
+# color error red black
+# color error red color0
+# color error red default
+
+color hdrdefault brightcolor222 color235
+# color hdrdefault brightgreen black
+# color hdrdefault color117 default
+# color hdrdefault color223 color237
+# color hdrdefault color23 color229
+# color hdrdefault color240 color0
+# color hdrdefault color240 color234
+# color hdrdefault color246 color234
+# color hdrdefault color30 color233
+# color hdrdefault color8 color0 # Default color of the message header in the pager.
+# color hdrdefault cyan default
+
+color header black blue "X-Mailer:.*iPhone Mail"
+color header black green "^bcc: [^ ]"
+color header black green "^cc: [^ ]"
+color header yellow black "X-MSMail-Priority: "
+color header yellow black "x-priority: "
+color header yellow default "^cc:"
+
+# color index black brightyellow '~f guckes ~p'
+color index black green "~C keysigning@"
+# color index black magenta "~h'^x-envelope-to: <pgp@guckes.net>' !~C pgp@ !~skey"
+color index black magenta "~h'^x-envelope-to:.*keysigningparty@' !~Cparty@ !~skey"
+color index black red "~D" # Deleted messages
+color index black red "~h '^User-Agent: KMail'"
+color index yellow default "~F" # Flagged messages
+color index yellow green "~C pgp@"
+color index yellow red "~C lms@tfh-berlin.de" # 2006-04-21
+
+color index_author brightred black "~N"
+# color index_author default color234 '.*'
+# color index_author red black '.*'
+# color index_author red default '.*'
+
+color index_collapsed default brightblue
+
+color index_date brightcolor244 color235
+# color index_date green default
+
+color index_flags brightcolor239 color235 %A
+# color index_flags color253 default %A
+# color index_flags default red '~F'
+
+color index_label default brightgreen
+
+color index_number blue black
+# color index_number blue default
+# color index_number red default
+
+color index_size cyan default
+# color index_size green default
+
+color index_subject cyan black '.*'
+# color index_subject cyan default '.s'
+
+color indicator black white
+# color indicator brightcolor232 color154 # selected email in index
+# color indicator brightwhite blue
+# color indicator color0 color136
+# color indicator color108 color236
+# color indicator color15 color06
+# color indicator color15 red
+# color indicator color22 color185
+# color indicator color223 color237
+# color indicator color226 default
+# color indicator color230 color238
+# color indicator color231 color241
+# color indicator color234 color136
+# color indicator color236 color248
+# color indicator color7 color237
+# color indicator cyan brightblack
+
+color markers brightcolor232 color222 # wrapped-line /^\+/ markers
+# color markers color138 color230
+# color markers color138 color232
+# color markers color138 default
+# color markers color142 color238
+# color markers color160 color254
+# color markers color210 default
+# color markers color243 color234
+# color markers green default
+# color markers red black
+# color markers red color0 # The + at the beginning of wrapped lines in the pager.
+# color markers red default
+# color markers red white
+
+color message brightcyan default
+# color message color231 color166
+# color message color253 color234
+# color message color37 color0
+# color message color37 color234
+# color message color50 color232
+# color message color50 default
+# color message color82 color235
+# color message cyan black
+# color message default default
+# color message white blue
+# color message white color0
+
+color normal black white
+# color normal brightwhite black
+# color normal color188 color237
+# color normal color22 color230
+# color normal color223 color234
+# color normal color241 color234
+# color normal color244 color0
+# color normal color244 color233
+# color normal color244 color234
+# color normal color250 default
+# color normal color253 color234 # mod
+# color normal color254 color0
+# color normal color35 color232
+# color normal default default
+# color normal white color0
+# color normal white color232
+# color normal white color235
+# color normal white default
+
+color progress white red
+
+color prompt default default
+# color prompt white color0
+
+color quoted blue default
+# color quoted brightcolor250 default
+# color quoted brightyellow default
+# color quoted color107 color232 # quoted text
+# color quoted color107 color234 # quoted text
+# color quoted color107 default # quoted text
+# color quoted color108 color237
+# color quoted color19 color230 # quoted text
+# color quoted color250 color234
+# color quoted color33 color0
+# color quoted color33 color234
+# color quoted color39 color235
+# color quoted color61 default
+# color quoted color8 color0
+# color quoted cyan default # pager body
+# color quoted green black
+
+color quoted1 blue black
+# color quoted1 brightmagenta default
+# color quoted1 color108 color234
+# color quoted1 color116 color237
+# color quoted1 color117 default
+# color quoted1 color165 color235
+# color quoted1 color37 color0
+# color quoted1 color37 color234
+# color quoted1 color66 color232
+# color quoted1 color66 color234
+# color quoted1 color66 default
+# color quoted1 color8 color0
+# color quoted1 color88 color230
+# color quoted1 red default # pager body
+
+color quoted2 brightcyan default
+# color quoted2 color136 color0
+# color quoted2 color136 color234
+# color quoted2 color247 color237
+# color quoted2 color250 color234
+# color quoted2 color32 color232
+# color quoted2 color32 color234
+# color quoted2 color32 default
+# color quoted2 color39 color235
+# color quoted2 color55 color230
+# color quoted2 color8 color0
+# color quoted2 color84 default
+# color quoted2 cyan black
+# color quoted2 cyan default # pager body
+
+color quoted3 color108 color234
+# color quoted3 color108 color237
+# color quoted3 color16 color230
+# color quoted3 color160 color0
+# color quoted3 color160 color234
+# color quoted3 color215 default
+# color quoted3 color222 color235
+# color quoted3 color30 color232
+# color quoted3 color30 color234
+# color quoted3 color30 default
+# color quoted3 color8 color0
+# color quoted3 yellow black
+# color quoted3 yellow default # pager body
+
+color quoted4 color116 color237
+# color quoted4 color166 color0
+# color quoted4 color166 color234
+# color quoted4 color166 color235
+# color quoted4 color212 default
+# color quoted4 color250 color234
+# color quoted4 color52 color230
+# color quoted4 color8 color0
+# color quoted4 color99 color232
+# color quoted4 color99 color234
+# color quoted4 color99 default
+# color quoted4 red black
+
+color quoted5 brightred black
+# color quoted5 color108 color234
+# color quoted5 color24 color230
+# color quoted5 color247 color237
+# color quoted5 color36 color232
+# color quoted5 color36 color234
+# color quoted5 color36 default
+# color quoted5 color8 color0
+
+color quoted6 color108 color237
+# color quoted6 color114 color232
+# color quoted6 color114 color234
+# color quoted6 color114 default
+# color quoted6 color8 color0
+# color quoted6 color96 color230
+
+color quoted7 color109 color232
+# color quoted7 color109 color234
+# color quoted7 color109 default
+# color quoted7 color116 color237
+# color quoted7 color235 color230
+# color quoted7 color8 color0
+
+color quoted8 color130 color230
+# color quoted8 color247 color237
+# color quoted8 color41 color232
+# color quoted8 color41 color234
+# color quoted8 color41 default
+# color quoted8 color8 color0
+
+color quoted9 color108 color237
+# color quoted9 color138 color232
+# color quoted9 color138 color234
+# color quoted9 color138 default
+# color quoted9 color26 color230
+# color quoted9 color8 color0
+
+color search brightmagenta color236
+# color search brightred default
+# color search color100 color232
+# color search color100 default
+# color search color21 color215
+# color search color232 color154 # search patterns in pager
+# color search color234 color208
+# color search color61 color0
+# color search color61 color234
+# color search color84 default
+# color search default magenta
+# color search white blue
+
+color sidebar_divider brightblack black
+# color sidebar_divider color250 color234
+# color sidebar_divider color8 default
+
+color sidebar_flagged red black
+# color sidebar_flagged red default
+
+color sidebar_highlight red black
+# color sidebar_highlight white color141
+# color sidebar_highlight white color238
+
+color sidebar_indicator default color17
+
+color sidebar_new color142 color234
+# color sidebar_new cyan black
+# color sidebar_new green default
+
+color sidebar_ordinary default default
+
+color sidebar_spoolfile yellow default
+
+color signature brightgreen black
+# color signature color102 color234
+# color signature color108 color234
+# color signature color212 default
+# color signature color223 color237
+# color signature color240 color0
+# color signature color240 color230
+# color signature color240 color234
+# color signature color70 color232
+# color signature color70 default
+# color signature color8 color0
+# color signature color81 color235 # everything below /^--\s*$/
+# color signature cyan default
+# color signature red default # pager body
+# color signature white default
+
+color status black blue
+# color status brightcolor232 color39
+color status brightred default '\([^)]+/[^)]+\)'
+# color status red default '\[([^]]+)\]' 1
+color status brightred white '(New|Del|Flag):[0-9]+'
+# color status brightwhite blue
+color status brightwhite default 'NeoMutt: ([^ ]+)' 1
+# color status color03 default #color132
+# color status color101 color16
+# color status color141 color236
+# color status color144 color234
+# color status color233 color214
+# color status color234 color250
+# color status color241 color235
+# color status color248 color236
+# color status color254 color235
+# color status color48 color235
+# color status default brightblack
+color status default default '\(threads/last-date-received\)'
+# color status white blue
+# color status white color234
+
+color tilde blue default
+# color tilde blue default # pager body
+# color tilde brightblue black
+# color tilde color108 color237
+# color tilde color130 color230
+# color tilde color130 color232
+# color tilde color130 color235
+# color tilde color130 default
+# color tilde color231 default
+# color tilde color235 color0
+# color tilde color235 color234
+# color tilde color243 color234
+# color tilde color81 color233 # vi-like tildes marking blank lines
+# color tilde default color0 # Used to pad blank lines in the pager.
+# color tilde white default
+# color tilde yellow default
+
+color tree brightcolor165 color233 # arrow in threads (`-->')
+# color tree color109 color237
+# color tree color136 color0 # arrow in threads
+# color tree color136 color230
+# color tree color136 color234 # arrow in threads
+# color tree color141 default
+# color tree color142 color234
+# color tree color208 color234
+# color tree color23 color232
+# color tree color23 default
+# color tree color238 color235
+# color tree color238 default
+# color tree default color0
+# color tree green default# Color if the attachment is autoviewed
+# color tree green default#███╗ ███╗ ██████╗ ███╗ ██╗███████╗████████╗ █████╗ ██████╗
+# color tree red black
+# color tree red default
+
+color underline black default
+# color underline brightblack black
+# color underline color223 color239
+# color underline color233 color244
+# color underline color235 color0
+# color underline color235 color234
+# color underline yellow default # underlined text
+
+# mono body bold "^gpg: BAD signature from.*"
+# mono body bold "^gpg: Good signature"
+
+# mono bold bold
+# mono error bold
+# mono header bold "^(From|Subject|Date|To|Cc|Bcc):"
+# mono indicator reverse
+# mono quoted bold
+
+# mono underline underline
+

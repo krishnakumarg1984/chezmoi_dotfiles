@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>EnvironmentVariables</key>
+        <dict>
+            <key>PATH</key>
+            <string>/Users/krishna/miniconda3/bin:/Users/krishna/miniconda3/condabin:/Users/krishna/node-v12.16.1-darwin-x64/bin:/Users/krishna/sw_src/spack/bin:/Users/krishna/bin:/Users/krishna/go/bin:/Users/krishna/.go/bin:/Users/krishna/.cargo/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/TeX/texbin:/opt/X11/bin:/Library/Apple/usr/bin:/Users/krishna/.fzf/bin</string>
+        </dict>
+        <key>Label</key>
+        <string>com.zerowidth.launched.duplicacy-scheduled</string>
+        <key>ProgramArguments</key>
+        <array>
+            <string>/Users/krishna/go/bin/duplicacy-util</string>
+            <string>-f</string>
+            <string>macos_downloads_duplicacy_config</string>
+            <string>-a</string>
+            <string>-q</string>
+        </array>
+        <key>RunAtLoad</key>
+        <false/>
+        <key>StartCalendarInterval</key>
+        <array>
+            <dict>
+                <key>Hour</key>
+                <integer>0</integer>
+                <key>Minute</key>
+                <integer>5</integer>
+            </dict>
+            <dict>
+                <key>Hour</key>
+                <integer>20</integer>
+                <key>Minute</key>
+                <integer>15</integer>
+            </dict>
+        </array>
+    </dict>
+</plist>

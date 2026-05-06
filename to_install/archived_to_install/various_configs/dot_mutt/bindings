@@ -1,0 +1,278 @@
+# vim: ft=neomuttrc
+
+bind attach <Esc>e noop    # Normally <resend-message>.
+bind attach f noop         # Normally <forward-message>.
+bind index,pager,attach , noop
+bind index,pager ,f forward-message
+bind attach v noop         # Normally <collapse-parts>; we could potentially use <tab> instead.
+
+bind generic = noop        # Normally <first-entry>.
+bind attach,browser,editor,generic,index,pager g noop
+# bind attach,index,pager g noop
+bind attach,browser,index,generic gg noop
+bind attach,browser,index,generic gg first-entry
+bind index ^ noop
+bind pager ^ noop          # Normally <top>, which we have bound to gg.
+bind pager gg top
+# bind browser gg top-page
+
+bind generic * noop        # Normally <last-entry>.
+bind generic,pager,editor,index G noop
+bind attach,browser,index,generic G last-entry
+bind pager G bottom
+
+bind generic Z noop
+bind generic z noop        # Normally <next-page>.
+bind attach,browser,index,pager \CF next-page
+bind generic,pager,editor,index \b noop
+bind attach,index,pager \b bounce-message
+# bind attach,index,pager b previous-page #  Normally <bounce-message>, but we use \b for that.
+bind index <BackSpace> previous-page
+bind attach,browser,index,pager \CB previous-page
+
+bind generic ] noop        # Normally <half-down>.
+bind attach,browser,pager,index,generic \Cd half-down
+
+bind generic [ noop        # Normally <half-up>.
+bind attach,browser,pager,index,generic \Cu half-up
+
+# bind attach,compose,index,pager | noop  # Normally <pipe-entry> or <pipe-message>.;w
+bind index,pager | noop                   # Normally <pipe-entry> or <pipe-message>.;w
+bind attach,index L bottom-page           # Normally <list-reply>.
+bind index l display-message
+bind attach,compose l view-attach
+bind browser,generic l select-entry
+bind pager l view-attachments
+
+bind attach m noop                        # Normally <view-mailcap>, which we have bound to <return>.
+bind attach <return> view-mailcap
+bind attach <enter> view-mailcap
+# bind attach l view-mailcap
+macro attach ,l "<pipe-entry>lynx -stdin -force_html<enter>"
+
+bind attach,index,pager H display-toggle-weed
+
+bind attach,index,pager <Esc>P noop       # Normally <check-traditional-pgp>.
+bind compose p postpone-message
+bind index p recall-message
+bind index,pager P parent-message
+
+bind compose \et edit-to
+
+bind generic > noop                       # Normally <next-line>.
+bind browser,index,pager,generic \Ce next-line
+bind pager <down> next-line
+bind pager j next-line
+bind pager \005 next-line                 # Mouse wheel
+
+bind generic < noop                       # Normally <previous-line>.
+bind pager <BackSpace> noop               # Normally <previous-line>.
+bind browser,index,pager,generic \Cy previous-line
+bind pager <up> previous-line             # scroll inside the message rather than the index
+bind pager k previous-line                # scroll inside the message rather than the index
+bind pager \031 previous-line             # Mouse wheel
+
+bind browser,attach j next-entry
+bind browser,attach k previous-entry
+bind index \ej next-undeleted
+bind index \ek previous-undeleted
+
+bind attach,index,pager \CK noop          # Normally <extract-keys>.
+bind attach,pager i noop                  # Normally <ispell> on attach. Normally <exit> on pager, but that is also bound to q.
+bind index,pager s noop
+bind browser S unsubscribe
+bind browser,pager,index N search-opposite
+bind editor <backspace> backspace
+bind editor <delete> delete-char
+bind editor <space> noop                  # So line-editor can accept folders with spaces in their names.
+
+bind editor <Tab> complete-query
+bind index <tab> sync-mailbox
+
+# bind index \Ct next-tagged
+bind index,pager \t next-unread
+bind index,pager ,\t previous-unread
+bind editor \CT complete
+bind editor ^T complete
+bind pager T noop                         # Normally <toggle-quoted>.
+bind generic,pager t noop
+macro index t <sync-mailbox><change-folder>?<tab> "Go to the folder menu"
+macro generic,index $ "<enter-command>unset wait_key<enter><sync-mailbox>\
+bind index <Esc>t noop                    # Normally <tag-thread>, which we have bound to t.
+bind generic \; noop                      # Normally <tag-prefix>.
+
+bind generic,index x tag-entry
+bind pager x tag-message
+
+bind generic zb current-bottom
+bind generic zt current-top
+bind generic zz current-middle
+
+bind generic,alias,attach,browser,editor,index,compose,pager,pgp,postpone ':' noop
+bind index % noop                         # Normally <toggle-write>.
+bind index . noop
+bind index <esc>L limit-current-thread
+
+bind index <Esc><Tab> noop                # Normally <previous-new-then-unread>.
+bind index <Backtab> previous-new-then-unread
+
+bind pager,index d noop
+bind pager,index dd delete-message
+# bind index D delete-message
+bind pager,index D purge-message
+# bind index D delete-pattern
+bind index U undelete-message
+
+bind attach,pager u exit
+bind attach,pager h exit
+bind browser h goto-parent
+
+bind editor \Cp history-up
+bind index,pager \Cp sidebar-prev
+bind editor \Cn history-down
+bind index,pager \Cn sidebar-next
+
+bind index,pager <right> sidebar-open
+bind index,pager \Co sidebar-open
+bind index,pager B sidebar-toggle-visible
+# bind index,pager <up> sidebar-prev
+# bind index,pager <down> sidebar-next
+# bind index,pager <F3> sidebar-page-up
+# bind index,pager <F4> sidebar-page-down
+# bind index,pager <F5> sidebar-prev-new
+
+bind index,pager @ compose-to-sender
+bind index,pager \ey edit-label
+bind index,pager c noop
+bind generic,pager,editor,index \f noop
+bind index F search
+bind pager F flag-message
+bind index,pager O edit
+bind attach r noop                        # Normally <reply>.
+# bind index,pager R group-reply
+bind index,pager ,r reply
+bind index,pager ,g group-reply
+bind index \031 previous-undeleted        # Mouse wheel
+bind index \005 next-undeleted            # Mouse wheel
+bind index,pager w noop                   # Normally <set-flag>.
+bind pager Q noop                         # Normally <quit>.
+
+bind index <Esc>v noop                    # Normally <collapse-thread>
+bind index <space> collapse-thread
+bind index - collapse-thread
+# bind index za collapse-thread
+bind index <Esc>V noop                    # Normally <collapse-all>.
+bind index _ collapse-all
+bind index zA collapse-all                # Missing :folddisable/foldenable
+# bind index g- collapse-all
+bind pager,index dt delete-subthread
+bind pager,index dT delete-thread
+bind pager,index gt noop
+bind pager,index gt next-thread
+bind pager,index gT noop
+bind pager,index gT previous-thread
+
+# Sync all email
+macro index,pager \eS "<shell-escape>mbsync -a<enter>" "run mbsync to sync all mail"
+
+# call urlscan to extract URLs out of a message
+macro attach,compose \cu "<pipe-entry> urlscan -cd<Enter>"
+macro index,pager \cu "<pipe-message> urlscan<Enter>"
+
+# Save all attachments
+macro attach \ea <save-entry><kill-line>~/Downloads/attachments/<enter>
+macro index,pager ,h "<view-attachments><search>html<enter><view-mailcap><exit>"
+macro index,pager V "<view-attachments><search>html<enter><view-mailcap><exit>"
+macro index,pager ,l "<view-attachments><search>html<enter>,l"
+macro index ,/ "<vfolder-from-query>" "Search mailbox"
+
+macro index h '<change-folder>?'
+macro index ,c "<change-vfolder>?" "Change to vfolder overview"
+macro index c "<change-folder>?<toggle-mailboxes>" "open a different folder"
+macro pager c "<change-folder>?<toggle-mailboxes>" "open a different folder"
+macro index C "<copy-message>?<toggle-mailboxes>" "copy a message to a mailbox"
+macro index M "<save-message>?<toggle-mailboxes>" "move a message to a mailbox"
+macro index \eM "<tag-thread><tag-prefix><save-message>?/" "move thread to mailbox"
+macro index ,m "<tag-prefix>w?" "Move tagged messages"
+macro attach W "<save-message>~/downloads/mails/<enter>y"
+macro attach z "<pipe-message>zathura -<enter>"
+
+# macro   index   q       '<change-folder>?<toggle-mailboxes>'
+# macro   browser q       '<exit><quit>'
+macro generic,browser,pager ,q ":set quit=yes\nqqy" "Quit mutt without asking"
+macro index ,q ":set quit=yes\nqy" "Quit mutt without asking"
+
+# https://unix.stackexchange.com/questions/108485/send-email-written-in-markdown-using-mutt
+# https://github.com/neomutt/neomutt/issues/587
+macro compose \e5 "F pandoc -s -f markdown -t html <enter>y^T^Utext/html; charset=utf-8<enter>"
+# macro compose \e6 "| pandoc -o /tmp/neomutt-alternative.html<enter> \
+#           <attach-file>/tmp/neomutt-alternative.html<enter> \
+#           <tag-entry><previous-entry><tag-entry><group-alternatives>"
+
+macro index .F "<limit>~F<Enter>" "view flagged messages"
+macro index .a "<limit>~A<Enter>" "view all messages"
+macro index .d "<limit>~D<Enter>" "view deleted messages"
+macro index .f "<limit>~f " "view from…"
+macro index .n "<limit>(~N)<Enter>" "view new messages"
+macro index .t "<limit>~T<Enter>" "view tagged messages"
+macro index .u "<limit>(~U|~N)<Enter>" "view unread messages"
+macro index L "<enter-command>unset wait_key<enter> \
+
+# # https://gitlab.com/muttmua/mutt/-/wikis/UseCases/UsingTmuxOrScreen
+# macro index,pager m ":set my_old_editor=$editor<enter>:set editor=muttedit<enter><compose>:set editor=$my_old_editor<enter>" "compose a new message"
+# macro index,pager r ":set my_old_editor=$editor<enter>:set editor=muttedit<enter><reply>:set editor=$my_old_editor<enter>" "reply to sender"
+# macro index,pager g ":set my_old_editor=$editor<enter>:set editor=muttedit<enter><group-reply>:set editor=$my_old_editor<enter>" "reply to all recipients"
+# macro index,pager L ":set my_old_editor=$editor<enter>:set editor=muttedit<enter><list-reply>:set editor=$my_old_editor<enter>" "reply to mailing list address"
+#
+# set autoedit=yes
+# set edit_headers=yes
+
+# source ~/.mutt/sort-threads.rc
+
+# bind index L limit
+# bind index,pager V noop                 #  Unbinds V from version
+# bind attach,index,pager p noop # Normally <print-entry> or <print-message>. #
+# bind attach,index,pager \CE noop        #  Normally <edit-type>.
+# bind index <tab> next-unread
+# bind pager c imap-fetch-mail
+
+#  macro index p "<display-toggle-weed> <print-message> <display-toggle-weed> <exit>"
+# macro index,pager H view-mailcap
+# macro index,pager \ea "<pipe-message>ripmime -i - -d ~/Downloads && rm ~/Downloads/textfile* >/dev/null 2>&1" "Save all non-text attachments using ripmime"
+
+# macro compose ,m \
+# "<enter-command>set pipe_decode<enter>\
+# <pipe-message>pandoc -f gfm -t plain -o /tmp/msg.txt<enter>\
+# <pipe-message>pandoc -s -f gfm -t html5 -o /tmp/msg.html<enter>\
+# <enter-command>unset pipe_decode<enter>a^U/tmp/msg.txt\n^Da^U/tmp/msg.html\n^D^T^Utext/html; charset=utf-8\n=DTT&d^U\n" \
+# "Convert markdown gfm to HTML and plain"
+
+# Press A to add contact to Khard address book
+# macro index,pager A \
+#     "<pipe-message>khard add-email<return>" \
+#     "add the sender email address to khard"
+
+# macro index,pager A \
+#     "<pipe-message>abook add | xargs abook edit<enter>" \
+#     "add the sender address"
+
+# https://gideonwolfe.com/posts/workflow/neomutt/intro/
+# ## Shortcuts
+# macro index,pager <f2> '<sync-mailbox><enter-command>source ~/.config/neomutt/accounts/gmail<enter><change-folder>!<enter>'
+# macro index,pager <f3> '<sync-mailbox><enter-command>source ~/.config/neomutt/accounts/work_ucl_account<enter><change-folder>!<enter>'
+# macro index,pager <f4> '<sync-mailbox><enter-command>source ~/.config/neomutt/accounts/school<enter><change-folder>!<enter>'
+# message-hook . 'macro index,pager \cb ,b "URL viewer"'
+# message-hook ~G 'macro index,pager \cb ,B "URL viewer"'
+# macro index gd "<change-folder>=Drafts<enter>" "Go to drafts"
+# macro index gi "<change-folder>=INBOX<enter>" "Go to inbox"
+# macro index gt "<change-folder>=Trash<enter>" "Go to trash"
+#  macro index gj "<change-folder>=Junk<enter>" "Go to junk"
+#  macro index gs "<change-folder>=Sent<enter>" "Go to sent"
+
+# Save all attachments
+# macro index,pager a "<pipe-message>abook --add-email-quiet<return>" "Add this sender to Abook"
+# macro index,pager H view-mailcap
+
+# macro index s "<shell-escape>offlineimap -qf INBOX<enter>"
+# macro index S "<shell-escape>offlineimap<enter>"
+

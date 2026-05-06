@@ -57,7 +57,7 @@ zellij = "latest"               # A terminal workspace with batteries included. 
 "cargo:procs" = "latest"                                    # A modern replacement for ps. https://github.com/dalance/procs
 
 "github:ayoisaiah/f2" = "latest"  # F2 is a cross-platform command-line tool for batch renaming files and directories quickly and safely. Written in Go! https://github.com/ayoisaiah/f2
- 
+
 
 {{- if ne .chezmoi.hostname "blend" }}
 # zig = "latest"               # A general-purpose programming language and toolchain for maintaining robust, optimal and reusable software. https://mise.en.dev/lang/zig.html
@@ -84,9 +84,11 @@ typst = "latest"               # A new markup-based typesetting system that is p
 {{- if eq .chezmoi.hostname "doesnotexist" }}
 # To install in future
 # --------------------
+
 # act = "latest"                # Run GitHub Actions locally. https://github.com/nektos/act
 # actionlint = "latest"         # Static checker for GitHub Actions workflow files. https://github.com/rhysd/actionlint
 # age = "latest"                # A simple, modern and secure encryption tool (and Go library) with small explicit keys, no config options, and UNIX-style composability. https://github.com/FiloSottile/age
+# bibtex-tidy = "latest"        # Cleaner and Formatter for BibTeX files. https://www.npmjs.com/package/bibtex-tidy
 # biome = "latest"              # A toolchain for web projects, aimed to provide functionalities to maintain them. Biome offers formatter and linter, usable via CLI and LSP. https://github.com/biomejs/biome
 # ccache = "latest"             # A fast compiler cache. https://github.com/ccache/ccache
 # checkmake = "latest"          # Linter/analyzer for Makefiles. https://github.com/checkmake/checkmake
@@ -144,7 +146,7 @@ typst = "latest"               # A new markup-based typesetting system that is p
 # "gem:t-rex" = "latest"  # Terminal Rpn calculator EXperiment. https://github.com/isene/t-rex
 
 # "github:Han8931/gorae" = "latest"                                                                                      # Gorae (고래, whale) is a terminal-first TUI knowledge base for PDFs, EPUBs, and Markdown—fast browsing, solid metadata, instant full-text search, bidirectional links, and a built-in AI assistant—built as a Vim/CLI-friendly alternative to Zotero, Mendeley, Notion, and Obsidian. https://github.com/Han8931/gorae
-# "github:marcopaganini/rpn" = { version = "latest",  asset_pattern = "rpn_*_linux_386.tar.gz",  rename_exe = "gorpn" }  # A CLI RPN calculator in Go. 
+# "github:marcopaganini/rpn" = { version = "latest",  asset_pattern = "rpn_*_linux_386.tar.gz",  rename_exe = "gorpn" }  # A CLI RPN calculator in Go.
 # "github:ArshErgon/shuntcalc" = { version = "latest", rename_exe = "shuntcalc" }                                        # A smart terminal calculator with variables, REPL, and step-by-step RPN evaluation using the Shunting Yard algorithm — written in Rust. https://github.com/ArshErgon/shuntcalc
 # "github:gurgeous/vectro" = "latest"  # rpn calculator for your terminal. https://github.com/gurgeous/vectro
 

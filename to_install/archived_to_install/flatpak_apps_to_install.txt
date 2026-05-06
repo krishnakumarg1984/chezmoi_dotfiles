@@ -1,0 +1,13 @@
+BreakTimer   org.gnome.BreakTimer
+calibre      com.calibre_ebook.calibre
+Curtail      com.github.huluti.Curtail
+Foliate      com.github.johnfactotum.Foliate
+ImEditor     io.github.ImEditor
+LibreOffice  org.libreoffice.LibreOffice
+LibreWolf    io.gitlab.librewolf-community
+Mesa         org.freedesktop.Platform.GL.default
+Okular       org.kde.okular
+openh264     org.freedesktop.Platform.openh264
+VLC          org.videolan.VLC
+Zeal         org.zealdocs.Zeal
+Zoom         us.zoom.Zoom

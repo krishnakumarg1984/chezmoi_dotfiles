@@ -1,0 +1,5 @@
+aristocratos/btop
+mrtazz/checkmake
+Wilfred/difftastic
+Canop/dysk
+zyedidia/eget

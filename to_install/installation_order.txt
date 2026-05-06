@@ -1,0 +1,23 @@
+Edit /etc/locale.gen to include the desired locale and then run locale-gen as root user
+Install firefox profile by logging in
+Setup/copy the .ssh folder to ~/.ssh that contains my private key so that we can pull dotfiles from Github private repo
+-----------------------------------------------------------------------------------------------------------------------
+
+01. chezmoi on all machines (sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:$GITHUB_USERNAME/dotfiles.git). See ~/to_install/01_cli_tui_tools_to_install/02_darwin_linux_cli_tui_tools_to_install/01_darwin_linux_all_machines_cli_tui_to_install/00_curl_to_bash_all_machines_cli_tui_tools.txt
+02. Install webi brew (try on all *nixy machines, else localhost *nixy machines) (curl -sS https://webi.sh/brew | sh). See ~/to_install/01_cli_tui_tools_to_install/02_darwin_linux_cli_tui_tools_to_install/01_darwin_linux_all_machines_cli_tui_to_install/00_curl_to_bash_all_machines_cli_tui_tools.txt
+3a. nerd_font_name="VictorMono" bash <(curl -fsSL https://raw.githubusercontent.com/monoira/nefoin/main/install.sh). Needs fontconfig which is usually missing on default macOS installs
+3b. If 3a does not work, for VictorMono NF on Linux localhost only (brew bundle install --file= ~/to_install/01_cli_tui_tools_to_install/00_linux_only_cli_tui_tools/00_linux_only_localhost_cli_tui_tools_to_install/Brewfile_linux_only_local_host_cli_tui_tools_to_install.txt) and do a Symlink (if not already present) ~/.local/share/fonts to ~/.local/opt/brew/share/fonts
+04. Install Flatpak (on Linux localhost only) if not already installed in the base distro
+05. Install Flatpak apps (Linux localhost only). (cat ~/to_install/02_gui_tools_to_install/linux_only_gui_tools_localhost/flatpak_apps_to_install.txt | xargs -n1 flatpak install -y)
+06. Install Pixi (all OS, all machines). curl -fsSL https://pixi.sh/install.sh | PIXI_HOME="$HOME/.config/pixi" bash (for *nixy installation. Windows installation uses different syntax). See ~/to_install/01_cli_tui_tools_to_install/02_darwin_linux_cli_tui_tools_to_install/01_darwin_linux_all_machines_cli_tui_to_install/00_curl_to_bash_all_machines_cli_tui_tools.txt and do `pixi global sync`
+07. Install mise (curl https://mise.run | sh) and run `mise install`
+08. Install Rustup (all OS, all machines). curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh. See ~/to_install/01_cli_tui_tools_to_install/02_darwin_linux_cli_tui_tools_to_install/01_darwin_linux_all_machines_cli_tui_to_install/00_curl_to_bash_all_machines_cli_tui_tools.txt
+09. Install cargo-binstall (all OS, all machines). ~/to_install/01_cli_tui_tools_to_install/01_all_os_cli_tui_tools_to_install/01_all_os_all_machines_cli_tui_tools_to_install/02_cargo_packages_all_os_all_machines_to_install/01_cargo_to_install_from_src_all_os_all_machines.txt
+10. Now cargo binstall -y (all OS, all machines) useful rust packages. cat ~/to_install/01_cli_tui_tools_to_install/01_all_os_cli_tui_tools_to_install/01_all_os_all_machines_cli_tui_tools_to_install/02_cargo_packages_all_os_all_machines_to_install/02_cargo_binstall_all_os_all_machines.txt | xargs -n1 cargo binstall -y
+11. Install pipx packages (all OS, all machines). cat ~/to_install/01_cli_tui_tools_to_install/01_all_os_cli_tui_tools_to_install/01_all_os_all_machines_cli_tui_tools_to_install/04_pipx_all_os_all_machines_cli_tui_tools.txt | xargs -n1 pipx install
+12. Install some tools for *nix localhost machines only. brew bundle install --file=~/to_install/01_cli_tui_tools_to_install/02_darwin_linux_cli_tui_tools_to_install/00_darwin_linux_localhost_only_cli_tui_to_install/Brewfile_nixy_localhost.txt
+13. Install some tools for all *nix machines (cat ~/to_install/01_cli_tui_tools_to_install/02_darwin_linux_cli_tui_tools_to_install/01_darwin_linux_all_machines_cli_tui_to_install/01_cargo_binstall_all_nixy_machines.txt | xargs -n1 cargo binstall -y)
+14. Install more tools for all *nix machines (brew bundle install --file=~/to_install/01_cli_tui_tools_to_install/02_darwin_linux_cli_tui_tools_to_install/01_darwin_linux_all_machines_cli_tui_to_install/02_Brewfile_all_nixy_machines_cli_tui_tools.txt)
+15. Install TexLive (All OS, localhost only) (~/to_install/01_cli_tui_tools_to_install/01_all_os_cli_tui_tools_to_install/00_all_os_localhost_cli_tui_tools_to_install/01_other_packages_to_install.txt)
+16. Install remake if possible (all *nixy machines). Instructions given in the URL available on ~/to_install/01_cli_tui_tools_to_install/02_darwin_linux_cli_tui_tools_to_install/01_darwin_linux_all_machines_cli_tui_to_install/from_src_cli_tui_tools_all_machines_optional.txt
+17. Install a TUI display manager (linux localhost only).

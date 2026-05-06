@@ -1,0 +1,13 @@
+7zip
+clangd
+cpufetch
+gomi
+helm
+helmfile
+kind
+kubecolor
+marksman
+mise
+tenv
+tlrc
+zip

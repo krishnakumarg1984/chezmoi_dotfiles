@@ -1,0 +1,4 @@
+# vim:ft=ruby:
+
+brew "act"    # Run your GitHub Actions locally. Written in GoLang
+brew "c"      # Compile and execute C "scripts" in one go. Written in Shell script

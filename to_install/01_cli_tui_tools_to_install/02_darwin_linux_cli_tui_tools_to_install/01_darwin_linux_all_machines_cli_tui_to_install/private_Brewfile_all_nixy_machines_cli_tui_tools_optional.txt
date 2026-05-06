@@ -1,0 +1,9 @@
+# vim: ft=ruby:
+
+brew "cloud-provider-kind"  # Cloud provider for KIND clusters
+brew "nano"                 # Free (GNU) replacement for the Pico text editor. Written in C
+brew "otree"                # Command-line tool to view objects (JSON/YAML/TOML) in TUI tree widget. Written in Rust
+brew "translate-shell"      # Command-line translator using Google Translate and more
+
+
+# brew info $(git show HEAD~1 | grep "Formula/" | tail -n 1 | awk -F "/" '{print $NF}' | awk -F "." '{print $1}') | less

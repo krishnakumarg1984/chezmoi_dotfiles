@@ -1,0 +1,32 @@
+{
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "git.autofetch": true,
+    "editor.minimap.enabled": false,
+    "cmake.showOptionsMovedNotification": false,
+    "explorer.confirmDelete": false,
+    "terminal.integrated.enablePersistentSessions": false,
+    "terminal.integrated.shellIntegration.enabled": true,
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+            "path": "bash",
+            "icon": "terminal-bash",
+            "args": ["--login"]
+        },
+        "zsh": {
+            "path": "zsh"
+        },
+        "fish": {
+            "path": "fish"
+        },
+        "tmux": {
+            "path": "tmux",
+            "icon": "terminal-tmux"
+        },
+        "pwsh": {
+            "path": "pwsh",
+            "icon": "terminal-powershell"
+        }
+    },
+    "terminal.integrated.fontFamily": "VictorMono Nerd Font",
+    "terminal.integrated.fontWeight": "normal",
+}

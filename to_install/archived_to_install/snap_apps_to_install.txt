@@ -1,0 +1,15 @@
+asciinema
+bitwarden
+breaktimer
+chromium
+codium
+discord
+exercism
+fwupd
+languagetool
+lsd
+pinta
+slack
+teams
+vlc
+zoom-client

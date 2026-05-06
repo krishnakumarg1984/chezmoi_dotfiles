@@ -1,0 +1,2 @@
+sudo apt-add-repository ppa:flexiondotorg/quickemu && sudo apt update && sudo apt install quickemu quickget
+curl https://gitlab.com/volian/volian-archive/-/raw/main/install-nala.sh | bash

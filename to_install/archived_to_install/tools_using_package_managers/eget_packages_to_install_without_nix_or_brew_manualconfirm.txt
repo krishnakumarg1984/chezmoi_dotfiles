@@ -1,0 +1,10 @@
+sharkdp/bat
+biomejs/biome
+cargo-bins/cargo-binstall
+twpayne/chezmoi
+cli/cli
+Kitware/CMake
+solidiquis/erdtree
+eza-community/eza
+llvm/llvm-project
+lycheeverse/lychee

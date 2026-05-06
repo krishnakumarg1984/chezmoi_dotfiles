@@ -1,0 +1,28 @@
+IMAPAccount work_ucl_account
+Host outlook.office365.com
+Port 993
+User uccagop@ucl.ac.uk
+PassCmd "pass ucl_email_account_pw"
+AuthMechs LOGIN
+SSLType IMAPS
+SSLVersions TLSv1.2
+# CertificateFile /etc/ssl/certs/ca-certificates.crt
+
+IMAPStore work_ucl_account-remote
+Account work_ucl_account
+
+MaildirStore work_ucl_account-local
+Subfolders Verbatim
+Path ~/Mail/work_ucl_account/
+INBOX ~/Mail/work_ucl_account/INBOX
+
+Channel work_ucl_account
+Master :work_ucl_account-remote:
+Slave :work_ucl_account-local:
+Patterns *
+# Patterns INBOX Drafts Spam Sent Trash OTHERFOLDER_TO_SYNC
+SyncState *
+Create Both
+Expunge Both
+MaxMessages 0
+

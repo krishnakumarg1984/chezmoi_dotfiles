@@ -1,0 +1,301 @@
+pkgs.eget # Easily install prebuilt binaries from GitHub. Not in pixi (Oct 2024). Written in Go
+pkgs.elfutils # Libraries and utilities for handling ELF objects
+pkgs.epy # CLI Ebook Reader. Written in Python
+pkgs.erdtree # File-tree visualizer and disk usage analyzer. Not in pixi (Oct 2024). Written in Rust
+pkgs.eza # Modern, maintained replacement for ls. Written in Rust
+pkgs.fastfetch # Like neofetch, but much faster. Not in pixi (Oct 2024). Written mostly in C
+pkgs.fd # Simple, fast and user-friendly alternative to find. Written in Rust
+pkgs.ffmpeg_7 # Cross-platform tool to play, record, convert and stream audio and video.
+pkgs.file # Utility to determine file types
+pkgs.fortls # Fortran Language Server
+pkgs.fx # Terminal JSON viewer
+pkgs.fzf # Command-line fuzzy finder written in Go
+pkgs.gdb # GNU debugger
+pkgs.gh # GitHub CLI tool. Written in Go
+pkgs.gh-dash # Github Cli extension to display a dashboard with pull requests and issues
+pkgs.ghostscript # Interpreter for PostScript and PDF. https://hub.docker.com/r/leplusorg/pdf
+pkgs.git # Distributed version control system. Written in C
+pkgs.git-cliff # Highly customizable changelog generator
+pkgs.git-delete-merged-branches # Command-line tool to delete merged Git branches
+pkgs.gitleaks # Audit git repos for secrets. # https://hub.docker.com/r/zricethezav/gitleaks/tags
+pkgs.gitlint # Linting for your git commit messages. Written in Python
+pkgs.gitui # Blazing fast terminal-ui for git written in rust
+pkgs.gnumake # Utility for directing compilation
+pkgs.gnupg # GNU Pretty Good Privacy (PGP) package. Written in C
+pkgs.gnutar # GNU implementation of the `tar' archiver
+pkgs.gzip # GNU zip compression program. Written in C
+pkgs.harper # Grammar Checker for Developers
+pkgs.hwinfo # Hardware detection tool from openSUSE
+pkgs.image_optim # Optimize images using multiple utilities
+pkgs.imagemagick # Tools and libraries to manipulate images in many formats
+pkgs.imgp # High-performance CLI batch image resizer & rotator
+pkgs.libtree # Tree ldd with an option to bundle dependencies into a single folder
+pkgs.lnav # Curses-based tool for viewing and analyzing log files
+pkgs.lsb-release # Prints certain LSB (Linux Standard Base) and Distribution information. Written in C
+pkgs.lua-language-server # Language server that offers Lua language support
+pkgs.lua54Packages.lua # Powerful, fast, lightweight, embeddable scripting language
+pkgs.makefile2graph # Create a graph of dependencies from GNU-Make
+pkgs.manix # A fast CLI documentation searcher for Nix
+pkgs.markdown-oxide # A markdown LSP server inspired by Obsidian. Written in Rust
+pkgs.marksman # Language Server for Markdown
+pkgs.mise # Front-end to your dev env. Written in Rust
+pkgs.mupdf # Lightweight PDF, XPS, & E-book viewer & toolkit written in portable C.
+pkgs.nano # Free (GNU) replacement for the Pico text editor
+pkgs.ncdu # NCurses Disk Usage
+pkgs.nix-search-cli # CLI for searching packages on search.nixos.org
+pkgs.nix-tree # Interactively browse dependency graphs of Nix derivations.
+pkgs.nixd # Feature-rich Nix language server interoperating with C++ nix
+pkgs.nixpkgs-lint-community # Fast semantic linter for Nix using tree-sitter
+pkgs.nvd # Nix/NixOS package version diff tool
+pkgs.oxker # A simple tui to view & control docker containers
+pkgs.parallel-disk-usage # Highly parallelized, blazing fast directory tree analyzer
+pkgs.patch # GNU Patch, a program to apply differences to files. Written in C
+pkgs.pcalc # Calculator for those working with multiple bases, sizes, and close to the bits
+pkgs.pdd # Tiny date, time diff calculator
+pkgs.pdftk # Command-line tool for working with PDFs. https://hub.docker.com/r/leplusorg/pdf
+pkgs.pixz # Parallel, indexed, xz compressor. Too slow to build with non-root brew
+pkgs.pkg-config # Manage compile and link flags for libraries
+pkgs.pplatex # A tool to reformat output of latex & friends into readable messages.
+pkgs.procs # Modern replacement for ps written in Rust
+pkgs.progress # Tool that shows the progress of coreutils programs
+pkgs.remake # GNU Make with improved error handling, tracing, and a debugger
+pkgs.ripgrep # Utility that combines the usability of The Silver Searcher with the raw speed of grep
+pkgs.rsclock # A simple terminal clock written in Rust.
+pkgs.rsync # Utility that provides fast incremental file transfer
+pkgs.ruff # An extremely fast Python linter and code formatter, written in Rust.
+pkgs.ruplacer # Find and replace text in source files
+pkgs.rust-analyzer # Modular compiler frontend for the Rust language
+pkgs.rusti-cal # Minimal command line calendar, similar to cal
+pkgs.shellcheck # Shell script analysis tool. Written in Haskell
+pkgs.shellharden # Corrective bash syntax highlighter
+pkgs.shfmt # Shell parser and formatter. Written in Go
+pkgs.sonarlint-ls # Sonarlint language server
+pkgs.speedtest-rs # Command line internet speedtest tool written in rust
+pkgs.stylua # Opinionated Lua code formatter
+pkgs.taplo # TOML toolkit written in Rust
+pkgs.texlivePackages.pdfcrop # Crop PDF graphics. Written in perl
+pkgs.tgpt # ChatGPT in terminal without needing API keys
+pkgs.timg # Terminal image and video viewer
+pkgs.tlrc # Official tldr client written in Rust
+pkgs.topgrade # Upgrade all the things
+pkgs.translate-shell # CLI translator (GTranslate, Bing Translator, Yandex.Translate & Apertium)
+pkgs.trash-cli # Command-line interface to the freedesktop.org trashcan
+pkgs.tree-sitter # A parser generator tool and an incremental parsing library
+pkgs.typos-lsp # Source code spell checker
+pkgs.unzip # Extraction utility for archives compressed in .zip format. Written in C
+pkgs.unzrip # Unzip implementation, support for parallel decompression, automatic detection encoding
+pkgs.util-linux # Collection of Linux utilities
+pkgs.vale-ls # LSP implementation for the Vale command-line tool
+pkgs.vim # The most popular clone of the VI editor
+pkgs.vim-language-server # VImScript language server, LSP for vim script
+
+# Not crucial to install these below tools
+# ----------------------------------------
+
+# pkgs.act # Run your GitHub Actions locally. Can be run as needed with nix run. Written in Go
+# pkgs.actionlint # Static checker for GitHub Actions workflow files. Use with Pixi. Written in Go
+# pkgs.adguardian # Real-time traffic monitoring & statistics for AdGuard Home instance. Written in Rust
+# pkgs.age # Modern encryption tool with small explicit keys. Install as needed. Written in Go
+# pkgs.aha # ANSI HTML Adapter. Written in C
+# pkgs.aichat # Use GPT-4(V), Gemini, LocalAI, Ollama and other LLMs in the terminal. Written in Rust
+# pkgs.aider-chat # AI pair programming in your terminal. Written in Python
+# pkgs.amfora # Fancy terminal browser for the Gemini protocol. Can be run as needed with nix run
+# pkgs.aria # Download with resuming and segmented downloading. Can do a nix run as needed
+# pkgs.as-tree # Print a list of paths as a tree of paths. Can be run as needed with nix run
+# pkgs.asciidoctor # Faster Asciidoc processor. Written in Ruby
+# pkgs.asciinema # Terminal session recorder. Various companion tools also exist. Written in Python
+# pkgs.asn # OSINT command line tool for investigating network data. Run with nix run. Written in shell
+# pkgs.aspell # Spell checker for many languages. Written in ReScript/C++
+# pkgs.ast-grep # Fast and polyglot tool for code searching, linting, rewriting at large scale. Need to study this further
+# pkgs.atac # Simple API client (postman like) in your terminal. Written in Rust
+# pkgs.atop # Console system performance monitor. Written in C
+# pkgs.atuin # Replacement for a shell history which records additional commands context with optional encrypted synchronization between machines. Written in Rust
+# pkgs.autotools-language-server # Autotools language server, support configure.ac, Makefile.am, Makefile. Written in Python
+# pkgs.azure-cli # Microsoft Azure CLI 2.0. Written in Python
+# pkgs.basedpyright # Type checker for Python. Not with pixi (Oct 2024). Use pipx. Written in Python
+# pkgs.bash # Bourne-Again SHell, a UNIX command interpreter
+# pkgs.bash-completion # Programmable completion for Bash 4.2+
+# pkgs.bash-language-server # Not in conda-forge (Oct 2024). Install via npm. Written in Nodejs
+# pkgs.bashate # Code style enforcement for bash programs
+# pkgs.bat # Clone of cat(1) with syntax highlighting and Git integration. Use Pixi. Written in Rust
+# pkgs.bear # Generate compilation database for clang tooling. Install as needed
+# pkgs.beautysh # Tool for beautifying Bash scripts
+# pkgs.bibclean # Prettyprint and syntax check BibTeX and Scribe bibliography data base files
+# pkgs.bibtool # Tool for manipulating BibTeX bibliographies
+# pkgs.bingrep # Greps through binaries from various OSs & architectures, & colors them. Written in Rust
+# pkgs.binutils  # collides with gcc
+# pkgs.biome # A toolchain for web projects. formatter & linter (CLI & LSP). Use Pixi. Written in Rust
+# pkgs.bitwise # Terminal based bit manipulator in ncurses. Can use nix run Written in C
+# pkgs.bk # Terminal epub reader. Not in conda-forge (Oct 2024). Written in rust.
+# pkgs.blesh # Bash Line Editor -- a full-featured line editor written in pure Bash
+# pkgs.bolt # Thunderbolt 3 device management daemon
+# pkgs.bottom # Cross-platform process/system monitor with a customizable interface. Written in Rust
+# pkgs.btop # Monitor of resources. Not in pixi (Oct 2024). Use eget. Written in C++
+# pkgs.bzip2 # High-quality data compression program. Use micromamba/pixi for install. Written in C
+# pkgs.calc # C-style arbitrary precision calculator
+# pkgs.capnproto # Cap'n Proto cerealization protocol
+# pkgs.cargo # Downloads your Rust project's dependencies and builds your project
+# pkgs.cargo-binstall # Binary installs for rust tools. eget since not in pixi (Oct 2024). Written in Rust
+# pkgs.cargo-cache # Manage cargo cache, print sizes & remove dirs selectively. Use cargo. Written in Rust
+# pkgs.cargo-update # Cargo subcommand to check & apply updates to executables. Use cargo. Written in Rust
+# pkgs.castero # TUI podcast client for the terminal. Not in pixi (Oct 2024). Written in python
+# pkgs.ccache # Compiler cache for fast recompilation of C/C++ code. Install as necessary. Written in C++
+# pkgs.chawan # Lightweight and featureful terminal web browser. web browser for your terminal
+# pkgs.checkmake # Experimental tool for linting & checking Makefiles. Installed with Pixi. Written in Go
+# pkgs.chezmoi # Manage your dotfiles across multiple machines, securely. Use Pixi. Written in Go
+# pkgs.circumflex # 🌿 It's Hacker News in your terminal. executable is clx. Written in Go.
+# pkgs.clang # C language family frontend for LLVM (wrapper script). Problematic for libc. Written in C++.
+# pkgs.clang-manpages # man page for Clang
+# pkgs.clang-tools # Standalone command line tools for C++ development. Use Pixi. Written in C++
+# pkgs.clipcat # Clipboard Manager. Not in brew as of Sep 2024. Written in Rust
+# pkgs.cmake # Cross-platform, open-source build system generator. Use Pixi. Written in C/C++
+# pkgs.cmake-lint # Static code checker for CMake files. Use Pixi. Written in Python
+# pkgs.codespell # check code for common misspellings. Use Pixi. Written in Python
+# pkgs.colordiff # Wrapper for 'diff' with pretty 'syntax' highlighting. Use Pixi. Written in Perl
+# pkgs.colormake # Simple wrapper around make to colorize output. Not in pixi (Oct 2024). Written in Perl
+# pkgs.commitlint # Lint your commit messages. Not in pixi (Oct 2024). Use nvim or npm. Written in Nodejs
+# pkgs.conan # Distributed, open source, package manager for C/C++
+# pkgs.conceal # Trash collector. Not in brew as of Sep 2024. Written in Rust
+# pkgs.conserve # Robust portable backup tool. Not available in brew as of Sep 2024. Written in Rust
+# pkgs.coreutils # GNU File, Shell, and Text utilities
+# pkgs.cppcheck # Static analysis of C and C++ code. Use Pixi. Written in C++
+# pkgs.cpplint # Static code checker for C++. Does not build as of Sep 2024
+# pkgs.cpu-x # Not a TUI app. Free software that gathers information on CPU, motherboard and more. Written in C/C++
+# pkgs.cpufetch # Simple yet fancy CPU architecture fetching tool. Written in C
+# pkgs.croc # Easily and securely send things from one computer to another. Written in Go
+# pkgs.ctop # Top-like interface for container metrics. Written in Go
+# pkgs.curl # A command line tool for transferring files with URL syntax.
+# pkgs.deno # Secure runtime for JavaScript and TypeScript
+# pkgs.detox # Utility to replace problematic characters in filenames. Use Pixi. Written in C
+# pkgs.devbox # Instant, easy, predictable shells and containers.
+# pkgs.difftastic # Syntax-aware diff. Use Pixi. Written in Rust
+# pkgs.diffutils # File comparison utilities. Written in C
+# pkgs.discordo # A lightweight, secure, and feature-rich Discord terminal client
+# pkgs.diskonaut # Terminal disk space navigator. Written in Rust
+# pkgs.docker-compose-language-service # Not in brew/pixi (Oct 2024). Use npm. Written in Typescript
+# pkgs.dockerfile-language-server-nodejs # Not in pixi (Oct 2024). Use npm. Written in TypeScript
+# pkgs.doxygen # Source code documentation generator tool. Written in C++
+# pkgs.dua # Tool to conveniently learn about the disk usage of directories. Written in Rust
+# pkgs.duf # Disk Usage/Free Utility. Written in Go
+# pkgs.dust # du + rust = dust. Like du but more intuitive. Written in Rust
+# pkgs.dutree # Tool to analyze file system usage. Written in Rust
+# pkgs.dvc # Git for data science projects. Problematic to build in August 2024
+# pkgs.dysk # Get information on your mounted disks. Not in pixi (Oct 2024). Use cargo. Written in Rust
+# pkgs.exiftool # A tool to read, write and edit EXIF meta information.
+# pkgs.fend # Arbitrary-precision unit-aware calculator
+# pkgs.flawfinder # Examines code and reports possible security weaknesses
+# pkgs.fontconfig # XML-based font configuration API for X Windows
+# pkgs.gfold # CLI tool to help keep track of your Git repositories, written in Rust
+# pkgs.go # Open source programming language to build simple/reliable/efficient software.
+# pkgs.gprof2dot # Convert the output from many profilers into a Graphviz dot graph
+# pkgs.graphviz # Graph visualization software from AT&T and Bell Labs. Would be nice with Pixi
+# pkgs.grcov # Rust tool to collect and aggregate code coverage data for multiple source files
+# pkgs.hello # Adds the 'hello' command to your environment. It prints "Hello, world!" when run.
+# pkgs.hex # Futuristic take on hexdump, made in Rust.
+# pkgs.hexdino # A hex editor with vim like keybindings written in Rust.
+# pkgs.himalaya # CLI email client written in Rust
+# pkgs.hoard # cli command organizer written in rust
+# pkgs.hyfetch # A command-line system information tool written in bash 3.2+.
+# pkgs.ikos # Static analyzer for C/C++ based on the theory of Abstract Interpretation
+# pkgs.invidtui # An invidious TUI client
+# pkgs.inxi # Full featured CLI system information tool. Can run as a one-off without needing to install
+# pkgs.jless # Command-line pager for JSON data
+# pkgs.julia-bin # High-level, high-performance, dynamic language for technical computing. Use with Pixi
+# pkgs.languagetool-rust # LanguageTool API in Rust
+# pkgs.lcov # Graphical front-end for GCC's coverage testing tool (gcov)
+# pkgs.lemminx # XML Language Server
+# pkgs.lemonade # Remote utility tool that to copy, paste and open browsers over TCP
+# pkgs.lldb_17 # A next-generation high-performance debugger
+# pkgs.llvmPackages_17.clang-unwrapped # A C language family frontend for LLVM (wrapper script)
+# pkgs.lscolors # A Rust library and tool to colorize paths using LS_COLORS
+# pkgs.ltex-ls # LSP language server for LanguageTool. dependency building in brew (as of Aug 2024)
+# pkgs.lychee # Fast, async, stream-based link checker written in Rust
+# pkgs.man # An implementation of the standard Unix documentation system accessed using the man command
+# pkgs.man-pages # Linux development manual pages
+# pkgs.mapscii # MapSCII is a Braille & ASCII world map renderer for your console
+# pkgs.mdcat # Show markdown documents on text terminals
+# pkgs.mermaid-cli # Generation of diagrams from text in a similar manner as markdown
+# pkgs.micromamba # Reimplementation of the conda package manager. Install with curl piped to bash
+# pkgs.moreutils  # Growing collection of unix tools missed when unix was young. Too may conflicts
+# pkgs.mtr # Network diagnostics tool. Written in C
+# pkgs.ncspot # Cross-platform ncurses Spotify client written in Rust, inspired by ncmpc and the likes.
+# pkgs.neocmakelsp # CMake LSP implementation based on Tower and Tree-sitter. Install with Pixi. Written in Rust
+# pkgs.neovim # Ambitious Vim-fork focused on extensibility and agility.
+# pkgs.netcat-openbsd # TCP/IP swiss army knife. OpenBSD variant. Written in C
+# pkgs.newsraft # Feed reader for terminal. Errored in Oct 2024. Written in C
+# pkgs.nix-du # which gc-roots take space in your nix store (problematic to build in August 2024)
+# pkgs.nixpkgs-fmt # Nix code formatter for nixpkgs
+# pkgs.nodejs-slim # Event-driven I/O framework for the V8 JavaScript engine
+# pkgs.nodePackages.npm # a package manager for JavaScript
+# pkgs.nodePackages_latest.vscode-json-languageserver # JSON language server.
+# pkgs.nom # RSS reader for the terminal. Written in Go
+# pkgs.numbat # Statically typed language for computations. Just use python or Julia as calculator
+# pkgs.nuspell # Free and open source C++ spell checking library
+# pkgs.ov # Feature-rich terminal-based text viewer
+# pkgs.paperoni  # An article extractor in Rust
+# pkgs.pdm # Modern Python package and dependency manager supporting the latest PEP standards
+# pkgs.perl # The standard implementation of the Perl 5 programming language
+# pkgs.perl538Packages.Appcpanminus # Get, unpack, build, and install modules from CPAN
+# pkgs.perl538Packages.PerlTidy # Indents & reformats Perl scripts. Slow to build with non-root brew
+# pkgs.photon # RSS/Atom reader with focus on speed, usability & a bit of unix philosophy. Written in Go
+# pkgs.pikchr # A PIC-like markup language for diagrams in technical documentation
+# pkgs.pip-audit # Audits Python environments and dependency trees for known vulnerabilities
+# pkgs.pipx # Install and run Python applications in isolated environments. Use with Pixi
+# pkgs.plantuml-c4 # Draw UML diagrams using a simple and human readable text description # PlantUML bundled with C4-Plantuml and plantuml sprites library
+# pkgs.poetry # Python package management tool
+# pkgs.ponysay
+# pkgs.powershell # cross-platform shell & scripting language based on .NET (problematic Oct 2024)
+# pkgs.pspg # Unix pager optimized for psql
+# pkgs.pueue # Command-line tool for managing long-running shell commands
+# pkgs.putty # Free Telnet/SSH Client
+# pkgs.python3 # High-level dynamically-typed programming language
+# pkgs.python312Packages.conda # OS-agnostic, system-level binary package manager
+# pkgs.ripasso-cursive # A simple password manager written in Rust
+# pkgs.rnr # Command-line tool to batch rename files and directories
+# pkgs.rqbit # A bittorrent client in Rust
+# pkgs.ruby # An object-oriented language for quick and easy programming
+# pkgs.rustc # Safe, concurrent, practical language (wrapper script)
+# pkgs.rustic # rustic - fast, encrypted, and deduplicated backups powered by Rust
+# pkgs.rusty-man # A command-line viewer for documentation generated by rustdoc
+# pkgs.rx # Modern and extensible pixel editor implemented in Rust
+# pkgs.sic-image-cli # Accessible image processing and conversion from the terminal
+# pkgs.starship # Cross-shell prompt for astronauts. Curl-to-bash approach is best. Written in Rust
+# pkgs.t-rec # Blazingly fast terminal recorder that generates animated gif images for the web
+# pkgs.temurin-bin # for now using mise's version of java
+# pkgs.termusic # Terminal Music Player TUI written in Rust. Depends on libmpv. Written in Rust
+# pkgs.texinfo # Official documentation format of the GNU project
+# pkgs.texlab # Implementation of the Language Server Protocol for LaTeX
+# pkgs.textplots # Terminal plotting library for Rust
+# pkgs.todo # Simple todo cli program written in rust
+# pkgs.traceroute # Tracks the route taken by packets over an IP network. Written in C
+# pkgs.tran # Securely transfer and send anything between computers with TUI
+# pkgs.trippy # Network diagnostic tool. Sudo required. Written in Rust.
+# pkgs.urlscan # View/select the URLs in an email message or file
+# pkgs.uutils-coreutils-noprefix # Cross-platform Rust rewrite of coreutils.
+# pkgs.valgrind # Dynamic analysis tools (memory, debug, profiling)
+# pkgs.vgrep # User-friendly pager for grep/git-grep/ripgrep
+# pkgs.vimpc # Official repository for vimpc a vi/vim inspired client for the Music Player Daemon (mpd)
+# pkgs.vimv # Batch-rename files using Vim
+# pkgs.vimv-rs # A command line utility for batch-renaming files. (Rust version)
+# pkgs.wezterm # GPU-accelerated cross-platform terminal emulator & multiplexer implemented in Rust
+# pkgs.wget # Internet file retriever. Written in C.
+# pkgs.wiki-tui # A simple & easy to use Wikipedia Text User Interface. Not in Pixi (Oct 2024). Use cargo. Written in Rust.
+# pkgs.wl-clipboard # Command-line copy/paste utilities for Wayland. Problematic in neovim ca. July 2024
+# pkgs.wl-clipboard-rs # Command-line copy/paste utilities for Wayland, written in Rust. Seems to be problematic (neovim errors ca. July 2024)?
+# pkgs.wtf # The personal information dashboard for your terminal
+# pkgs.wtfis # Passive hostname, domain and IP lookup tool for non-robots
+# pkgs.wthrr # Weather companion for the terminal. Use cargo or eget. Written in Rust
+# pkgs.xclip # Access X11 clipboards from the command-line
+# pkgs.xsel # Command-line program for getting and setting the contents of the X selection
+# pkgs.xxv # A visual hex viewer for the terminal
+# pkgs.xz # A general-purpose data compression software, successor of LZMA
+# pkgs.xz # General-purpose data compression software, successor of LZMA. Use Pixi. Written in C
+# pkgs.yaml-language-server # Language Server for YAML Files. Use Pixi. Written in Nodejs
+# pkgs.yewtube # Terminal based YouTube player and downloader
+# pkgs.youtube-tui # An aesthetically pleasing YouTube TUI written in Rust
+# pkgs.yt-dlp # Feature-rich command-line audio/video downloader. Use pipx version.
+# pkgs.ytermusic # TUI based Youtube Music Player. Problematic to compile. Written in Rust
+# pkgs.ytui-music # Youtube client in terminal for music
+# pkgs.zellij # Terminal workspace with batteries included. Perhaps best to install with system package manager? But then on remote servers, that is not feasible and might have to cargo install it
+# pkgs.zk # Zettelkasten plain text note-taking assistant
+# pkgs.zstd # Zstandard real-time compression algorithm. Use Pixi. Written in C

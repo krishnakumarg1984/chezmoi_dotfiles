@@ -1,0 +1,455 @@
+## Paths
+# set folder=~/Mail
+set folder = "~/Mail/work_ucl_account"  # Note: do not end "folder" path with a "/", because mutt automatically inserts one when you use "=" or "+". An extra one would break some functionality because of "//". Typically you set "$folder" first and all its dependencies after that, this means: the order matters.
+set mbox_type=Maildir                   # does not convert existing folders to MaildirFormat, it only creates new ones that way.
+set spoolfile = "+INBOX"                # This is the startup folder assumed to contain all new email that arrives for you. https://gitlab.com/muttmua/mutt/-/wikis/MuttGuide/Folders
+# set spoolfile=+/
+# folder-hook work_ucl_account "set spoolfile="+INBOX""
+set mask = no
+# set mask=".*"    # the default mask hides dotfiles and maildirs are dotfiles now.
+# set mask="!^\.[^.]"  # this line intentionally commented out
+# set record = +$my_sent_noquote
+set record = "+Sent Items"     # Sometimes it's good to keep a copy of sent out messages in case you need to resend them or verify discussions.
+# folder-hook work_ucl_account "set postponed=+work_ucl_account/Drafts"
+# set postponed = "=INBOX.Drafts"
+set postponed = "+Drafts"      # Start new email but then pause to continue later.
+set mbox=+mbox  # based on Arch Wiki for outgoing mail; If you want to save (move) mails out of the inbox which you've read instead of deleting them right on (or cluttering up your inbox). Default mailbox.
+
+set header_cache = "~/.mutt/work_ucl_account/hcache"
+set message_cachedir = "~/.mutt/work_ucl_account/mcache"
+# set certificate_file = ~/dotfiles/office/certificates.crt
+set mailcap_path = ~/.mutt/mailcap  # Where to find the mailcap.
+set tmpdir = '/tmp/mutt'
+# folder-hook . `$SHELL -c "echo \`rm -f /tmp/mutt/*\`"`
+
+## Sane defaults
+unset wait_key                 # don't wait for keystroke to return from shell
+# set wait_key=no
+set check_mbox_size # 2019-02-18 Sven Guckes, hopefully this makes neomutt skip scanning all mailboxes on startup *sigh*
+
+set timeout = "5"              # mutt 'presses' (like) a key for you (while you're idle)
+                               # each x sec to trigger the thing below
+set mail_check = 0
+
+set delete                     # don't ask me to delete messages - just do it!
+set quit
+set thorough_search            # strip headers and eval mimes before searching
+set mail_check_stats = yes
+unset confirmappend            # Just append, don't hassle me. may want to change this later
+unset move                     # Hold messages in $MAIL.
+unset mark_old                 # don't mark unread new messages as old
+unset beep_new                 # don't? beep on new message
+
+## compose View Options
+set envelope_from              # which from?
+# set edit_headers=yes         # show headers when composing
+unset askcc                    # don't prompt for cc's
+set fcc_attach                 # save attachments with the body
+set forward_format = "Fwd: %s" # format of subject when forwarding
+set forward_decode             # decode when forwarding
+set attribution ='\nOn %{%a, %d %b %Y}, %n wrote:\n' # format of quoting header
+set fast_reply=yes             # don't prompt for stuff when replying # skip to compose when replying
+set reply_to                   # reply to Reply to: field
+set reply_regexp = "^(([Rr][Ee]?(\[[0-9]+\])?: *)?(\[[^]]+\] *)?)*"
+# set reply_regexp="^((re|aw|sv|ang):[ \t]*)+"
+unset ignore_list_reply_to
+unset reply_self
+# set list_reply=ask-yes   # check when replying to messages originating from a mailing list. It will ask the user if he really intended to reply to the author only (instead of the mailing list).
+set reverse_name           # reply as whomever it was to
+set reverse_alias = yes    # If you want to also include the real names the person that e-mailed you used, you need to use this. This var is set to 'yes' by default, so remember to change it if you do not want to use those names. Also verify that the $use_from variable is set to "yes". It is correct by default, but may be unset say in Debian's global /etc/Muttrc.
+set include=yes            # include message in replies
+set forward_quote          # include message in forwards
+set text_flowed            # send format-flowed; vim must be set to fo+ = w
+set sig_dashes=no          # no dashes between message text and signature
+unset mime_forward         # forward attachments as part of body
+
+## Pager View Options
+set pager_index_lines = 8  # add a small message index at top of pager. Display the index above the pager view
+set pager_context = 3      # Show context lines when going to next page
+set pager_stop = yes       # don't go to next message at end of message. Stop at the end instead of displaying next mail
+set menu_scroll            # scroll menu a page on last line
+set tilde = yes            # Fill out messages with '~'.
+unset markers              # Don't want any wrap markers. put a '+' at the beginning of wrapped lines.
+
+## email headers and attachments
+ignore *                   #  ignore all headers
+# unignore From To Cc Subject Date Reply-To Organization X-Mailer User-Agent
+unignore from: to: cc: bcc: date: subject:
+unhdr_order *         # some distros order things by default
+hdr_order from: to: cc: bcc: date: subject:  # and in this order
+
+# auto_view text/plain
+auto_view =          "yes"
+auto_view application/emacs-lisp
+auto_view application/ms-rtf application/rtf
+auto_view application/ms-tnef
+auto_view application/msexcel application/vnd.ms-excel application/ms-excel application/pdf application/postscript
+auto_view application/msword
+auto_view application/octet-stream
+auto_view application/pgp
+auto_view application/pgp-encrypted
+auto_view application/pgp-signature
+auto_view application/vnd.ms-powerpoint
+auto_view application/x-arj-compressed
+auto_view application/x-delphi-source
+auto_view application/x-gunzip
+auto_view application/x-gzip
+auto_view application/x-perl
+auto_view application/x-sh
+auto_view application/x-tar-gz
+auto_view application/x-tcl
+auto_view application/x-zip-compressed
+auto_view application/zip
+auto_view audio/*
+auto_view image/*
+auto_view image/tiff
+auto_view text/calendar application/ics
+auto_view text/html # view html automatically
+auto_view text/x-diff
+auto_view text/x-lisp
+auto_view text/x-lyx
+auto_view text/x-patch
+auto_view text/x-script.elisp
+auto_view text/x-vcard
+mime_lookup application/octet-stream
+mime_lookup text/plain                  #  See if it is really the correct MIME type, otherwise change it.
+
+# If you receive many emails with multiple or alternate encodings Mutt may default to treating every email as html. To avoid this, add the following variable to your ~/.muttrc to have Mutt default to text when available and use w3m/lynx only when no text version is availble in the email:
+# alternative_order text/calendar text/plain text/enriched text/html text/*
+alternative_order text/calendar text/html text/enriched text/plain text/* text application/postscript image/*
+alternative_order =  "yes"
+# alternative_order text/html text/plain text/enriched text/*
+set rfc2047_parameters = yes
+
+## Status-bar, date format, finding stuff etc
+set status_chars = " *%A"
+set status_format = "%f%?V?/%V? [%m%?M?, %M shown?%?n?, %n new?%?o?, %o old?%?d?, %d deleted?%?F?, %F flagged?%?t?, %t tagged?%?p?, %p postponed?] %> %P"
+# set status_format = "[ Folder: %f ] [%r%m messages%?n? (%n new)?%?d? (%d to delete)?%?t? (%t tagged)? ]%>─%?p?( %p postponed )?"
+# set status_on_top
+set date_format ="%d/%m/%y %I:%M"
+set date_format="%A %d %b %Y à %H:%M:%S (%Z)"
+# set date_format = "%d.%m.%Y %H:%M"
+# 1) four columns (%4C) for the number of the email message (which ensures alignment of rest of the columns)
+# 2) dynamic message size (kB, MB etc)
+# 3) message status indicator 2 columns (%Z), a flag column for new (N) and 1 more column for a message
+# 4) a clever date-received indicator (all the leading and trailing spaces are for alignment considering next column)
+# 5) subject line of message
+set index_format='%4C  (%?l?%4l&%4c?) %Z %<[y?%<[m?%<[d?%[      %H:%M ]&%[     %a %d ]>&%[%b %d,%Y ]>&%[%b %d,%Y ]> %-21.21L  %s'
+# set index_format = "%4C %Z %{%b %d %Y} %-15.15L (%?l?%4l&%4c?) %s"
+# set index_format = "[%Z] %?X?A&-? %D  %-20.20F  %s"
+#  set index_format = "%2C %Z %d %-15.15F %s (%-4.4c)"
+set group_index_format='%4C %M%N %5s %-45.45f %d'
+set sort = reverse-threads
+# set sort = threads
+set sort_alias = alias
+# set sort_aux = date-received
+set sort_aux = last-date-received
+# set sort_aux = 'reverse-last-date-received'
+# set sort_browser = alpha                #  is the default I think, but anyway
+# set sort_browser="reverse-date"
+#  set sort_browser="reverse-count"
+set sort_re                             #  thread based on regex
+#  set uncollapse_jump                  # jump to unread message when uncollapsing?
+set quote_regexp = "^( {0,4}[>|:#%]| {0,4}[a-z0-9]+[>|]+)+"  # What we consider to be a quote.
+set send_charset = "utf-8:iso-8859-1:us-ascii"
+# set send_charset = "us-ascii:utf-8"
+set charset = "utf-8"
+
+# set query_command = "abook --mutt-query '%s'"
+#  set query_command = "mates --mutt-query '%s'"
+# when composing emails, use this command to get addresses from
+# the addressbook with khard first, and everything else from mu index
+# set query_command = "( khard email --parsable --search-in-source-files '%s' | sed -n '1!p'; mu cfind --format=mutt-ab '%s' )"
+# set query_command = "khard email --parsable --search-in-source-files '%s'"
+
+## sidebar patch config
+set sidebar_visible = yes
+set sidebar_short_path = yes
+set sidebar_folder_indent = yes
+set sidebar_width = 25
+set sidebar_divider_char = ' ▐ '
+# set sidebar_indent_string = ' '
+set sidebar_indent_string = '  ''
+set sidebar_format = "%B%?F? [%F]?%* %?N?%N/?%?S?%S?"
+# set sidebar_format = "%B%?F? [%F]?%* %?N?%N/?%S"
+#  set sidebar_new_mail_only = yes
+set sidebar_component_depth=1
+set sidebar_delim_chars = '/'
+# sidebar_whitelist =work_ucl_account =work_ucl_account/INBOX
+sidebar_whitelist =work_ucl_account
+set sidebar_non_empty_mailbox_only = no
+set sidebar_next_new_wrap = yes
+set sidebar_on_right = no
+set sidebar_sort_method = 'path'
+
+## Mailboxes to show in the sidebar.
+# mailboxes = ALL-INBOXES
+# mailboxes = +"INBOX/" +"Sent Items" +"Drafts"
+# mailboxes =-work_ucl_account-
+# named-mailboxes "Fun (woo!)"  =fun
+# mailboxes =INBOX/
+# mailboxes =work_ucl_account/INBOX =work_ucl_account/Sent =work_ucl_account/Trash =work_ucl_account/Drafts =work_ucl_account/Spam
+# mailboxes `echo ~/Mail/work_ucl_account/Inbox/*`
+# mailboxes `gfind ~/Mail/work_ucl_account/ -type d -name cur -printf '%h '`
+# mailboxes `$SHELL -c "echo \`gfind ~/Mail/work_ucl_account -not -empty '(' -type d '(' -name 'cur' -o -name 'new' -o -name 'tmp' -o -name 'Journal' -o -name 'Outbox' -o -name 'Sent*' -o -name 'Tasks' -o -name 'Calendar' -o -name '.uidvalidity' ')' -prune ')' -o -type f -print \`"`
+# mailboxes `gfind ~/Mail/work_ucl_account '(' -type d '(' -name 'cur' -o -name 'new' -o -name 'tmp' -o -name 'Journal' -o -name 'Outbox' -o -name 'Sent*' -o -name 'Tasks' -o -name 'Calendar' ')' -prune -printf '%h ' ')' -o '(' -type f -printf '%p ' ')'`
+# mailboxes `$SHELL -c "echo \`find ~/Mail/work_ucl_account -type d '(' -name 'cur' -o -name 'new' ')' -prune -print | sed -e '/[^/]*$' \`"`
+# mailboxes `find ~/Mail/work_ucl_account '(' -type d '(' -name 'cur' -o -name 'new' ')' -prune -printf '%h ' ')' -o '(' -type f -printf '%p ' ')'`
+
+# mailboxes ! + `\
+# for file in ~/Mail/work_ucl_account/.*; do \
+#    box=$(basename "$file"); \
+#    if [ ! "$box" = '.' -a ! "$box" = '..' -a ! "$box" = '.customflags' \
+#        -a ! "$box" = '.subscriptions' ]; then \
+#      echo -n "\"+$box\" "; \
+#    fi; \
+# done; \
+# for folder in ~/Mail/work_ucl_account/*; do \
+#    if [ -x $folder]; then \
+#          box=$(basename "$folder"); \
+#          for file in ~/Mail/work_ucl_account/$box/.*; do \
+#                 box2=$(basename "$file"); \
+#                 if [ ! "$box2" = '.' -a ! "$box2" = '..' -a ! "$box2" = '.customflags' \
+#                  -a ! "$box2" = '.subscriptions' ]; then \
+#                    echo -n "\"+$box/$box2\" "; \
+#                 fi; \
+#          done; \
+#     fi; \
+# done`
+
+# mailboxes `gfind ~/Mail/work_ucl_account '(' -type d '(' -name 'cur' -o -name 'new' ')' -prune -printf '%h ' ')' -o '(' -type f -printf '%p ' ')'`
+
+# mailboxes `$SHELL -c "echo \`gfind ~/Mail/work_ucl_account '(' -type d '(' -name 'cur' -o -name 'new' -o name 'tmp' ')' -prune ')' -o -type f -print \`"`
+
+# mailboxes `$SHELL -c "echo \`gfind ~/Mail/work_ucl_account -type d '(' -name 'cur' -o -name 'new' ')' -prune -print | gsed -e '/[^/]*$' \`"`
+
+source `FILE=$HOME/.mutt/bindings; if [ ! -s "$FILE" ]; then FILE=/dev/null;fi;echo "$FILE"`
+
+# If enter-command is available from the UI, it is possible to see the password unencrypted, which may be undesired if anybody else than you has access to your session while Mutt is running. You may want to disable it for this reason. As a consequence, every command that the user intends to use must be bound to a key in advance, otherwise it will never be accessible.
+
+folder-hook . "push <collapse-all>\n"
+
+attachments +A message/.* multipart/.*
+attachments +I message/.* multipart/.*
+attachments -A message/external-body
+attachments -I message/external-body
+
+# Mutt will include your e-mail address(es) in the recipient list when you group-reply to a mail you were CC'ed. If you use multiple email addresses in the same mailbox, make sure to configure the alternates variable, so that Mutt knows which messages were from you.  You can ask Mutt to ignore some addresses with:
+# alternates kg314@imperial.ac.uk|k.gopalakrishnan14@imperial.ac.uk|krishnakumar@imperial.ac.uk
+
+set history=25
+
+charset-hook ^iso-8859-1$ cp1252
+folder-hook . 'set read_inc=1000'  # Read counter ticks every 1000 msgs.
+set write_inc=100                  # Write counter ticks every 100 msgs. http://www.davep.org/mutt/muttrc/
+
+set pipe_decode                    #  strip headers and eval mimes when piping
+ignore Content-Transfer-Encoding:
+ignore Content-Type:
+# ignore User-Agent
+unignore Newsgroups:
+
+#  mailboxes `gfind -H ~/Mail/work_ucl_account -mindepth 0 -maxdepth 3 -type d \! -name "Spam" -printf "+'%f' "`
+# mailboxes `gfind ~/Mail/work_ucl_account '(' -type d '(' -name 'cur' -o -name 'new' -name 'Journal' ')' -prune -printf '%h ' ')' -o '(' -type f -printf '%p ' ')' | sed 's: /:\n/:g' | sed '/^$/d' | sort | uniq | tr '\n' ' '`
+
+# set locale = `echo "${LC_ALL:-${LC_TIME:-${LANG}}}"`
+set narrow_tree # narrow threading trees
+set postpone = ask-no
+#  set print_command="/usr/bin/muttprint %s -p {PrinterName}"
+#  unset arrow_cursor # use arrow cursor
+## %[d Today %[%H:%M ] 12:34
+## %[m This month %[%a %d] Thu 12
+## %[y This year %[%b %d] Dec 10
+## - Older %[%m/%y ] 06/15
+## --------------------------------------------
+## Test Date Range Format String Example
+## We replace the date field '%{%b %d}', giving:
+set abort_noattach = ask-yes
+set abort_nosubject = ask-yes
+set abort_unmodified = ask-yes
+set alias_format="%4n %2f %t %-12a %r"
+set allow_ansi
+# set ascii_chars=yes # bad ascii arrows
+set ask_follow_up = no
+set ask_x_comment_to = no
+set assumed_charset = "utf-8"
+set attach_format = '%u%D%I %t%4n %T%.40d%> [%.12m/%.12M, %.6e%?C?, %C?, %s]
+
+# set attach_keyword = "\\<attach(|ed|ments?)\\>"
+# set abort_noattach_regexp =  "\\<attach(|ed|ments?)\\>"
+set auto_tag = yes
+set autoedit
+set bounce = yes
+set bounce_delivered=no
+set catchup_newsgroup = ask-yes
+set check_new = yes
+set compose_format="-- %v-- Compose [Approximate Message Size: %l Attachments: %a]%>-"
+set config_charset = "utf-8"
+set copy                          #  keep copies of sent messages
+set delete_untag                  #  untag messages when marking them for deletion
+# set editor = "nvim +/^$ ++1 -c start"   #  start editor in insert mode
+# set editor="`echo \$EDITOR` +/^$ ++1 -c start"   #  start editor in insert mode
+# set editor="nvim +/^$ -c start -c 'set spell spelllang=en'"   #  start editor in insert mode
+set editor="`echo \$EDITOR` +/^$ -c start -c 'set spell spelllang=en'"   #  start editor in insert mode
+set visual = "nvim"
+
+set fcc_clear  #  Keep fcc's clear of signatues and encryption.
+
+set folder_format="%3C %t%N %F %-8.8u %-8.8g %8s %d %f"
+set followup_to                         #  add Mail-Followup-To header
+set followup_to_poster = ask-yes
+set forward_edit = ask-yes              #  automatically start editor when forwarding.
+set from = "krishna.kumar@ucl.ac.uk"
+# folder-hook work_ucl_account "set from="krishna.kumar@ucl.ac.uk""
+# set hdr_format="%3C %Z %[!%m/%d/%y] (%4l) %-22.22F %s"  # messes up the index formatting
+# set help                                #  show help on first line of display
+set hidden_host
+set honor_followup_to=ask-yes           #  Ask whether to honor Mail-Followup-To header.
+# set hostname = "ic.ac.uk"               #  who am i?
+set implicit_autoview="yes"             #  Autoview every MIME type with a copiousoutput entry in mailcap.
+set indent_str = "> "
+set inews = ''
+
+set menu_context=5                      #  Lines of context
+set message_format="%-.16n: %s"
+set metoo=no
+set mime_forward_rest = "yes"
+set mime_subject = yes
+# set my_sent_noquote = "Sent Items"
+set net_inc = "100"
+set new_mail_command = "notify-send 'New Email in %f' '%n new messages, %u unread.' &"
+# set news_cache_dir = '~/.neemail_stuff/.mutt'
+set news_server = 'news.in-berlin.de'
+set newsgroups_charset = utf-8
+set newsrc = '~/.newsrc'
+set nntp_authenticators = ''
+set nntp_context = 200
+set nntp_listgroup = yes
+set nntp_load_description = yes
+set nntp_pass = ''
+set nntp_poll = 60
+set nntp_user = ''
+set noallow_8bit    # 8bit isn't safe via Demon.
+set noprompt_after
+set nosave_empty
+set pager_format = "~~~~~~~~~ On %{%a, %d %b %Y} at [%[%H:%M]]: %s %|~"
+
+set post_moderated = ask-yes
+
+set print = ask-yes  # # Ask before printing.
+# set print_command="muttprint"
+set prompt_after = no
+set my_name = "Krishnakumar Gopalakrishnan"
+set realname = "Krishnakumar"  # for outgoing mail
+set recall = ask-yes
+# folder-hook work_ucl_account "set record=+work_ucl_account/Sent Items"
+set trash = "+Deleted Items"
+# folder-hook work_ucl_account "set trash=+work_ucl_account/Deleted Items"
+set reflow_space_quotes
+set reflow_text
+set reverse_realname = yes
+set rfc2047_parameters = yes            #  encode = ?iso-8858....? = filenames
+set save_unsubscribed = no
+# set sendmail = "~/.mutt/krishna_sendmail"
+# set sendmail = "/usr/local/bin/msmtp -a work_ucl_account"
+# set sendmail = "/usr/local/bin/msmtp"
+set sendmail = "/bin/sh $HOME/.mutt/krishna_sendmail"
+# set sendmail="msmtp-enqueue.sh -C $DOTFILES_PRIVATE/msmtprc"
+set sendmail_wait = -1             # Don't wait around for sendmail.
+set shell = /bin/bash
+set show_new_news = yes
+set show_only_unread = no
+set sig_on_top                     #  puts signature above quoted or forwarded text
+set signature="~/.mutt/signature"
+set skip_quoted_offset = 3
+set sleep_time = 0                 #  be fast. Speed up folders switch
+set smart_wrap                     #  wrap long lines at word boundary.
+
+set strict_threads = yes
+set to_chars = "X+TCF"             #  no L for mail_list
+set ts_enabled = yes
+set ts_status_format = 'mutt %m messages%?n?, %n new?'
+set use_from
+set x_comment_to = no
+set xterm_set_titles
+unset askbcc               #  don't prompt for bcc's
+unset beep                 #  don't beep on error
+# unset collapse_unread    #  don't collapse threads with unread mails
+unset menu_move_off        #  Don't let last items of menus scroll up past the bottom of the screen.
+# set mime_forward = no    #  forward all attachments as a single attachment?
+unset use_domain
+unset user_agent
+
+# After $timeout seconds of inactivity, run this NeoMutt command
+timeout-hook 'exec sync-mailbox'
+# When NeoMutt first loads, run this NeoMutt command
+startup-hook 'exec sync-mailbox'
+# When NeoMutt quits, run this NeoMutt command
+shutdown-hook 'exec sync-mailbox'
+
+set arrow_cursor = "no" # Change `color indicator` depending
+set ssl_force_tls=yes
+set recall=no
+
+# set display_filter="t-prot -cemt -M=mutt"
+# set my_tprot = 't-prot -aelmtS -c --bigq -M=mutt --spass'
+# set display_filter = $my_tprot
+
+unmy_hdr *       # delete existing header-settings, if there are any.
+# my_hdr X-Homepage: http://www.calmar.ws
+# my_hdr X-PGP-Key: http://www.calmar.ws/calmar.asc
+
+my_hdr Organization: University College London
+
+## OS Info.
+my_hdr X-Operating-System: `uname -s`, kernel `uname -r`
+
+## Custom Mail-User-Agent ID.
+# my_hdr User-Agent: Every email client sucks, this one just sucks less.
+
+## This header only appears to MS Outlook users
+# my_hdr X-Message-Flag: WARNING!! Outlook sucks
+
+# Handler for gzip compressed mailboxes
+# Support for compressed folders (read-only in this case)
+# open-hook \\.gz$ "gzip -cd %f > %t"
+open-hook   '\.gz$' "gzip --stdout --decompress '%f' >  '%t'"
+close-hook  '\.gz$' "gzip --stdout              '%t' >  '%f'"
+append-hook '\.gz$' "gzip --stdout              '%t' >> '%f'"
+# Handler for bzip2 compressed mailboxes
+open-hook   '\.bz2$' "bzip2 --stdout --decompress '%f' >  '%t'"
+close-hook  '\.bz2$' "bzip2 --stdout              '%t' >  '%f'"
+append-hook '\.bz2$' "bzip2 --stdout              '%t' >> '%f'"
+# Handler for xz compressed mailboxes
+open-hook   '\.xz$' "xz --stdout --decompress '%f' >  '%t'"
+close-hook  '\.xz$' "xz --stdout              '%t' >  '%f'"
+append-hook '\.xz$' "xz --stdout              '%t' >> '%f'"
+# Handler for pgp encrypted mailboxes
+# PGP does not support appending to an encrypted file
+open-hook   '\.pgp$' "pgp -f < '%f' > '%t'"
+close-hook  '\.pgp$' "pgp -fe YourPgpUserIdOrKeyId < '%t' > '%f'"
+
+open-hook   '\.gpg$' "gpg --decrypt < '%f' > '%t'"
+close-hook  '\.gpg$' "gpg --encrypt --recipient YourGpgUserIdOrKeyId < '%t' > '%f'"
+
+push <show-version>
+push <first-entry> # first-entry is the function called when you press Home, which takes you to the first message shown in your mailbox. push will add this function as a keyboard entry. https://unix.stackexchange.com/questions/255828/mutt-select-top-message-on-startup
+
+# source `FILE=$HOME/.mutt/colors_dir/krishna_custom_neomutt_colors; if [ ! -s "$FILE" ]; then FILE=/dev/null;fi;echo "$FILE"`
+# source `FILE=$HOME/.mutt/colors_dir/gruvbox; if [ ! -s "$FILE" ]; then FILE=/dev/null;fi;echo "$FILE"`
+source ~/.mutt/colors_dir/grubox-256.neomttrc
+source ~/.mutt/colors_dir/gruvbox-powerline.neomuttrc
+source ~/.mutt/colors_dir/powerline-rounded.neomuttrc
+# Colour definitions when on a mono screen
+mono bold bold
+mono underline underline
+mono indicator reverse
+
+# set date_format="%y-%m-%d %T"
+# set index_format="%2C | %Z [%d] %-30.30F (%-4.4c) %s"
+
+source ~/.mutt/gpg.rc
+
+# set nm_default_uri = "notmuch://$HOME/.mail"
+# set virtual_spoolfile=no
+

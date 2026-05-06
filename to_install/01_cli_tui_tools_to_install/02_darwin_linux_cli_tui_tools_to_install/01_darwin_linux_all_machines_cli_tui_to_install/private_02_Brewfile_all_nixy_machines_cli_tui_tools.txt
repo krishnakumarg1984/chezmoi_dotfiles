@@ -1,0 +1,335 @@
+# vim: ft=ruby:
+
+tap "marwanhawari/tap"  # for the stew package manager
+tap "umlx5h/tap"        # for gtrash
+
+brew "btop"     # Resource monitor. C++ version and continuation of bashtop and bpytop
+brew "gtrash"   # A Featureful Trash CLI manager: alternative to rm and trash-cli. Written in GoLang
+brew "pixz"     # Parallel, indexed, xz compressor. Too slow to build with non-root brew
+brew "progress" # Tool that shows the progress of coreutils programs
+brew "stew"     # An independent package manager for compiled binaries. Written in GoLang
+
+# brew "actionlint" # Static checker for GitHub Actions workflow files. Written in Go
+# brew "age" # Simple, modern, secure file encryption. Install as needed
+# brew "aha" # ANSI HTML adapter. Written in C
+# brew "amfora" # Fancy terminal browser for the Gemini protocol
+# brew "as-tree" # Print a list of paths as a tree. Last commit Mar 2021 (on Sep 2044). Written in Rust
+# brew "aspell" # Spell checker with better logic than ispell
+# brew "ast-grep" # Fast and polyglot tool for code searching, linting, rewriting at large scale. Study before installing
+# brew "bash" # will be built from source. Bourne-Again SHell, a UNIX command interpreter
+# brew "bash-completion@2" # Programmable completion for Bash 4.2+
+# brew "bat-extras" # Bash scripts that integrate bat with various command-line tools. Slow to install with non-root brew
+# brew "bib-tool" # Manipulates BibTeX databases
+# brew "bibclean" # BibTeX bibliography file pretty printer and syntax checker
+# brew "bingrep" # Greps through binaries from various OSs and architectures. Written in Rust
+# brew "biome" # Biome offers formatter and linter, usable via CLI and LSP. Written in Rust
+# brew "bitwise" # slow to build dependencies with webi-install brew (Apr 2024). Terminal based bit manipulator in ncurses. Written in C
+# brew "bk" # Terminal EPUB Reader. Written in Rust
+# brew "bottom" # preferring btop for now. Yet another cross-platform graphical process/system monitor. Written in Rust
+# brew "bzip2" # Freely available high-quality data compressor. Written in C
+# brew "checkmake" # Experimental tool for linting and checking Makefiles. Written in Go
+# brew "chezmoi" # Manage your dotfiles across multiple diverse machines, securely. Written in Go
+# brew "colordiff" # Color-highlighted diff(1) output. Written in Perl
+# brew "colormake" # Wrapper around make to colorize the output. Written in Perl
+# brew "croc" # Securely send things from one computer to another. Written in Go
+# brew "ctop" # Top-like interface for container metrics
+# brew "ctop" # Top-like interface for container metrics. Weitten in Go
+# brew "difftastic" # Diff that understands syntax. Written in Rust
+# brew "diskonaut" # Terminal visual disk space navigator
+# brew "doxygen" # Generate documentation for several programming languages
+# brew "dua-cli" # View disk space usage and delete unwanted data, fast. Written in Rust
+# brew "duf" # Disk Usage/Free Utility - a better 'df' alternative. Written in Go
+# brew "dust" # More intuitive version of du in rust
+# brew "dutree" # not actively developed?. Tool to analyze file system usage written in Rust
+# brew "dysk" # Linux utility to get information on filesystems, like df but better. Written in Rust
+# brew "eget" # Easily install prebuilt binaries from GitHub
+# brew "entr" # Run arbitrary commands when files change
+# brew "erdtree" # Multi-threaded file-tree visualizer and disk usage analyzer. Written in Rust
+# brew "f2" # Command-line batch renaming tool
+# brew "fclones" # Efficient Duplicate File Finder
+# brew "fd" # Simple, fast and user-friendly alternative to find
+# brew "fzf" # builds pkg-config (dependency). fzf is available in webi, but it silently modifies ~/.bashrc (Feb 2024)
+# brew "gawk" # GNU Awk
+# brew "gcc" # GNU compiler collection
+# brew "gdu" # Disk usage analyzer with console interface written in Go
+# brew "gh" # available in webi. GitHub command-line tool. Written in Go
+# brew "ghq" # Remote repository management made easy
+# brew "git-delta" # available in webi, but messes up git config. Syntax-highlighting pager for git and diff output
+# brew "gitleaks" # Audit git repos for secrets
+# brew "gnu-tar" # GNU implementation of the `tar' archiver
+# brew "gzip" # Popular GNU data compression program. Written in C
+# brew "hexyl" # Command-line hex viewer
+# brew "hyperfine" # Command-line benchmarking tool
+# brew "jabba" # Cross-platform Java Version Manager
+# brew "jaq" # JQ clone focussed on correctness, speed, and simplicity
+# brew "jenv" # Manage your Java environment
+# brew "jpegoptim" # Optimize JPEG files
+# brew "just" # Handy way to save and run project-specific commands
+# brew "lazydocker" # Lazier way to manage everything docker
+# brew "lazygit" # Simple terminal UI for git commands
+# brew "lcov" # Graphical front-end for GCC's coverage testing tool (gcov). Installs perl
+# brew "less" # Pager program similar to more
+# brew "lua" # Powerful, lightweight programming language
+# brew "lua-language-server" # Language Server for the Lua language
+# brew "luajit" # Just-In-Time Compiler (JIT) for the Lua programming language
+# brew "macchina" # System information fetcher, with an emphasis on performance and minimalism
+# brew "make" # Slow to build with non-root brew. # Utility for directing compilation. Remake is a better option
+# brew "marksman" # Language Server Protocol for Markdown. Difficult to get running on HPCs without libicu
+# brew "moar" # Nice to use pager for humans
+# brew "mtr" # 'traceroute' and 'ping' in a single tool. Written in C
+# brew "nano" # Free (GNU) replacement for the Pico text editor
+# brew "ncdu" # NCurses Disk Usage. Slow to build with non-root brew
+# brew "ninja" # Small build system for use with gyp or CMake
+# brew "opam" # OCaml package manager
+# brew "ouch" # Painless compression and decompression for your terminal
+# brew "oxipng" # Multithreaded PNG optimizer written in Rust
+# brew "oxker" # A simple tui to view & control docker containers.
+# brew "pandoc" # available in webi # Swiss-army knife of markup format conversion
+# brew "parallel" # Shell command parallelization utility
+# brew "patch" # Apply a diff file to an original. Written in C
+# brew "pbzip2" # Parallel bzip2.
+# brew "pcalc" # Calculator for those working with multiple bases, sizes, & close to the bits. Slow to build with non-root brew
+# brew "pfetch-rs" # Pretty system information tool written in Rust
+# brew "pigz" # Parallel gzip. Installs zopfli
+# brew "plzip" # Data compressor
+# brew "portal" # Quick and easy command-line file transfer utility from any computer to another
+# brew "prettyping" # Wrapper to colorize and simplify ping's output
+# brew "procs" # Modern replacement for ps written by Rust
+# brew "pstree" # Show ps output as a tree
+# brew "pv" # Monitor data's progress through a pipe
+# brew "remake" # Slow to build with non-root brew. # GNU Make with improved error handling, tracing, and a debugger
+# brew "riff" # Diff filter highlighting which line parts have changed
+# brew "ripgrep" # Search tool like grep and The Silver Searcher
+# brew "ripgrep-all" # Wrapper around ripgrep that adds multiple rich file types
+# brew "ruff" # An extremely fast Python linter and code formatter, written in Rust.
+# brew "sad" # CLI search and replace | Space Age seD
+# brew "sd" # Intuitive find & replace CLI
+# brew "sevenzip" # 7-Zip is a file archiver with a high compression ratio
+# brew "shellcheck" # Static analysis and lint tool, for (ba)sh scripts. Written in Haskell
+# brew "shellharden" # Corrective bash syntax highlighter
+# brew "shfmt" # Autoformat shell script source code. Written in Go
+# brew "sponge" # Soak up standard input and write to a file
+# brew "sshs" # Graphical command-line client for SSH
+# brew "starship" # Cross-shell prompt for astronauts. Best using curl-to-bash approach. Written in Rust
+# brew "statix" # Lints and suggestions for the nix programming language
+# brew "taplo" # TOML toolkit written in Rust
+# brew "tlrc" # Official tldr client written in Rust
+# brew "tokei" # Program that allows you to count code, quickly
+# brew "topgrade" # will need to install to update system, flatpak & other packages (outside chroot) # Upgrade all the things
+# brew "tree" # Display directories as trees (with optional color/HTML output)
+# brew "tree-sitter" # Parser generator tool and incremental parsing library
+# brew "trippy" # Network diagnostic tool, inspired by mtr. sudo required. Written in Rust
+# brew "tz" # CLI time zone visualizer
+# brew "unzip" # Extraction utility for .zip compressed archives
+# brew "unzip" # Extraction utility for .zip compressed archives. Written in C
+# brew "valgrind" # Dynamic analysis tools (memory, debug, profiling). Slow to build with non-root brew
+# brew "viddy" # Modern watch command
+# brew "viu" # Simple terminal image viewer written in Rust
+# brew "xz" # General-purpose data compression with high compression ratio. Written in C
+# brew "yank" # Copy terminal output to clipboard
+# brew "yarn" # JavaScript package manager
+# brew "yazi" # Blazing fast terminal file manager written in Rust, based on async I/O.
+# brew "zip" # Compression and file packaging/archive utility
+# brew "zk" # Zettelkasten plain text note-taking assistant
+
+# Less urgent/low priority/slow to compile tools
+# ----------------------------------------------
+
+# brew "aria2" # slow to build with webi-install brew (Apr 2024). Download with resuming & segmented downloading. openssl compilation is finicky on hpcs. Written in C++
+# brew "asciidoctor" # Text processor and publishing toolchain for AsciiDoc. Written in Ruby
+# brew "asciinema" # slow to build dependencies with webi-install brew (Apr 2024). # Record and share terminal sessions. Written in Python
+# brew "asn" # Organization lookup and server tool (ASN / IPv4 / IPv6 / Prefix / AS Path). Written in Shell
+# brew "aspell" # slow to build dependencies with webi-install brew (Apr 2024) Builds pkg-config. # Spell checker with better logic than ispell. Written in Rescript/C++
+# brew "atop" # Advanced system and process monitor for Linux using process events. Written in C
+# brew "azure-cli" # slow to build dependencies with webi-install brew (Apr 2024). Microsoft Azure CLI 2.0
+# brew "bandwhich" # Terminal bandwidth utilization tool
+# brew "basedpyright" # Type checker for the Python language. openssl compilation is too finicky on hpcs (like ucl myriad). Written in nodejs
+# brew "bash-language-server" # Language Server for Bash. Needs to build openssl. Written in nodejs
+# brew "bat" # slow with webi-install brew. Clone of cat with syntax highlighting & Git integration. openssl compilation is finicky on hpcs. cargo binstall. Written in Rust
+# brew "bdw-gc" # Garbage collector for C and C++
+# brew "bear" # slow with webi-install brew (Apr 2024). Generate compilation database for clang tooling. openssl compilation is finicky on hpcs. Written in C++
+# brew "binutils" # GNU binary tools for native development. Slow to build with non-root brew
+# brew "bison" # parser generator
+# brew "bk" # Terminal Epub reader
+# brew "brotli"
+# brew "bufbuild/buf/buf"
+# brew "c-ares"
+# brew "ca-certificates"
+# brew "cairo"
+# brew "calc" # C-style arbitrary precision calculator. Slow to build with non-root brew
+# brew "cargo-nextest"
+# brew "ccache" # Compiler cache for fast recompilation of C/C++ code. Depends on openssl3. Written in C++
+# brew "ccls" # C/C++/ObjC language server
+# brew "cgdb" # Curses-based interface to the GNU Debugger
+# brew "chroma" # General purpose syntax highlighter in pure Go
+# brew "circumflex" # Hacker News in your terminal. Builds pkg-config. Executable is 'clx'. Written in Go.
+# brew "clinfo" # Print information about OpenCL platforms and devices
+# brew "clipboard" # installs wayland!
+# brew "cmake" # slow to build dependencies with webi-install brew (Apr 2024). Cross-platform, open-source build system generator. Openssl failure on myriad
+# brew "cmake-docs"
+# brew "cmocka" # Unit testing framework for C
+# brew "codespell" # check code for common misspellings. Openssl build issue on myriad. Written in Python
+# brew "commitlint" # Lint your commit messages. opensslv3. Written in Nodejs
+# brew "coreutils" # GNU File, Shell, and Text utilities
+# brew "cowsay" # Configurable talking characters in ASCII art
+# brew "cpanminus" # Get, unpack, build, and install modules from CPAN
+# brew "cppcheck" # slow to build dependencies with webi-install brew (Apr 2024). # binary package available from mamba too. Static analysis of C and C++ code
+# brew "cppman" # C++ 98/11/14/17/20 manual pages from cplusplus.com and cppreference.com. Slow to install via non-root brew
+# brew "csvkit" # Suite of command-line tools for converting to and working with CSV. Too slow to install
+# brew "curl" # Slow to build with non-root brew. A command line tool for transferring files with URL syntax
+# brew "dasht" # pulls in w3m as a dependency # Search API docs offline, in your terminal or browser. Slow to build with non-root brew
+# brew "datamash" # Tool to perform numerical, textual & statistical operations. Slow to build with non-root brew
+# brew "detox" # Utility to replace problematic characters in filenames. # slow to build dependencies with webi-install brew (Apr 2024).
+# brew "diffutils" # File comparison utilities
+# brew "direnv" # Load/unload environment variables based on $PWD. Slow to build with non-root brew
+# brew "dlib"  # A toolkit for making real world machine learning and data analysis applications in C++
+# brew "dockerfile-language-server" # Language server for Dockerfiles. Too much stuff to build. Written in Typescript
+# brew "doitlive" # now available with mason-tool-installer.nvim # Replay stored shell commands for live presentations
+# brew "double-conversion" # Binary-decimal and decimal-binary routines for IEEE doubles
+# brew "dsq"  # Commandline tool for running SQL queries against JSON, CSV, Excel, Parquet, and more.
+# brew "dvc" # Git for data science projects
+# brew "elfutils" # Libraries and utilities for handling ELF objects. Problem building on myriad
+# brew "eva" # Calculator REPL, similar to bc(1)
+# brew "exiftool" # Install as needed. Moderate disk space required. # Perl lib/tool for reading & writing EXIF metadata. https://hub.docker.com/r/leplusorg/img
+# brew "expat" # XML 1.0 parser
+# brew "eza" # Builds openssl from src. Modern, maintained replacement for ls. Difficult on myriad
+# brew "fastfetch" # Like neofetch, but much faster because written mostly in C. Too many build dependencies (an incredible number of dependencies)
+# brew "fend" # slow to build dependencies with webi-install brew (Apr 2024). Arbitrary-precision unit-aware calculator
+# brew "ffmpeg" # available in webi. Play, record, convert, and stream audio and video. Too many brew dependencies to build. openssl@3 build is problematic
+# brew "fftw" # C routines to compute the Discrete Fourier Transform
+# brew "file-formula" # Slow to build with non-root brew. Utility to determine file types. Written in C
+# brew "flac" # Free lossless audio codec
+# brew "flawfinder" # Slow to build with non-root brew. # Examines code and reports possible security weaknesses
+# brew "fnm" # Fast and simple Node.js version manager
+# brew "fontconfig" # XML-based font configuration API for X Windows
+# brew "fortls" # Fortran Language Server. openssl@3 requirement
+# brew "freetype" # Software library to render fonts
+# brew "fx" # slow to build with non-root brew. Terminal JSON viewer. openssl@3 requirement
+# brew "gdb" # problems with python dependency. GNU debugger. openssl
+# brew "gdbgui" # Modern, browser-based frontend to gdb (gnu debugger). Slow to build with non-root brew
+# brew "ghostscript" # slow to build with non-root brew. Interpreter for PostScript and PDF. openssl
+# brew "git" # slow to build with non-root brew. Distributed revision control system. openssl
+# brew "git-branchless" # High-velocity, monorepo-scale workflow for Git
+# brew "git-cliff" # Highly customizable changelog generator. openssl
+# brew "git-crypt" # Enable transparent encryption/decryption of files in a git repo
+# brew "git-extras" # Small git utilities
+# brew "git-lfs" # Git extension for versioning large files
+# brew "gitlint" # Linting for your git commit messages. Too many build dependencies. Written in Python
+# brew "gitui" # Blazing fast terminal-ui for git written in rust
+# brew "glog" # Application-level logging library
+# brew "gnupg" # available in webi. GNU Pretty Good Privacy (PGP) package. Tough to build on myriad
+# brew "go" # install with mise? Install with webi? Open source programming language to build simple/reliable/efficient software. # Slow to build with non-root brew.
+# brew "gperf" # Perfect hash function generator
+# brew "gping" # Ping, but with a graph
+# brew "graphviz" # Slow to build with non-root brew. Graph visualization software from AT&T and Bell Labs. Too many dependencies
+# brew "grep" # GNU grep, egrep and fgrep
+# brew "guile" # GNU Ubiquitous Intelligent Language for Extensions
+# brew "highlight" # Convert source code to formatted text with syntax highlighting
+# brew "himalaya" # CLI email client written in Rust. Slow to build with non-root brew
+# brew "htop" # Improved top (interactive process viewer)
+# brew "hugo" # somewhat heavy in disk space. Configurable static site generator
+# brew "hyfetch" # Fast, highly customisable system info script
+# brew "imagemagick" # Tools and libraries to manipulate images in many formats. Too many dependencies
+# brew "include-what-you-use" # Tool to analyze #includes in C and C++ source files
+# brew "jless" # Command-line pager for JSON data. Slow to build with non-root brew
+# brew "joern" # Open-source code analysis platform based on code property graphs
+# brew "jpeginfo" # Prints information and tests integrity of JPEG/JFIF files
+# brew "jq" # consider jaq. jq is available in webi # Lightweight and flexible command-line JSON processor
+# brew "julia" # too many dependencies
+# brew "julien-cpsn/atac/atac" # A simple API client (postman like) in your terminal. Written in Rust
+# brew "kcov" # Code coverage tool for compiled programs, Python & shell scripts which uses debugging information to collect & report data without special compilation options
+# brew "latex2rtf" # Translate LaTeX to RTF
+# brew "lbzip2" # Parallel bzip2 utility (deprecated message from brew doctor ca. Jul 2024)
+# brew "lesspipe" # Input filter for the pager less. Needs to build a few dependencies on a mutable/minimal OS
+# brew "lf" # Terminal file manager
+# brew "lftp" # Sophisticated file transfer program
+# brew "llvm"  # (this package is huge). Slow to build with non-root brew. # Next-gen compiler infrastructure. Written in C++
+# brew "lm-sensors" # Tools for monitoring the temperatures, voltages, and fans
+# brew "lmod" # Lua-based environment modules system to modify PATH variable. Slow to build with non-root brew
+# brew "lnav" # installs libarchive (tar) # Curses-based tool for viewing and analyzing log files. openssl
+# brew "lsd" # Clone of ls with colorful output, file type icons, and more
+# brew "lsyncd" # Synchronize local directories with remote targets
+# brew "lua" # Powerful, lightweight programming language. Slow to build with non-root brew
+# brew "luajit" # Just-In-Time Compiler (JIT) for the Lua programming language
+# brew "luarocks" # Package manager for the Lua programming language
+# brew "lychee" # Fast, async link checker. pkg-config & openssl dependencies. Written in Rust
+# brew "lynx" # Text-based web browser
+# brew "makefile2graph" # Create a graph of dependencies from GNU-Make. openssl
+# brew "meta-package-manager" # too many dependencies
+# brew "micromamba" # Fast Cross-Platform Package Manager
+# brew "mise" # exists in nix, but outdated. If installed through brew, it builds pkg-config and other dependencies
+# brew "mkcert" # Simple tool to make locally trusted development certificates
+# brew "modules" # installs tcl-tk as a dependency (disk space) # Dynamic modification of a user's environment via modulefiles
+# brew "moreutils" # Collection of tools that nobody wrote when UNIX was young. Slow to build with non-root brew
+# brew "mtr" # 'traceroute' and 'ping' in a single tool. Requires sudo
+# brew "mupdf-tools" # fairly big on disk space. Lightweight PDF and XPS viewer
+# brew "nasa-sw-vnv/core/ikos" # does not yet build on gcc-12 (as of Dec 2023)
+# brew "neovim" # problems with webi-installed brew (Feb 2024). Vim-fork focused on extensibility and agility. openssl compilation is too finicky on hpcs (like ucl myriad).
+# brew "neovim-remote" # Control nvim processes using `nvr` command-line tool
+# brew "nerdfix" # Find/fix obsolete Nerd Font icons
+# brew "netcat" # Too many dependencies to build
+# brew "nmap" # install as needed. Moderate amount of disk space needed
+# brew "node" # available in webi. Platform built on V8 to build network applications. Too slow to build with non-root brew. openssl3
+# brew "numbat" # Statically typed programming language for scientific computations. Just use python or julia for now
+# brew "open-mpi" # High performance message passing library
+# brew "optipng" # PNG file optimizer
+# brew "par" # Paragraph reflow for email
+# brew "pass" # Password manager. Too slow to install with non-root brew
+# brew "pdftk-java" # Port of pdftk in java. Slow to build with non-root brew
+# brew "perl" # Highly capable, feature-rich programming language. Slow to build with non-root brew
+# brew "perltidy" # Indents and reformats Perl scripts to make them easier to read. Slow to build with non-root brew
+# brew "pipx" # Execute binaries from Python packages in isolated environments
+# brew "plantuml" # Draw UML diagrams. Slow to install with non-root brew
+# brew "pmd" # Source code analyzer for Java, JavaScript, and more. Slow to build with non-root brew
+# brew "poac" # Package manager and build system for C++. Slow to build with non-root brew
+# brew "popt" # Library like getopt(3) with a number of enhancements
+# brew "pyenv" # Python version management. Slow to build with non-root brew
+# brew "pygments"  # try chroma instead # Generic syntax highlighter
+# brew "qpdf" # Tools for and transforming and inspecting PDF files
+# brew "redpen" # Proofreading tool to help writers of technical documentation. Slow to install with non-root brew
+# brew "rename" # Perl-powered file rename script with many helpful built-ins
+# brew "rkhunter" # Rootkit hunter. Must be root to run
+# brew "rnr"  # f2 is better? # Command-line tool to batch rename files and directories
+# brew "rsync" # Utility that provides fast incremental file transfer. Slow to install with non-root brew
+# brew "rtmpdump" # Tool for downloading RTMP streaming media
+# brew "ruby" # Powerful, clean, object-oriented scripting language
+# brew "socat" # SOcket CAT: netcat on steroids. Slow to build with non-root brew
+# brew "source-highlight" # Source-code syntax highlighter
+# brew "sqlite" # Command-line interface for SQLite. Slow to build with non-root brew
+# brew "starship" # Cross-shell prompt for astronauts. Slow to install with non-root brew
+# brew "style-check" # Parses latex-formatted text in search of forbidden phrases. Slow to install with non-root brew
+# brew "t-rec" # Blazingly fast terminal recorder that generates animated gif images for the web. Slow build with non-root brew
+# brew "tealdeer" # Very fast implementation of tldr in Rust
+# brew "texinfo" # perl as dependency. Slow to build with non-root brew
+# brew "texlab" # Implementation of the Language Server Protocol for LaTeX
+# brew "textidote" # slow to build with non-root brew. Spelling, grammar and style checking on LaTeX documents
+# brew "tig" # Text interface for Git repositories. Slow to build with non-root brew
+# brew "timg" # Terminal image and video viewer
+# brew "tmate" # Instant terminal sharing
+# brew "tmux" # Terminal multiplexer
+# brew "translate-shell" # Command-line translator using Google Translate and more. Slow to install with non-root brew
+# brew "trash-cli" # lots of building from source required. slow to install with webi-based brew? March 2024. openssl3
+# brew "ttyplot" # Realtime plotting utility for terminal with data input from stdin
+# brew "typescript" # Language for application scale JavaScript development
+# brew "universal-ctags" # Maintained ctags implementation
+# brew "urlview" # perl as dependency. URL extractor/launcher. Slow to build with non-root brew
+# brew "util-linux" # Collection of Linux utilities. Slow to build with non-root brew. openssl
+# brew "vagrant-completion" # Bash completion for Vagrant
+# brew "vgrep" # User-friendly pager for grep. Too slow to build with non-root brew
+# brew "vim" # Vi 'workalike' with many additional features. Slow to build with non-root brew. openssl
+# brew "virtualenvwrapper" # Python virtualenv extensions. Slow to build with non-root brew
+# brew "w3m" # Pager/text based browser. Slow to build with non-root brew
+# brew "watchman" # pulls in 'boost'. Watch files and take action when they change. Slow to build with non-root brew
+# brew "wezterm" # hard to set up as default terminal when installed through brew
+# brew "wget" # Internet file retriever. Slow to build with non-root brew. openssl
+# brew "xdotool" # Fake keyboard/mouse input and window management for X. Slow to install with non-root brew
+# brew "xinput" # Utility to configure and test X input devices
+# brew "xkeyboardconfig" # Keyboard configuration database for the X Window System
+# brew "youplot" # better alternatives exist in JuliaLang
+# brew "yt-dlp" # Feature-rich command-line audio/video downloader. Slow to build with non-root brew. openssl
+# brew "z3" # High-performance theorem prover. Too slow to build with non-root brew
+# brew "zellij" # Pluggable terminal workspace, with terminal multiplexer as the base feature. Slow to build with non-root brew
+# brew "zlib" # General-purpose lossless data-compression library
+# brew "zstd" # Zstandard is a real-time compression algorithm. Too many dependencies to install. Written in C
+
+# brew info $(git show HEAD~1 | grep "Formula/" | tail -n 1 | awk -F "/" '{print $NF}' | awk -F "." '{print $1}') | less

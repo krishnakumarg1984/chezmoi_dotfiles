@@ -1,0 +1,14 @@
+1. sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:$GITHUB_USERNAME/dotfiles.git
+2, curl -sS https://webi.sh/brew | sh
+3. curl -fsSL https://pixi.sh/install.sh | PIXI_HOME="$HOME/.config/pixi" bash
+4. curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+curl https://zyedidia.github.io/eget.sh | sh
+
+
+curl -s https://repo.waydro.id | sudo bash
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/mhewedy/vermin/master/install.sh)"
+curl https://mise.run | sh
+
+curl -sS https://starship.rs/install.sh | sh
+curl -L https://github.com/guyfedwards/nom/releases/download/v2.1.4/nom_2.1.4_darwin_amd64.tar.gz | tar -xzvf -

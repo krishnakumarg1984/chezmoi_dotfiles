@@ -1,0 +1,6 @@
+# vim:ft=ruby:
+
+tap "homebrew/linux-fonts"
+brew "font-victor-mono-nerd-font"
+brew "c" # Compile and execute C "scripts" in one go. Written in Shell
+

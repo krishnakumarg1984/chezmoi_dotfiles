@@ -1,0 +1,5 @@
+lquota
+
+For /etc/sudoers when using Ansible NOPASSWD
+--------------------------------------------
+Defaults timestamp_type=global, timestamp_timeout=60

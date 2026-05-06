@@ -1,0 +1,11 @@
+nektos/act
+sigoden/aichat
+ast-grep/ast-grep
+aeosynth/bk
+dcodesdev/clipcat
+TD-Sky/conceal
+imsnif/diskonaut
+nachoparker/dutree
+Canop/dysk
+guyfedwards/nom
+shellrow/nrev

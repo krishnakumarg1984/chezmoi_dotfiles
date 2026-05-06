@@ -1,0 +1,6 @@
+basedpyright
+cmakelint
+codespell
+gitlint
+install-release
+pytest

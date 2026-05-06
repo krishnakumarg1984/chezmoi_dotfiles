@@ -1,0 +1,6 @@
+sudo apt-add-repository ppa:flexiondotorg/quickemu && sudo apt update && sudo apt install quickgui
+analizo
+docker-ce
+docker-ce-cli
+mainline
+y-ppa-manager
