@@ -270,6 +270,42 @@ typst = "latest"               # A new markup-based typesetting system that is p
 # THE PIPELINE   : sd. Use when you need a high-speed Rust-based regex replacement engine within shell pipelines.
 # ======================================================================================================================
 
+# RPN calculator options
+# ----------------------
+# https://docs.rs/crate/rpn-cli/1.8.0/source/,  https://github.com/isene/XRPN, https://github.com/marcopaganini/rpn,  https://github.com/gurgeous/vectro,  https://github.com/rsp2k/pydantic-rpn,  https://github.com/Allain18/pol,  https://github.com/ConceptJunkie/rpn/, https://github.com/terrycojones/rpnpy, https://codeberg.org/scip/rpnc/, https://github.com/frossm/rpncalc
+# | Project             | Lang   | Score | Maint | Undo | TUI | Vis | Saved | ArbP | Ratl | Matrx | Plot | Turing | Cmplx | Const | SciNot | REPL | Lib | Speed |
+# | :------------------ | :----- | :---: | :---: | :--: | :-: | :-: | :---: | :--: | :--: | :---: | :--: | :----: | :---: | :---: | :----: | :--: | :-: | :---: |
+# | rpn-cli             | Rust   | 18    |   3   |  ❌  | ❌  | ✅  |  ✅   |  ✅  |  ✅  |  ✅   |  ❌  |   ✅   |  ✅   |  ✅   |   ✅   |  ✅  | ✅  |   3   |
+# | rpnpy               | Python | 18    |   2   |  ❌  | ✅  | ✅  |  ✅   |  ✅  |  ✅  |  ✅   |  ✅  |   ✅   |  ✅   |  ✅   |   ✅   |  ✅  | ✅  |   1   |
+# | T-REX               | Ruby   | 17    |   3   |  ✅  | ✅  | ✅  |  ✅   |  ❌  |  ❌  |  ❌   |  ❌  |   ✅   |  ✅   |  ✅   |   ✅   |  ✅  | ❌  |   1   |
+# | rpncalc (frossm)    | Java   | 15    |   2   |  ✅  | ✅  | ✅  |  ✅   |  ✅  |  ✅  |  ❌   |  ❌  |   ❌   |  ❌   |  ✅   |   ✅   |  ✅  | ❌  |   2   |
+# | XRPN (isene)        | Ruby   | 12    |   1   |  ✅  | ❌  | ✅  |  ✅   |  ❌  |  ❌  |  ❌   |  ❌  |   ✅   |  ✅   |  ✅   |   ✅   |  ✅  | ✅  |   1   |
+# | pol (Allain18)      | Rust   | 11    |   2   |  ❌  | ❌  | ❌  |  ❌   |  ❌  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ✅   |   ✅   |  ✅  | ✅  |   3   |
+# | rpn (paganini)      | Go     | 10    |   2   |  ❌  | ❌  | ❌  |  ❌   |  ✅  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ❌   |   ✅   |  ✅  | ✅  |   3   |
+# | ConceptJunkie/rpn   | C++    | 9     |   1   |  ❌  | ❌  | ❌  |  ❌   |  ✅  |  ❌  |  ❌   |  ❌  |   ❌   |  ✅   |  ✅   |   ✅   |  ✅  | ❌  |   3   |
+# | rpnc (scip)         | C      | 4     |   1   |  ❌  | ❌  | ❌  |  ❌   |  ❌  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ❌   |   ❌   |  ❌  | ❌  |   3   |
+# | vectro              | Go     | 4     |   1   |  ❌  | ❌  | ❌  |  ❌   |  ❌  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ❌   |   ❌   |  ❌  | ❌  |   2   |
+# | pydantic-rpn        | Python | 2     |   0   |  ❌  | ❌  | ❌  |  ❌   |  ❌  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ❌   |   ❌   |  ❌  | ✅  |   1   |
+
+
+# | Project       | Lang  | Score | Pipes | Scripting | Speed | Maint | CAS | TUI | ArbP | Ratl | Matrx | Cmplx | Docs | Win/Mac/Lin |
+# | :------------ | :---- | :---: | :---: | :-------- | :---: | :---: | :-: | :-: | :--: | :--: | :---: | :---: | :--: | :---------- |
+# | Emacs Calc    | Elisp | 26    |  ✅   | Turing    |   2   |   3   | ✅  | ✅  |  ✅  |  ✅  |  ✅   |  ✅   |  ✅  | ✅ Native   |
+# | rpnpy         | Python| 22    |  ❌   | Turing    |   1   |   2   | ✅  | ✅  |  ✅  |  ✅  |  ✅   |  ✅   |  ✅  | ✅ Native   |
+# | rpn-cli       | Rust  | 21    |  ✅   | Turing    |   3   |   3   | ❌  | ❌  |  ✅  |  ✅  |  ✅   |  ✅   |  ✅  | ✅ Native   |
+# | Calc.jl       | Julia | 20    |  ❌   | Turing    |   2   |   2   | ✅  | ✅  |  ✅  |  ❌  |  ✅   |  ✅   |  ✅  | ✅ Native   |
+# | esc           | Python| 17    |  ✅   | Turing    |   1   |   2   | ✅  | ✅  |  ❌  |  ❌  |  ❌   |  ✅   |  ✅  | ✅ Native   |
+# | rpn (paganini)| Go    | 12    |  ✅   | Basic     |   3   |   2   | ❌  | ❌  |  ✅  |  ❌  |  ❌   |  ❌   |  ✅  | ✅ Native   |
+# | ConceptJunkie | C++   | 10    |  ❌   | ❌        |   3   |   1   | ❌  | ❌  |  ✅  |  ❌  |  ❌   |  ✅   |  ✅  | ✅ Native   |
+
+# | Project    | Lang  | Score | LitProg | Bidirect | Parallel | GPU | Pipes | Lib | CAS | TUI | ArbP | Matrx | Cmplx | Plot | Speed |
+# | :--------- | :---- | :---: | :-----: | :------: | :------: | :-: | :---: | :-: | :-: | :-: | :--: | :---: | :---: | :--: | :---: |
+# | Emacs Calc | Elisp | 27    |   ✅    |    ✅    |    ❌    | ❌  |  ✅   | ❌  | ✅  | ✅  |  ✅  |  ✅   |  ✅   |  ✅  |   2   |
+# | rpnpy      | Python| 27    |   ✅    |    ✅    |    ✅    | ✅  |  ❌   | ✅  | ✅  | ✅  |  ✅  |  ✅   |  ✅   |  ✅  |   1   |
+# | Calc.jl    | Julia | 25    |   ✅    |    ✅    |    ✅    | ✅  |  ❌   | ✅  | ✅  | ✅  |  ✅  |  ✅   |  ✅   |  ✅  |   2   |
+# | rpn-cli    | Rust  | 23    |   ❌    |    ✅    |    ❌    | ❌  |  ✅   | ✅  | ❌  | ❌  |  ✅  |  ✅   |  ✅   |  ❌  |   3   |
+
+
 {{- end }}
 
 
