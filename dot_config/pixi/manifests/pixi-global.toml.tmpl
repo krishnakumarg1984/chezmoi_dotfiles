@@ -5,11 +5,6 @@ channels = ["conda-forge"]
 dependencies = { biome = "*", croc = "*", dysk = "*", fx = "*", goawk = "*", jinja-lsp = "*", jnv = "*", jq = "*", jupyter = "*", make = "*", markdown-oxide = "*", mdslw = "*", selene = "*", terraform-ls = "*", treefmt = "*", typos-lsp = "*", yj = "*", zk = "*" }
 exposed = { biome = "biome", croc = "croc", dysk = "dysk", fx = "fx", goawk = "goawk", jinja-lsp = "jinja-lsp", jnv = "jnv", jq = "jq", jupyter = "jupyter", make = "make", markdown-oxide = "markdown-oxide", mdslw = "mdslw", selene = "selene", terraform-ls = "terraform-ls", treefmt = "treefmt", typos-lsp = "typos-lsp", yj = "yj", zk = "zk" }
 
-[envs.pixi_global_env_clang]
-channels = ["conda-forge"]
-dependencies = { clang = "*", clang-tools = "*" }
-exposed = { amdgpu-arch = "amdgpu-arch", analyze-build = "analyze-build", clang = "clang", clang-apply-replacements = "clang-apply-replacements", clang-apply-replacements-22 = "clang-apply-replacements-22", clang-change-namespace = "clang-change-namespace", clang-change-namespace-22 = "clang-change-namespace-22", clang-check = "clang-check", clang-check-22 = "clang-check-22", clang-cl = "clang-cl", clang-cpp = "clang-cpp", clang-doc = "clang-doc", clang-doc-22 = "clang-doc-22", clang-extdef-mapping = "clang-extdef-mapping", clang-extdef-mapping-22 = "clang-extdef-mapping-22", clang-include-cleaner = "clang-include-cleaner", clang-include-cleaner-22 = "clang-include-cleaner-22", clang-include-fixer = "clang-include-fixer", clang-include-fixer-22 = "clang-include-fixer-22", clang-installapi = "clang-installapi", clang-installapi-22 = "clang-installapi-22", clang-linker-wrapper = "clang-linker-wrapper", clang-linker-wrapper-22 = "clang-linker-wrapper-22", clang-move = "clang-move", clang-move-22 = "clang-move-22", clang-nvlink-wrapper = "clang-nvlink-wrapper", clang-nvlink-wrapper-22 = "clang-nvlink-wrapper-22", clang-offload-bundler = "clang-offload-bundler", clang-offload-bundler-22 = "clang-offload-bundler-22", clang-query = "clang-query", clang-query-22 = "clang-query-22", clang-refactor = "clang-refactor", clang-refactor-22 = "clang-refactor-22", clang-reorder-fields = "clang-reorder-fields", clang-reorder-fields-22 = "clang-reorder-fields-22", clang-repl = "clang-repl", clang-repl-22 = "clang-repl-22", clang-scan-deps = "clang-scan-deps", clang-scan-deps-22 = "clang-scan-deps-22", clang-sycl-linker = "clang-sycl-linker", clang-sycl-linker-22 = "clang-sycl-linker-22", clang-tidy = "clang-tidy", clang-tidy-22 = "clang-tidy-22", clangd = "clangd", diagtool = "diagtool", find-all-symbols = "find-all-symbols", git-clang-format = "git-clang-format", hmaptool = "hmaptool", intercept-build = "intercept-build", modularize = "modularize", nvptx-arch = "nvptx-arch", offload-arch = "offload-arch", pp-trace = "pp-trace", run-clang-tidy = "run-clang-tidy", scan-build = "scan-build", scan-build-py = "scan-build-py", scan-view = "scan-view" }
-
 [envs.pixi_global_env_cmake]
 channels = ["conda-forge"]
 dependencies = { cmake = "*" }
@@ -25,20 +20,20 @@ channels = ["conda-forge"]
 dependencies = { detox = "*" }
 exposed = { detox = "detox", inline-detox = "inline-detox" }
 
-[envs.pixi_global_env_emacs]
-channels = ["conda-forge"]
-dependencies = { emacs = "*" }
-exposed = { ctags = "ctags", ebrowse = "ebrowse", emacs = "emacs", "emacs-30.2" = "emacs-30.2", emacsclient = "emacsclient", etags = "etags", "x86_64-conda-linux-gnu-gcc-14.3.0" = "x86_64-conda-linux-gnu-gcc-14.3.0" }
+# [envs.pixi_global_env_emacs]
+# channels = ["conda-forge"]
+# dependencies = { emacs = "*" }
+# exposed = { ctags = "ctags", ebrowse = "ebrowse", emacs = "emacs", "emacs-30.2" = "emacs-30.2", emacsclient = "emacsclient", etags = "etags", "x86_64-conda-linux-gnu-gcc-14.3.0" = "x86_64-conda-linux-gnu-gcc-14.3.0" }
 
 [envs.pixi_global_env_fontconfig]
 channels = ["conda-forge"]
 dependencies = { fontconfig = "*" }
 exposed = { fc-cache = "fc-cache", fc-cat = "fc-cat", fc-conflist = "fc-conflist", fc-list = "fc-list", fc-match = "fc-match", fc-pattern = "fc-pattern", fc-query = "fc-query", fc-scan = "fc-scan", fc-validate = "fc-validate" }
 
-[envs.pixi_global_env_gcc]
-channels = ["conda-forge"]
-dependencies = { gcc = "*" }
-exposed = { cc = "cc", cpp = "cpp", gcc = "gcc", gcc-ar = "gcc-ar", gcc-nm = "gcc-nm", gcc-ranlib = "gcc-ranlib", gcov = "gcov", gcov-dump = "gcov-dump", gcov-tool = "gcov-tool" }
+# [envs.pixi_global_env_gcc]
+# channels = ["conda-forge"]
+# dependencies = { gcc = "*" }
+# exposed = { cc = "cc", cpp = "cpp", gcc = "gcc", gcc-ar = "gcc-ar", gcc-nm = "gcc-nm", gcc-ranlib = "gcc-ranlib", gcov = "gcov", gcov-dump = "gcov-dump", gcov-tool = "gcov-tool" }
 
 [envs.pixi_global_env_gdb]
 channels = ["conda-forge"]

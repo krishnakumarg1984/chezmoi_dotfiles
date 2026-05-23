@@ -1,5 +1,6 @@
 [env]
 MISE_ENV_FILE = ".env"
+MISE_NODE_VERIFY = "0"
 
 [tools]
 node = "latest"                                     # Node.js JavaScript runtime
@@ -45,7 +46,6 @@ tree-sitter = "latest"          # An incremental parsing system for programming 
 usage = "latest"                # A specification for CLIs. https://github.com/jdx/usage
 uv = "latest"                   # An extremely fast Python package installer and resolver, written in Rust. https://github.com/astral-sh/uv
 viddy = "latest"                # A modern watch command. Time machine and pager etc. https://github.com/sachaos/viddy
-zellij = "latest"               # A terminal workspace with batteries included. https://github.com/zellij-org/zellij
 
 "cargo:bookokrat" = "latest"                                # A terminal-based EPUB/PDF Books reader. https://github.com/bugzmanov/bookokrat
 "cargo:brush" = { version = "latest", locked = true }       # Rust-implemented shell focused on POSIX and bash compatibility. https://github.com/reubeno/brush
@@ -93,6 +93,7 @@ typst = "latest"               # A new markup-based typesetting system that is p
 # ccache = "latest"             # A fast compiler cache. https://github.com/ccache/ccache
 # checkmake = "latest"          # Linter/analyzer for Makefiles. https://github.com/checkmake/checkmake
 # chezmoi = "latest"            # Manage your dotfiles across multiple diverse machines, securely. https://github.com/twpayne/chezmoi
+# clang = "latest"                # Huge (1GB+ on Linux as of May 2026). Clang is an 'LLVM native' C/C++/Objective-C compiler, which aims to deliver amazingly fast compiles, extremely useful error and warning messages and to provide a platform for building great source level tools. https://github.com/clang
 # clang-format = "latest"       # Format C/C++/Java/JavaScript/JSON/Objective-C/Protobuf/C# code. https://github.com/clang-format
 # cosign = "latest"             # Code signing and transparency for containers and binaries. https://github.com/sigstore/cosign
 # cpz = "latest"                # A zippy alternative to cp, a tool to copy files and directories. https://github.com/SUPERCILEX/fuc/cpz.  Needs "progress" to be marked as a feature while installing through here.
@@ -124,6 +125,7 @@ typst = "latest"               # A new markup-based typesetting system that is p
 # tombi = "latest"              # TOML Formatter / Linter / Language Server. https://github.com/tombi-toml/tombi
 # yamlfmt = "latest"            # An extensible command line tool or library to format yaml files. https://github.com/google/yamlfmt
 # yamllint = "latest"           # A linter for YAML files. https://pypi.org/project/yamllint
+# zellij = "latest"             # No graphics capability yet (as of May 2026). A terminal workspace with batteries included. https://github.com/zellij-org/zellij
 
 # "cargo:binsider" = "latest"                               # Analyze ELF binaries like a boss. https://github.com/orhun/binsider
 # "cargo:carl" = "latest"                                   # A colorful commandline calendar with ical support. Similar to `cal`, but with features. https://codeberg.org/birger/carl
@@ -273,38 +275,102 @@ typst = "latest"               # A new markup-based typesetting system that is p
 # RPN calculator options
 # ----------------------
 # https://docs.rs/crate/rpn-cli/1.8.0/source/,  https://github.com/isene/XRPN, https://github.com/marcopaganini/rpn,  https://github.com/gurgeous/vectro,  https://github.com/rsp2k/pydantic-rpn,  https://github.com/Allain18/pol,  https://github.com/ConceptJunkie/rpn/, https://github.com/terrycojones/rpnpy, https://codeberg.org/scip/rpnc/, https://github.com/frossm/rpncalc
-# | Project             | Lang   | Score | Maint | Undo | TUI | Vis | Saved | ArbP | Ratl | Matrx | Plot | Turing | Cmplx | Const | SciNot | REPL | Lib | Speed |
-# | :------------------ | :----- | :---: | :---: | :--: | :-: | :-: | :---: | :--: | :--: | :---: | :--: | :----: | :---: | :---: | :----: | :--: | :-: | :---: |
-# | rpn-cli             | Rust   | 18    |   3   |  ❌  | ❌  | ✅  |  ✅   |  ✅  |  ✅  |  ✅   |  ❌  |   ✅   |  ✅   |  ✅   |   ✅   |  ✅  | ✅  |   3   |
-# | rpnpy               | Python | 18    |   2   |  ❌  | ✅  | ✅  |  ✅   |  ✅  |  ✅  |  ✅   |  ✅  |   ✅   |  ✅   |  ✅   |   ✅   |  ✅  | ✅  |   1   |
-# | T-REX               | Ruby   | 17    |   3   |  ✅  | ✅  | ✅  |  ✅   |  ❌  |  ❌  |  ❌   |  ❌  |   ✅   |  ✅   |  ✅   |   ✅   |  ✅  | ❌  |   1   |
-# | rpncalc (frossm)    | Java   | 15    |   2   |  ✅  | ✅  | ✅  |  ✅   |  ✅  |  ✅  |  ❌   |  ❌  |   ❌   |  ❌   |  ✅   |   ✅   |  ✅  | ❌  |   2   |
-# | XRPN (isene)        | Ruby   | 12    |   1   |  ✅  | ❌  | ✅  |  ✅   |  ❌  |  ❌  |  ❌   |  ❌  |   ✅   |  ✅   |  ✅   |   ✅   |  ✅  | ✅  |   1   |
-# | pol (Allain18)      | Rust   | 11    |   2   |  ❌  | ❌  | ❌  |  ❌   |  ❌  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ✅   |   ✅   |  ✅  | ✅  |   3   |
-# | rpn (paganini)      | Go     | 10    |   2   |  ❌  | ❌  | ❌  |  ❌   |  ✅  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ❌   |   ✅   |  ✅  | ✅  |   3   |
-# | ConceptJunkie/rpn   | C++    | 9     |   1   |  ❌  | ❌  | ❌  |  ❌   |  ✅  |  ❌  |  ❌   |  ❌  |   ❌   |  ✅   |  ✅   |   ✅   |  ✅  | ❌  |   3   |
-# | rpnc (scip)         | C      | 4     |   1   |  ❌  | ❌  | ❌  |  ❌   |  ❌  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ❌   |   ❌   |  ❌  | ❌  |   3   |
-# | vectro              | Go     | 4     |   1   |  ❌  | ❌  | ❌  |  ❌   |  ❌  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ❌   |   ❌   |  ❌  | ❌  |   2   |
-# | pydantic-rpn        | Python | 2     |   0   |  ❌  | ❌  | ❌  |  ❌   |  ❌  |  ❌  |  ❌   |  ❌  |   ❌   |  ❌   |  ❌   |   ❌   |  ❌  | ✅  |   1   |
+# https://git.sr.ht/~jamis/rcalc
 
-
-# | Project       | Lang  | Score | Pipes | Scripting | Speed | Maint | CAS | TUI | ArbP | Ratl | Matrx | Cmplx | Docs | Win/Mac/Lin |
-# | :------------ | :---- | :---: | :---: | :-------- | :---: | :---: | :-: | :-: | :--: | :--: | :---: | :---: | :--: | :---------- |
-# | Emacs Calc    | Elisp | 26    |  ✅   | Turing    |   2   |   3   | ✅  | ✅  |  ✅  |  ✅  |  ✅   |  ✅   |  ✅  | ✅ Native   |
-# | rpnpy         | Python| 22    |  ❌   | Turing    |   1   |   2   | ✅  | ✅  |  ✅  |  ✅  |  ✅   |  ✅   |  ✅  | ✅ Native   |
-# | rpn-cli       | Rust  | 21    |  ✅   | Turing    |   3   |   3   | ❌  | ❌  |  ✅  |  ✅  |  ✅   |  ✅   |  ✅  | ✅ Native   |
-# | Calc.jl       | Julia | 20    |  ❌   | Turing    |   2   |   2   | ✅  | ✅  |  ✅  |  ❌  |  ✅   |  ✅   |  ✅  | ✅ Native   |
-# | esc           | Python| 17    |  ✅   | Turing    |   1   |   2   | ✅  | ✅  |  ❌  |  ❌  |  ❌   |  ✅   |  ✅  | ✅ Native   |
-# | rpn (paganini)| Go    | 12    |  ✅   | Basic     |   3   |   2   | ❌  | ❌  |  ✅  |  ❌  |  ❌   |  ❌   |  ✅  | ✅ Native   |
-# | ConceptJunkie | C++   | 10    |  ❌   | ❌        |   3   |   1   | ❌  | ❌  |  ✅  |  ❌  |  ❌   |  ✅   |  ✅  | ✅ Native   |
-
-# | Project    | Lang  | Score | LitProg | Bidirect | Parallel | GPU | Pipes | Lib | CAS | TUI | ArbP | Matrx | Cmplx | Plot | Speed |
-# | :--------- | :---- | :---: | :-----: | :------: | :------: | :-: | :---: | :-: | :-: | :-: | :--: | :---: | :---: | :--: | :---: |
-# | Emacs Calc | Elisp | 27    |   ✅    |    ✅    |    ❌    | ❌  |  ✅   | ❌  | ✅  | ✅  |  ✅  |  ✅   |  ✅   |  ✅  |   2   |
-# | rpnpy      | Python| 27    |   ✅    |    ✅    |    ✅    | ✅  |  ❌   | ✅  | ✅  | ✅  |  ✅  |  ✅   |  ✅   |  ✅  |   1   |
-# | Calc.jl    | Julia | 25    |   ✅    |    ✅    |    ✅    | ✅  |  ❌   | ✅  | ✅  | ✅  |  ✅  |  ✅   |  ✅   |  ✅  |   2   |
-# | rpn-cli    | Rust  | 23    |   ❌    |    ✅    |    ❌    | ❌  |  ✅   | ✅  | ❌  | ❌  |  ✅  |  ✅   |  ✅   |  ❌  |   3   |
-
+# rpnChilada is the 4th best
+# | Category      | Factor (Weight)               | rpnpy                                 | Calc.jl                               | Emacs Calc                           |
+# | :------------ | :---------------------------- | :-----------------------------------: | :-----------------------------------: | :----------------------------------: |
+# | Reference     | Implementation Lang (1.0)     | Python <br> (Standard CPython)        | Julia <br> (LLVM-based JIT)           | Elisp <br> (Emacs Lisp)              |
+# | Reference     | Memory Safety (1.0)           | ✅ <br> (Garbage Collected)            | ✅ <br> (Garbage Collected)            | ✅ <br> (Garbage Collected)        |
+# | Reference     | Static Type Checking (1.0)    | ❌ <br> (Dynamic Typing)               | ⚠️ <br> (Optional Type Hints)          | ❌ <br> (Dynamic Lisp)             |
+# | Reference     | Modern Architecture (1.0)     | ✅ <br> (Modular Scripting)            | ✅ <br> (High-Performance)            | ⚠️ <br> (Legacy Buffer-based)       |
+# | Stack         | Stack Always Visible (1.5)    | ✅ <br> (Dedicated TUI pane)          | ✅ <br> (Interactive REPL loop)       | ✅ <br> (Living buffer view)         |
+# | Stack         | Unlimited Stack Size (1.5)    | ✅ <br> (RAM-bound list)              | ✅ <br> (RAM-bound array)             | ✅ <br> (Buffer-size bound)          |
+# | Stack         | Multiple Undo Levels (1.5)    | ✅ <br> (Deep stack history)          | ✅ <br> (Command history undo)        | ✅ <br> (Infinite Emacs undo)        |
+# | Stack         | Stack Persistence (1.5)       | ✅ <br> (Automatic session save)      | ✅ <br> (Workspace serialization)      | ✅ <br> (Standard auto-save)        |
+# | Stack         | Stack Roll Up (1.5)           | ✅ <br> (Native roll command)         | ✅ <br> (Native roll command)         | ✅ <br> (Native roll command)        |
+# | Stack         | Stack Roll Down (1.5)         | ✅ <br> (Native rolld command)        | ✅ <br> (Native rolld command)        | ✅ <br> (Native rolld command)       |
+# | Stack         | Stack Pick (1.5)              | ✅ <br> (Standard index pick)         | ✅ <br> (Standard index pick)         | ✅ <br> (Interactive buffer pick)    |
+# | Stack         | Stack Rotate (1.5)            | ✅ <br> (Native rotate command)       | ✅ <br> (Native rotate command)       | ✅ <br> (Lisp rotation logic)        |
+# | Stack         | Named Stacks (1.5)            | ✅ <br> (Named workspaces)            | ⚠️ <br> (Manual variable storage)     | ✅ <br> (Infinite buffers)           |
+# | Heritage      | HP RPL Logic (1.0)            | ❌ <br> (Standard Python lists)       | ⚠️ <br> (Partial via dispatch)        | ✅ <br> (Native object-stack)        |
+# | Heritage      | Last X Register (1.0)         | ✅ <br> (Native 'L' recall)           | ❌ <br> (Manual stack duplication)    | ✅ <br> (Native 'L' recall)          |
+# | Heritage      | Softkey Menus (0.0)           | ❌ <br> (CLI prompt only)             | ❌ <br> (REPL prompt only)            | ✅ <br> (Buffer keymaps)             |
+# | Heritage      | Keystroke Macros (0.0)        | ❌ <br> (Requires .py script)         | ❌ <br> (Requires .jl script)         | ✅ <br> (Standard Emacs Macros)      |
+# | Display       | Multiple Colours (1.0)        | ✅ <br> (Python Rich/TUI)             | ✅ <br> (Native REPL Crayons)         | ✅ <br> (Font-lock faces)            |
+# | Display       | Syntax Highlighting (1.0)     | ✅ <br> (Native TUI prompt)           | ✅ <br> (Native Julia highlighting)   | ✅ <br> (Emacs Font-lock)            |
+# | Display       | 2D Pretty Print (1.0)         | ✅ <br> (Textbook SymPy)              | ✅ <br> (Rich-text Julia)             | ✅ <br> (ASCII Art Engine)           |
+# | Display       | Hex Stack View (1.0)          | ✅ <br> (Formatted output)            | ✅ <br> (Persistent display mode)     | ✅ <br> (Dedicated d6 mode)          |
+# | Display       | Binary Stack View (1.0)       | ✅ <br> (Formatted output)            | ✅ <br> (Persistent display mode)     | ✅ <br> (Dedicated d2 mode)          |
+# | Display       | Octal Stack View (1.0)        | ✅ <br> (Formatted output)            | ✅ <br> (Persistent display mode)     | ✅ <br> (Dedicated d8 mode)          |
+# | Display       | Real-time Output (1.0)        | ✅ <br> (Immediate TUI update)        | ❌ <br> (REPL loop limited)           | ⚠️ <br> (Requires manual update)     |
+# | Math          | Matrix Addition (1.0)         | ✅ <br> (via NumPy)                   | ✅ <br> (Native Julia addition)       | ✅ <br> (Lisp vector math)           |
+# | Math          | Matrix Multiplication (1.0)   | ✅ <br> (via NumPy @)                 | ✅ <br> (Native Julia *)              | ✅ <br> (Lisp vector math)           |
+# | Math          | Matrix Transposition (1.0)    | ✅ <br> (via NumPy .T)                | ✅ <br> (Native Julia ')              | ✅ <br> (Lisp transposition)         |
+# | Math          | Matrix Determinant (1.0)      | ✅ <br> (via NumPy det)               | ✅ <br> (Native Julia det)            | ✅ <br> (Internal Lisp det)          |
+# | Math          | Matrix Inversion (1.0)        | ✅ <br> (via NumPy inv)               | ✅ <br> (Native Julia inv)            | ✅ <br> (Internal Lisp inv)          |
+# | Math          | Complex Numbers (1.0)         | ✅ <br> (Python Native Type)          | ✅ <br> (Julia Native Type)           | ✅ <br> (Internal Lisp Engine)       |
+# | Math          | Arbitrary Precision (1.0)     | ✅ <br> (Python Decimal/BigInt)       | ✅ <br> (Julia BigFloat/BigInt)       | ✅ <br> (Internal float engine)      |
+# | Math          | Exact Rational Type (1.5)     | ✅ <br> (Python Fractions)            | ✅ <br> (Native Julia //)             | ✅ <br> (Exact Rational Logic)       |
+# | Math          | Rational GCD Reduc. (1.0)     | ✅ <br> (Native Python Fractions)     | ✅ <br> (Native Julia logic)          | ✅ <br> (Exact arithmetic engine)    |
+# | Math          | Symbolic Integration (1.0)    | ✅ <br> (via SymPy integrate)         | ✅ <br> (via Symbolics.jl)            | ✅ <br> (Integrated CAS)             |
+# | Math          | Symbolic Derivation (1.0)     | ✅ <br> (via SymPy diff)              | ✅ <br> (via Symbolics.jl)            | ✅ <br> (Integrated CAS)             |
+# | Math          | Taylor Expansion (1.0)        | ✅ <br> (via SymPy series)            | ✅ <br> (Native Julia Taylor)         | ✅ <br> (Internal logic)             |
+# | Math          | Equation Solving (1.0)        | ✅ <br> (via SymPy solve)             | ✅ <br> (via NonlinearSolve.jl)       | ✅ <br> (Internal solver)            |
+# | Math          | Forward Auto-Diff (1.0)       | ✅ <br> (via JAX bridge)              | ✅ <br> (ForwardDiff.jl)              | ❌ <br> (Symbolic only)              |
+# | Math          | Reverse Auto-Diff (1.0)       | ✅ <br> (via PyTorch bridge)          | ✅ <br> (Zygote.jl native)            | ❌ <br> (Symbolic only)              |
+# | Math          | ODE Solvers (1.0)             | ✅ <br> (via SciPy solve_ivp)         | ✅ <br> (DifferentialEq.jl)           | ❌ <br> (Manual entry only)          |
+# | Math          | PDE Solvers (1.0)             | ✅ <br> (Python ecosystem)            | ✅ <br> (MethodOfLines.jl)            | ❌ <br> (Manual entry only)          |
+# | Math          | Stochastic DEs (1.0)          | ✅ <br> (Python probability libs)     | ✅ <br> (StochasticDiffEq.jl)         | ❌ <br> (No SDE engine)              |
+# | Math          | Curve Fitting (1.0)           | ✅ <br> (via SciPy curve_fit)         | ✅ <br> (LsqFit.jl native)            | ✅ <br> (Internal fitting command)   |
+# | Math          | Linear Regression (1.0)       | ✅ <br> (via NumPy polyfit)           | ✅ <br> (Native GLM.jl)               | ✅ <br> (Least-squares fitting)      |
+# | Math          | Polynomial Root Find (1.0)    | ✅ <br> (via NumPy roots)             | ✅ <br> (Polynomials.jl)              | ✅ <br> (Internal logic)             |
+# | Math          | Physical Units SI (1.0)       | ✅ <br> (via Pint integration)        | ✅ <br> (Unitful.jl ecosystem)        | ✅ <br> (Exhaustive SI set)          |
+# | Math          | Physical Units Imp (1.0)      | ✅ <br> (via Pint integration)        | ✅ <br> (Unitful.jl ecosystem)        | ✅ <br> (Exhaustive Imperial set)    |
+# | Math          | Unit Conversion (1.0)         | ✅ <br> (Python Standard Lib)         | ✅ <br> (Dispatch-based conversion)   | ✅ <br> (Dedicated logic keys)       |
+# | Math          | Dimensional Analysis (1.0)    | ⚠️ <br> (Requires wrap logic)         | ✅ <br> (Compile-time checking)       | ✅ <br> (Strict Runtime checking)    |
+# | Math          | Financial TVM (1.0)           | ✅ <br> (HP-12C replication)          | ✅ <br> (JuliaFinance suite)          | ✅ <br> (Complete TVM library)       |
+# | Math          | Currency Conversion (1.0)     | ✅ <br> (API-based live sync)         | ✅ <br> (Live Julia exchange rates)   | ✅ <br> (Manual update tables)       |
+# | Math          | Bitwise XOR (1.0)             | ✅ <br> (Python ^ operator)           | ✅ <br> (Julia xor() function)        | ✅ <br> (Lisp bitwise logic)         |
+# | Math          | Bitwise AND (1.0)             | ✅ <br> (Python & operator)           | ✅ <br> (Julia & operator)           | ✅ <br> (Lisp bitwise logic)          |
+# | Math          | Bitwise OR (1.0)              | ✅ <br> (Python \| operator)          | ✅ <br> (Julia \| operator)          | ✅ <br> (Lisp bitwise logic)          |
+# | Math          | Bitwise NOT (1.0)             | ✅ <br> (Python ~ operator)           | ✅ <br> (Julia ~ operator)           | ✅ <br> (Lisp bitwise logic)          |
+# | Math          | Left Shift (1.0)              | ✅ <br> (Python << operator)          | ✅ <br> (Julia << operator)          | ✅ <br> (Lisp bitwise logic)          |
+# | Math          | Right Shift (1.0)             | ✅ <br> (Python >> operator)          | ✅ <br> (Julia >> operator)          | ✅ <br> (Lisp bitwise logic)          |
+# | Math          | Hex Entry 0x (1.0)            | ✅ <br> (Native Python parser)        | ✅ <br> (Native Julia parser)         | ✅ <br> (Dedicated 16# parser)       |
+# | Math          | Bin Entry 0b (1.0)            | ✅ <br> (Native Python parser)        | ✅ <br> (Native Julia parser)         | ✅ <br> (Dedicated 2# parser)        |
+# | Math          | Oct Entry 0o (1.0)            | ✅ <br> (Native Python parser)        | ✅ <br> (Native Julia parser)         | ✅ <br> (Dedicated 8# parser)        |
+# | Quality       | Unit Testing (1.0)            | ✅ <br> (Pytest framework)            | ✅ <br> (Native Test.jl)              | ✅ <br> (ERT framework)              |
+# | Quality       | Branch Coverage (1.0)         | ⚠️ <br> (Partial glue coverage)       | ✅ <br> (High >90% coverage)          | ✅ <br> (Exhaustive coverage)        |
+# | Quality       | Integration Testing (1.0)     | ✅ <br> (Subprocess testing)          | ✅ <br> (Ecosystem testing)           | ✅ <br> (Emacs-wide testing)         |
+# | Quality       | Regression Suites (1.0)       | ✅ <br> (Standard Pytest suites)      | ✅ <br> (Versioned testing)           | ✅ <br> (Decades-old GNU tests)      |
+# | Quality       | Issue Tracking (1.0)          | ✅ <br> (GitHub-based)                | ✅ <br> (GitHub-based)                | ✅ <br> (GNU Devel lists)            |
+# | DevOps        | CI/CD Pipelines (1.0)         | ✅ <br> (GitHub Actions)              | ✅ <br> (GitHub Actions)              | ⚠️ <br> (GNU Hydra integration)      |
+# | DevOps        | Atomic Commits (1.0)          | ✅ <br> (Modern Git history)          | ✅ <br> (Modern Git history)          | ✅ <br> (Strict GNU standards)       |
+# | DevOps        | Semantic Versioning (1.0)     | ✅ <br> (Standard SemVer)             | ✅ <br> (Standard SemVer)             | ✅ <br> (Epoch-based SemVer)         |
+# | DevOps        | Public Changelog (1.0)        | ✅ <br> (GitHub Releases)             | ✅ <br> (News file)                   | ✅ <br> (NEWS file)                  |
+# | DevOps        | Static Analysis (1.0)         | ✅ <br> (Mypy / Flake8)               | ✅ <br> (Julia StaticLint)            | ❌ <br> (Lisp dynamic only)          |
+# | Workflow      | XDG Compliance (1.0)          | ⚠️ <br> (Manual ENV overrides)        | ✅ <br> (Native Julia paths)          | ✅ <br> (Native Emacs paths)         |
+# | Workflow      | CLI Argument Support (1.0)    | ✅ <br> (Argparse integration)        | ⚠️ <br> (Requires main() setup)       | ⚠️ <br> (Requires --eval setup)      |
+# | Workflow      | Notation Switching (1.0)      | ✅ <br> (Python string parsing)       | ✅ <br> (Julia dispatch bridge)       | ✅ <br> (Dedicated notation toggle)  |
+# | Workflow      | Algebraic Entry (1.0)         | ✅ <br> (Interactive parsing)         | ✅ <br> (Standard Julia entry)        | ✅ <br> (Dedicated ' key)            |
+# | Workflow      | Lockfile Support (1.0)        | ✅ <br> (uv.lock / poetry)            | ✅ <br> (Manifest.toml)               | ❌ <br> (Manual elisp pinning)       |
+# | Integrate     | Invoke Emacs Calc (1.0)       | ✅ <br> (Subprocess eval)             | ✅ <br> (Pipeline read eval)          | ✅ <br> (Native call)                |
+# | Integrate     | Network Sockets (1.0)         | ✅ <br> (Native Python Sockets)       | ✅ <br> (Native Julia Sockets)        | ⚠️ <br> (Elisp buffer sockets)       |
+# | Integrate     | Database SQL (1.0)            | ✅ <br> (Standard Python Libs)        | ✅ <br> (Standard Julia Libs)         | ❌ <br> (Manual Lisp needed)         |
+# | Integrate     | HDF5 Reading (1.0)            | ✅ <br> (via h5py)                    | ✅ <br> (HDF5.jl)                     | ❌ <br> (Binary restricted)          |
+# | Integrate     | NetCDF Reading (1.0)          | ✅ <br> (via netcdf4)                 | ✅ <br> (NCDatasets.jl)               | ❌ <br> (Binary restricted)          |
+# | Ecosystem     | Jupyter Integration (1.0)     | ✅ <br> (Standard kernels)            | ✅ <br> (IJulia kernels)              | ❌ <br> (Org-mode only bridge)       |
+# | Ecosystem     | WASM Target (1.0)             | ✅ <br> (via Pyodide)                 | ⚠️ <br> (Experimental Julia)          | ✅ <br> (via Emacs-WASM)             |
+# | Ecosystem     | WebGPU Support (1.0)          | ✅ <br> (via wgpu-py)                 | ⚠️ <br> (Early stage development)     | ❌ <br> (CPU bounded only)           |
+# | Ecosystem     | LaTeX Support (1.0)           | ✅ <br> (SymPy render logic)          | ✅ <br> (Native math output)          | ✅ <br> (Embedded LaTeX mode)        |
+# | Ecosystem     | Typst Support (1.0)           | ✅ <br> (via typst-py bridge)         | ✅ <br> (via Julia Typst)             | ❌ <br> (Latex focused)              |
+# | Ecosystem     | Literate Programming (1.0)    | ✅ <br> (Notebooks/Quarto)            | ✅ <br> (Pluto/Weave)                 | ✅ <br> (Org-mode native)            |
+# | Speed         | Multi-threading (1.0)         | ⚠️ <br> (GIL limitations)             | ✅ <br> (Native thread logic)         | ⚠️ <br> (Cooperative Lisp)           |
+# | Speed         | Parallel Computing (1.0)      | ✅ <br> (Multiprocessing mod)         | ✅ <br> (Distributed.jl)              | ❌ <br> (Single core)                |
+# | Speed         | GPU Offload (1.0)            | ✅ <br> (via PyTorch/JAX)             | ✅ <br> (CUDA.jl/AMDGPU.jl)           | ❌ <br> (Software only)               |
+# | Speed         | Speed Tier (1.0)              | 1 <br> (Interpreted Startup)          | 2 <br> (JIT Compile Overhead)         | 2 <br> (Byte-code execution)         |
+# | SUMMARY       | FINAL SCORE                   | 126.0                                 | 122.0                                 | 121.5                                |
 
 {{- end }}
 
